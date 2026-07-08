@@ -76,7 +76,7 @@ function ProductDetail() {
           What&apos;s inside
         </h2>
         <ul className="space-y-2">
-          {product.features.map((f) => (
+          {product.features.map((f: string) => (
             <li key={f} className="flex items-start gap-3 rounded-xl border border-border bg-background p-3">
               <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                 <Check className="size-3" strokeWidth={3} />
