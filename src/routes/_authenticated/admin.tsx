@@ -474,7 +474,7 @@ function MethodsPanel() {
                   <div className="min-w-0">
                     <p className="text-sm font-bold">{m.label}</p>
                     <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
-                      {PAYMENT_KIND_LABEL[m.kind]} · {(m as { currency?: string }).currency ?? "PKR"}
+                      {PAYMENT_KIND_LABEL[m.kind]} · {m.currency ?? "PKR"}
                     </p>
                   </div>
                   <div className="flex gap-1">
