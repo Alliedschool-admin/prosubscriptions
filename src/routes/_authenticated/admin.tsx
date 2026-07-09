@@ -875,6 +875,20 @@ function OrdersPanel() {
     }
   }
 
+  async function remove(id: string) {
+    if (!confirm("Delete this order? It will be removed from your account totals.")) return;
+    setBusyId(id);
+    try {
+      await deleteOrder(id);
+      toast.success("Order deleted.");
+      invalidate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function viewProof(path: string) {
     try {
       const url = await getProofSignedUrl(path);
@@ -964,6 +978,16 @@ function OrdersPanel() {
                       <XIcon className="size-3.5" /> Reject
                     </button>
                   </>
+                )}
+                {o.status !== "pending" && (
+                  <button
+                    onClick={() => remove(o.id)}
+                    disabled={busyId === o.id}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive disabled:opacity-60"
+                    title="Delete order and remove from account"
+                  >
+                    <Trash2 className="size-3.5" /> Delete
+                  </button>
                 )}
               </div>
             </li>
