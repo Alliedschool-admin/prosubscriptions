@@ -221,6 +221,42 @@
   50%      { opacity: 1;    filter: blur(60px); }
 }
 
+/* Smooth theme + link transitions (respects reduced motion below). */
+html {
+  color-scheme: dark;
+}
+html.light { color-scheme: light; }
+
+body,
+.bg-background,
+.bg-foreground,
+.bg-primary,
+.bg-card,
+.bg-popover,
+.text-foreground,
+.text-muted,
+.border-border {
+  transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+}
+
+/* Visible focus ring in both themes. */
+:where(a, button, [role="button"], input, select, textarea):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Respect user motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  body::before { animation: none !important; }
+}
+
 @utility glass-card {
   background: color-mix(in oklab, var(--card) 70%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
