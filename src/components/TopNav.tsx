@@ -5,7 +5,7 @@ import { useAuth } from "../hooks/use-auth";
 const baseLinks = [
   { to: "/", label: "Discover", icon: Compass },
   { to: "/pricing", label: "Pricing", icon: Sparkles },
-  { to: "/dashboard", label: "Vault", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Library", icon: LayoutDashboard },
 ] as const;
 
 export function TopNav() {
@@ -23,7 +23,7 @@ export function TopNav() {
             <span className="grid size-7 place-items-center rounded-full bg-foreground">
               <span className="size-2 animate-pulse rounded-full bg-primary" />
             </span>
-            <span className="text-lg font-extrabold tracking-tighter">VAULT.01</span>
+            <span className="text-lg font-extrabold tracking-tighter">PRO SUBSCRIPTIONS</span>
           </Link>
           <div className="hidden items-center gap-1 sm:flex">
             {links.map((l) => {

@@ -6,9 +6,9 @@ import { useCart } from "../lib/cart-context";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Vault.01" },
-      { name: "description", content: "Compare Starter, Monthly Pro, and Annual Pro plans. Unlock the entire Vault." },
-      { property: "og:title", content: "Vault.01 Pricing" },
+      { title: "Pricing — Pro Subscriptions" },
+      { name: "description", content: "Compare Starter, Monthly Pro, and Annual Pro plans. Unlock every Pro subscription." },
+      { property: "og:title", content: "Pro Subscriptions Pricing" },
       { property: "og:description", content: "Compare Starter, Monthly Pro, and Annual Pro plans." },
     ],
   }),
@@ -21,7 +21,7 @@ function Pricing() {
     <main className="mx-auto max-w-2xl px-4 pb-32 pt-10">
       <header className="mb-10">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Access · Tiers</p>
-        <h1 className="mt-2 text-4xl font-extrabold leading-none tracking-tight">Vault Access.</h1>
+        <h1 className="mt-2 text-4xl font-extrabold leading-none tracking-tight">Pro Subscriptions.</h1>
         <p className="mt-3 max-w-md text-sm text-muted">
           Pay once for a single tool, or unlock the entire library with Pro. Cancel anytime.
         </p>

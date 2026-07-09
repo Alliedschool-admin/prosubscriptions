@@ -167,7 +167,7 @@ export function CheckoutSheet() {
                 onClick={close}
                 className="mt-4 w-full max-w-xs rounded-xl bg-foreground py-3 text-sm font-bold text-background"
               >
-                Back to Vault
+                Back to store
               </button>
             </div>
           ) : !user ? (

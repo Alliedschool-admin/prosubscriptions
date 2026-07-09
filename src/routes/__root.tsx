@@ -82,10 +82,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Vault.01 — Premium digital tools & Pro subscriptions" },
+      { title: "Pro Subscriptions — Premium digital tools & Pro subscriptions" },
       { name: "description", content: "A curated vault of professional-grade presets, UI kits, AI tools and dev templates. Buy once or unlock everything with Pro." },
-      { name: "author", content: "Vault.01" },
-      { property: "og:title", content: "Vault.01 — Premium digital tools" },
+      { name: "author", content: "Pro Subscriptions" },
+      { property: "og:title", content: "Pro Subscriptions — Premium digital tools" },
       { property: "og:description", content: "Curated presets, UI kits, AI tools and dev templates. Buy once or go Pro." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
