@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { setActiveLanguage } from "./dom-translate";
 
 export type Lang = "en" | "ar" | "ur";
 
@@ -117,6 +118,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     const dir = LANG_META[lang].dir;
     document.documentElement.setAttribute("lang", lang);
     document.documentElement.setAttribute("dir", dir);
+    setActiveLanguage(lang);
   }, [lang]);
 
   const value = useMemo<Ctx>(
