@@ -66,6 +66,7 @@ import {
   useStockInvalidator,
 } from "../../lib/stock-store";
 import { useAuth } from "../../hooks/use-auth";
+import { useI18n } from "../../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImageInput } from "@/components/ImageInput";
@@ -82,6 +83,45 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 type Tab = "products" | "methods" | "orders" | "accounts" | "requests" | "admins" | "users" | "posts";
+
+function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
+  const { t } = useI18n();
+  const items = [
+    { id: "products" as const, label: t("tab.products"), icon: Package },
+    { id: "methods" as const, label: t("tab.methods"), icon: Wallet },
+    { id: "orders" as const, label: t("tab.orders"), icon: Inbox },
+    { id: "accounts" as const, label: t("tab.accounts"), icon: BarChart3 },
+    { id: "requests" as const, label: t("tab.requests"), icon: MessageSquare },
+    { id: "admins" as const, label: t("tab.admins"), icon: Users },
+    { id: "users" as const, label: t("tab.users"), icon: Contact },
+    { id: "posts" as const, label: t("tab.posts"), icon: Megaphone },
+  ];
+  return (
+    <nav
+      className="no-scrollbar mb-6 -mx-1 flex gap-1 overflow-x-auto rounded-xl border border-border bg-background/70 p-1 backdrop-blur sm:grid sm:grid-cols-4 sm:overflow-visible lg:grid-cols-8"
+      aria-label="Admin sections"
+    >
+      {items.map(({ id, label, icon: Icon }) => {
+        const active = tab === id;
+        return (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            aria-current={active ? "page" : undefined}
+            className={`inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-bold uppercase tracking-widest transition sm:w-full sm:text-xs ${
+              active
+                ? "bg-foreground text-background shadow-sm"
+                : "text-muted hover:bg-foreground/5 hover:text-foreground"
+            }`}
+          >
+            <Icon className="size-3.5 shrink-0" />
+            <span>{label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
 
 function Admin() {
   const { user, isAdmin, refresh, signOut } = useAuth();
@@ -151,30 +191,7 @@ function Admin() {
 
       <VisitorStats />
 
-      <nav className="mb-6 flex gap-1 rounded-xl border border-border bg-background p-1">
-        {(
-          [
-            { id: "products", label: "Products", icon: Package },
-            { id: "methods", label: "Payment", icon: Wallet },
-            { id: "orders", label: "Orders", icon: Inbox },
-            { id: "accounts", label: "Accounts", icon: BarChart3 },
-            { id: "requests", label: "Requests", icon: MessageSquare },
-            { id: "admins", label: "Admins", icon: Users },
-            { id: "users", label: "Users", icon: Contact },
-            { id: "posts", label: "Posts", icon: Megaphone },
-          ] as const
-        ).map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-widest transition ${
-              tab === id ? "bg-foreground text-background" : "text-muted hover:text-foreground"
-            }`}
-          >
-            <Icon className="size-3.5" /> {label}
-          </button>
-        ))}
-      </nav>
+      <AdminTabs tab={tab} setTab={setTab} />
 
       {tab === "products" && <ProductsPanel />}
       {tab === "methods" && <MethodsPanel />}

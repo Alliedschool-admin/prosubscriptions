@@ -17,6 +17,8 @@ import { AuthProvider } from "../hooks/use-auth";
 import { CheckoutSheet } from "../components/CheckoutSheet";
 import { Toaster } from "../components/ui/sonner";
 import { VisitorTracker } from "../components/VisitorTracker";
+import { I18nProvider } from "../lib/i18n";
+import { ThemeProvider } from "../lib/theme";
 
 function NotFoundComponent() {
   return (
@@ -130,17 +132,21 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          <div className="min-h-screen bg-background text-foreground antialiased">
-            <TopNav />
-            <Outlet />
-          </div>
-          <CheckoutSheet />
-          <Toaster />
-          <VisitorTracker />
-        </CartProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <I18nProvider>
+          <AuthProvider>
+            <CartProvider>
+              <div className="min-h-screen bg-background text-foreground antialiased">
+                <TopNav />
+                <Outlet />
+              </div>
+              <CheckoutSheet />
+              <Toaster />
+              <VisitorTracker />
+            </CartProvider>
+          </AuthProvider>
+        </I18nProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
