@@ -43,7 +43,6 @@ import {
   deleteStockItem,
   useStockInvalidator,
 } from "../../lib/stock-store";
-import { useState as useStockPickerState } from "react";
 import { useAuth } from "../../hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -343,7 +342,7 @@ function ProductRow({
   product: import("../../lib/mock-data").Product;
   onDelete: (id: string, label: string) => void;
 }) {
-  const [open, setOpen] = useStockPickerState(false);
+  const [open, setOpen] = useState(false);
   const stock = product.available_stock ?? 0;
   return (
     <li className="rounded-xl border border-border bg-background p-3">
