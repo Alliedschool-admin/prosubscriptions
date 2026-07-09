@@ -171,6 +171,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          image: string | null
           link: string | null
           pinned: boolean
           published: boolean
@@ -183,6 +184,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          image?: string | null
           link?: string | null
           pinned?: boolean
           published?: boolean
@@ -195,6 +197,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          image?: string | null
           link?: string | null
           pinned?: boolean
           published?: boolean
