@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /reset-password
+
+Sitemap: https://prosubscriptions.lovable.app/sitemap.xml
