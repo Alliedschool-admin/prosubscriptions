@@ -1437,6 +1437,7 @@ function AdminsPanel() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [busyInvite, setBusyInvite] = useState<string | null>(null);
 
   const { data: admins = [], isLoading } = useQuery({
     queryKey: ["admins"],
@@ -1444,6 +1445,19 @@ function AdminsPanel() {
       const { data, error } = await supabase.rpc("list_admins");
       if (error) throw error;
       return (data ?? []) as AdminRow[];
+    },
+  });
+
+  const { data: invites = [] } = useQuery({
+    queryKey: ["admin-invites"],
+    queryFn: async () => {
+      const { data, error } = await (
+        supabase.rpc as unknown as (
+          fn: string,
+        ) => Promise<{ data: { email: string; created_at: string; invited_by_email: string | null }[] | null; error: { message: string } | null }>
+      )("list_admin_invites");
+      if (error) throw new Error(error.message);
+      return data ?? [];
     },
   });
 
@@ -1456,22 +1470,48 @@ function AdminsPanel() {
     }
     setBusy(true);
     try {
-      const { data, error } = await supabase.rpc("grant_admin_by_email", {
-        _email: value,
-      });
+      const { data, error } = await (
+        supabase.rpc as unknown as (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: { email: string; granted: boolean; invited: boolean }[] | null; error: { message: string } | null }>
+      )("invite_admin_by_email", { _email: value });
       if (error) throw error;
       const row = Array.isArray(data) ? data[0] : data;
-      if (row?.granted === false) {
-        toast(`${row.email} is already an admin.`);
+      if (row?.invited) {
+        toast.success(`Invite sent to ${row.email}. They become admin on sign up.`);
+      } else if (row?.granted) {
+        toast.success(`${row.email} is now an admin.`);
       } else {
-        toast.success(`${row?.email ?? value} is now an admin.`);
+        toast(`${row?.email ?? value} is already an admin.`);
       }
       setEmail("");
       qc.invalidateQueries({ queryKey: ["admins"] });
+      qc.invalidateQueries({ queryKey: ["admin-invites"] });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to grant admin");
+      toast.error(err instanceof Error ? err.message : "Failed to invite admin");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function revokeInvite(inviteEmail: string) {
+    if (!confirm(`Cancel admin invite for ${inviteEmail}?`)) return;
+    setBusyInvite(inviteEmail);
+    try {
+      const { error } = await (
+        supabase.rpc as unknown as (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ error: { message: string } | null }>
+      )("revoke_admin_invite", { _email: inviteEmail });
+      if (error) throw new Error(error.message);
+      toast.success("Invite cancelled");
+      qc.invalidateQueries({ queryKey: ["admin-invites"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to cancel invite");
+    } finally {
+      setBusyInvite(null);
     }
   }
 
@@ -1497,12 +1537,13 @@ function AdminsPanel() {
         className="space-y-3 rounded-2xl border border-border bg-background p-5"
       >
         <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
-          Grant admin access
+          Invite admin
         </p>
-        <h2 className="text-2xl font-extrabold tracking-tight">ADD ADMIN</h2>
+        <h2 className="text-2xl font-extrabold tracking-tight">INVITE ADMIN</h2>
         <p className="text-xs text-muted">
-          The person must already have a customer account. Enter the exact email they signed up
-          with.
+          Enter any email. If they already have an account, they become admin instantly.
+          Otherwise the invite waits and auto-grants admin the moment they sign up with that
+          email.
         </p>
         <Field label="Email">
           <input
@@ -1521,10 +1562,39 @@ function AdminsPanel() {
             disabled={busy}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
           >
-            <UserPlus className="size-4" /> {busy ? "Granting…" : "Make admin"}
+            <UserPlus className="size-4" /> {busy ? "Sending…" : "Invite"}
           </button>
         </div>
       </form>
+
+      {invites.length > 0 && (
+        <section className="mt-8">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Pending</p>
+          <h3 className="text-2xl font-extrabold tracking-tight">INVITES</h3>
+          <ul className="mt-4 space-y-2">
+            {invites.map((inv) => (
+              <li
+                key={inv.email}
+                className="flex items-center justify-between gap-2 rounded-xl border border-dashed border-border bg-background p-3"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold">{inv.email}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                    Awaiting sign up · {new Date(inv.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => revokeInvite(inv.email)}
+                  disabled={busyInvite === inv.email}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive disabled:opacity-40"
+                >
+                  <XIcon className="size-3.5" /> Cancel
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="mt-8">
         <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Current</p>
