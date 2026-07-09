@@ -29,6 +29,7 @@ export type Database = {
           payment_method_id: string | null
           payment_method_label: string | null
           proof_path: string | null
+          quantity: number
           reviewed_at: string | null
           reviewed_by: string | null
           sender_contact: string
@@ -52,6 +53,7 @@ export type Database = {
           payment_method_id?: string | null
           payment_method_label?: string | null
           proof_path?: string | null
+          quantity?: number
           reviewed_at?: string | null
           reviewed_by?: string | null
           sender_contact: string
@@ -75,6 +77,7 @@ export type Database = {
           payment_method_id?: string | null
           payment_method_label?: string | null
           proof_path?: string | null
+          quantity?: number
           reviewed_at?: string | null
           reviewed_by?: string | null
           sender_contact?: string

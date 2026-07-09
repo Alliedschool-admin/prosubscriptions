@@ -8,6 +8,7 @@ export type CartItem = {
   price_usd?: number | null;
   price_pkr?: number | null;
   cadence?: string;
+  available_stock?: number;
 };
 
 type CartCtx = {

@@ -105,7 +105,12 @@ function OrderCard({ order: o }: { order: Order }) {
     <li className="rounded-xl border border-border bg-background p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold">{o.item_name}</p>
+          <p className="truncate text-sm font-bold">
+            {o.item_name}
+            {o.quantity && o.quantity > 1 ? (
+              <span className="ml-1 font-mono text-xs text-muted">× {o.quantity}</span>
+            ) : null}
+          </p>
           <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
             VLT-{o.id.slice(0, 6).toUpperCase()} · {new Date(o.created_at).toLocaleString()}
           </p>
