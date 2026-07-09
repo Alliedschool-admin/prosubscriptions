@@ -31,6 +31,7 @@ type ProductRow = {
   delivery_instructions?: string | null;
   cost_usd?: number | string | null;
   cost_pkr?: number | string | null;
+  is_free?: boolean | null;
 };
 
 function rowToProduct(r: ProductRow): Product {
@@ -54,6 +55,7 @@ function rowToProduct(r: ProductRow): Product {
     delivery_instructions: r.delivery_instructions ?? null,
     cost_usd: costUsd,
     cost_pkr: costPkr,
+    is_free: !!r.is_free,
   };
 }
 
@@ -62,7 +64,7 @@ export const PRODUCTS_QUERY_KEY = ["products"] as const;
 async function fetchProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr")
+    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr, is_free")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data as ProductRow[]).map(rowToProduct);
@@ -102,7 +104,8 @@ function slugify(s: string) {
 export async function createProduct(input: NewProductInput): Promise<Product> {
   const id = (input.id?.trim() || slugify(input.name) || `vlt-${Date.now()}`).slice(0, 60);
   const { data: userData } = await supabase.auth.getUser();
-  const priceLegacy = input.price ?? input.price_usd ?? input.price_pkr ?? 0;
+  const isFree = !!input.is_free;
+  const priceLegacy = isFree ? 0 : (input.price ?? input.price_usd ?? input.price_pkr ?? 0);
   const { data, error } = await supabase
     .from("products")
     .insert({
@@ -112,17 +115,18 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
       tagline: input.tagline,
       description: input.description,
       price: priceLegacy,
-      price_usd: input.price_usd ?? null,
-      price_pkr: input.price_pkr ?? null,
+      price_usd: isFree ? 0 : (input.price_usd ?? null),
+      price_pkr: isFree ? 0 : (input.price_pkr ?? null),
       cost_usd: input.cost_usd ?? null,
       cost_pkr: input.cost_pkr ?? null,
       category: input.category,
       image: input.image || "",
       features: input.features,
       delivery_instructions: input.delivery_instructions ?? null,
+      is_free: isFree,
       created_by: userData.user?.id ?? null,
     })
-    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr")
+    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr, is_free")
     .single();
   if (error) throw error;
   return rowToProduct(data as ProductRow);
@@ -155,10 +159,11 @@ export async function updateProduct(
         delivery_instructions: patch.delivery_instructions,
       }),
       ...(patch.price !== undefined && { price: patch.price }),
+      ...(patch.is_free !== undefined && { is_free: patch.is_free }),
     })
     .eq("id", id)
     .select(
-      "id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr",
+      "id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr, is_free",
     )
     .single();
   if (error) throw error;
