@@ -1,10 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Compass, LayoutDashboard, Sparkles, ShieldCheck, LogIn, LogOut } from "lucide-react";
+import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
 
 const baseLinks = [
   { to: "/", label: "Discover", icon: Compass },
-  { to: "/pricing", label: "Pricing", icon: Sparkles },
   { to: "/dashboard", label: "Library", icon: LayoutDashboard },
 ] as const;
 
