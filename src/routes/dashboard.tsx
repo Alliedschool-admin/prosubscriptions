@@ -6,9 +6,9 @@ import { getProduct, mockLibrary, mockUser, plans } from "../lib/mock-data";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Your Vault — Vault.01" },
+      { title: "Your Library — Pro Subscriptions" },
       { name: "description", content: "Your library of purchased tools and active subscription." },
-      { property: "og:title", content: "Your Vault" },
+      { property: "og:title", content: "Your Library" },
       { property: "og:description", content: "Your library of purchased tools and active subscription." },
       { name: "robots", content: "noindex" },
     ],

@@ -153,7 +153,7 @@ export const plans: Plan[] = [
 ];
 
 export const promoCodes: Record<string, { label: string; kind: "percent" | "flat"; value: number }> = {
-  VAULT10: { label: "VAULT10 · 10% off", kind: "percent", value: 10 },
+  PRO10: { label: "PRO10 · 10% off", kind: "percent", value: 10 },
   LAUNCH25: { label: "LAUNCH25 · 25% off", kind: "percent", value: 25 },
   PRO50: { label: "PRO50 · $50 off", kind: "flat", value: 50 },
 };

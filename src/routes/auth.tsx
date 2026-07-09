@@ -15,8 +15,8 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "Sign in — Vault.01" },
-      { name: "description", content: "Sign in to Vault.01 to manage your library and admin console." },
+      { title: "Sign in — Pro Subscriptions" },
+      { name: "description", content: "Sign in to Pro Subscriptions to manage your library and admin console." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -81,7 +81,7 @@ function AuthPage() {
       <div className="w-full">
         <div className="mb-8 text-center">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-            Secure · Vault.01
+            Secure · Pro Subscriptions
           </p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight">
             {mode === "signin" ? "Sign in" : "Create account"}

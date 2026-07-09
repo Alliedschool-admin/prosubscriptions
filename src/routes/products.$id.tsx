@@ -8,9 +8,9 @@ export const Route = createFileRoute("/products/$id")({
   head: ({ params }) => {
     const product = getSeedProduct(params.id);
     if (!product) {
-      return { meta: [{ title: "Product · Vault.01" }] };
+      return { meta: [{ title: "Product · Pro Subscriptions" }] };
     }
-    const title = `${product.name} — Vault.01`;
+    const title = `${product.name} — Pro Subscriptions`;
     return {
       meta: [
         { title },
@@ -49,7 +49,7 @@ function ProductDetail() {
           to="/"
           className="mt-6 inline-flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-primary"
         >
-          <ChevronLeft className="size-3" /> Back to Vault
+          <ChevronLeft className="size-3" /> Back to store
         </Link>
       </main>
     );
@@ -63,7 +63,7 @@ function ProductDetail() {
         to="/"
         className="mb-4 inline-flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-muted"
       >
-        <ChevronLeft className="size-3" /> Back to Vault
+        <ChevronLeft className="size-3" /> Back to store
       </Link>
 
       <div className="overflow-hidden rounded-2xl border border-border bg-neutral-200">

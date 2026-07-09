@@ -43,7 +43,7 @@ import { useQueryClient } from "@tanstack/react-query";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Admin · Vault.01" },
+      { title: "Admin · Pro Subscriptions" },
       { name: "description", content: "Manage products, payment methods and order verifications." },
       { name: "robots", content: "noindex" },
     ],
@@ -113,7 +113,7 @@ function Admin() {
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
           Admin Console · Restricted
         </p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Vault control</h1>
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Admin control</h1>
         <p className="mt-2 text-sm text-muted">
           Signed in as <span className="font-mono">{user?.email}</span>.
         </p>
