@@ -124,3 +124,33 @@ export async function deleteProduct(id: string): Promise<void> {
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) throw error;
 }
+
+export async function updateProduct(
+  id: string,
+  patch: Partial<Omit<NewProductInput, "id">>,
+): Promise<Product> {
+  const { data, error } = await supabase
+    .from("products")
+    .update({
+      ...(patch.code !== undefined && { code: patch.code }),
+      ...(patch.name !== undefined && { name: patch.name }),
+      ...(patch.tagline !== undefined && { tagline: patch.tagline }),
+      ...(patch.description !== undefined && { description: patch.description }),
+      ...(patch.category !== undefined && { category: patch.category }),
+      ...(patch.image !== undefined && { image: patch.image }),
+      ...(patch.features !== undefined && { features: patch.features }),
+      ...(patch.price_usd !== undefined && { price_usd: patch.price_usd }),
+      ...(patch.price_pkr !== undefined && { price_pkr: patch.price_pkr }),
+      ...(patch.delivery_instructions !== undefined && {
+        delivery_instructions: patch.delivery_instructions,
+      }),
+      ...(patch.price !== undefined && { price: patch.price }),
+    })
+    .eq("id", id)
+    .select(
+      "id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions",
+    )
+    .single();
+  if (error) throw error;
+  return rowToProduct(data as ProductRow);
+}
