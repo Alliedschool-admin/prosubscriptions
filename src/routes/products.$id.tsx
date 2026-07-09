@@ -3,6 +3,7 @@ import { ChevronLeft, Check, Download } from "lucide-react";
 import { getProduct as getSeedProduct } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
 import { useCart } from "../lib/cart-context";
+import { availableCurrencies, formatMoney, productPrice } from "../lib/price";
 
 export const Route = createFileRoute("/products/$id")({
   head: ({ params }) => {
@@ -30,6 +31,9 @@ function ProductDetail() {
   const { getProduct, products, loading } = useProducts();
   const { openWith } = useCart();
   const product = getProduct(id);
+  const currencies = product ? availableCurrencies(product) : [];
+  const usd = product ? productPrice(product, "USD") : null;
+  const pkr = product ? productPrice(product, "PKR") : null;
 
   if (loading && !product) {
     return (
@@ -84,9 +88,13 @@ function ProductDetail() {
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{product.name}</h1>
           <p className="mt-1 text-sm text-muted">{product.tagline}</p>
         </div>
-        <span className="shrink-0 rounded-md bg-foreground px-3 py-1.5 font-mono text-sm font-bold text-background">
-          ${product.price}
-        </span>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          {currencies.map((c) => (
+            <span key={c} className="rounded-md bg-foreground px-3 py-1.5 font-mono text-sm font-bold text-background">
+              {formatMoney(c, productPrice(product, c) ?? Number(product.price))}
+            </span>
+          ))}
+        </div>
       </div>
 
       <p className="mt-6 text-pretty text-[15px] leading-relaxed text-foreground/80">
@@ -149,7 +157,11 @@ function ProductDetail() {
               <img src={r.image} alt={r.name} loading="lazy" className="aspect-square w-full object-cover" />
               <div className="p-3">
                 <p className="truncate text-xs font-bold">{r.name}</p>
-                <p className="font-mono text-[10px] text-muted">${r.price}</p>
+                <p className="font-mono text-[10px] text-muted">
+                  {availableCurrencies(r)
+                    .map((c) => formatMoney(c, productPrice(r, c) ?? Number(r.price)))
+                    .join(" · ")}
+                </p>
               </div>
             </Link>
           ))}
@@ -160,8 +172,12 @@ function ProductDetail() {
       <div className="fixed inset-x-0 bottom-[68px] z-30 border-t border-border bg-background/90 p-4 backdrop-blur-xl sm:bottom-0">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
           <div className="leading-none">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Total</span>
-            <div className="text-xl font-extrabold">${product.price.toFixed(2)}</div>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">From</span>
+            <div className="text-xl font-extrabold">
+              {currencies
+                .map((c) => formatMoney(c, productPrice(product, c) ?? Number(product.price)))
+                .join(" · ") || "—"}
+            </div>
           </div>
           <button
             onClick={() =>
@@ -170,7 +186,8 @@ function ProductDetail() {
                 id: product.id,
                 name: product.name,
                 subtitle: `${product.category} · ${product.code}`,
-                price: product.price,
+                price_usd: usd,
+                price_pkr: pkr,
               })
             }
             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20"

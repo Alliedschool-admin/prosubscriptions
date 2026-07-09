@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import type { Product } from "../lib/mock-data";
+import { formatPriceTags } from "../lib/price";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
+  const tags = formatPriceTags(product);
   return (
     <Link
       to="/products/$id"
@@ -27,9 +29,13 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           <h3 className="mt-1 truncate text-base font-extrabold tracking-tight">{product.name}</h3>
           <p className="mt-0.5 truncate text-sm text-muted">{product.tagline}</p>
         </div>
-        <span className="shrink-0 rounded-md bg-foreground px-2 py-1 font-mono text-xs font-bold text-background">
-          ${product.price}
-        </span>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          {tags.map((t) => (
+            <span key={t} className="rounded-md bg-foreground px-2 py-1 font-mono text-xs font-bold text-background">
+              {t}
+            </span>
+          ))}
+        </div>
       </div>
     </Link>
   );
