@@ -98,7 +98,7 @@ function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   ];
   return (
     <nav
-      className="no-scrollbar scroll-fade-x sm:mask-none mb-6 -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto scroll-smooth rounded-xl border border-border bg-background/70 p-1 backdrop-blur sm:grid sm:snap-none sm:grid-cols-4 sm:overflow-visible lg:grid-cols-8"
+      className="no-scrollbar mb-6 -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto scroll-smooth rounded-xl border border-border bg-background/70 p-1 backdrop-blur [mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)] sm:grid sm:snap-none sm:grid-cols-4 sm:overflow-visible sm:[mask-image:none] lg:grid-cols-8"
       aria-label="Admin sections"
       role="tablist"
     >
