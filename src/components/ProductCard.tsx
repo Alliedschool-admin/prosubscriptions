@@ -3,9 +3,10 @@ import type { Product } from "../lib/mock-data";
 import { formatPriceTags } from "../lib/price";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
-  const tags = formatPriceTags(product);
+  const isFree = !!product.is_free;
+  const tags = isFree ? ["FREE"] : formatPriceTags(product);
   const stock = product.available_stock ?? 0;
-  const outOfStock = stock === 0;
+  const outOfStock = !isFree && stock === 0;
   return (
     <Link
       to="/products/$id"
@@ -26,14 +27,18 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         />
         <span
           className={`absolute left-2 top-2 rounded-full px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest ${
-            outOfStock
+            isFree
+              ? "bg-emerald-500 text-white"
+              : outOfStock
               ? "bg-foreground text-background"
               : stock <= 3
                 ? "bg-primary text-primary-foreground"
                 : "bg-background/90 text-foreground"
           }`}
         >
-          {outOfStock
+          {isFree
+            ? "FREE · unlimited"
+            : outOfStock
             ? "Restocking soon"
             : stock <= 3
               ? `Only ${stock} left`

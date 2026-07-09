@@ -21,6 +21,7 @@ export type Product = {
   delivery_instructions?: string | null;
   cost_usd?: number | null;
   cost_pkr?: number | null;
+  is_free?: boolean;
 };
 
 export const products: Product[] = [

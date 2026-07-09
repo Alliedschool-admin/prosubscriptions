@@ -313,6 +313,7 @@ export type Database = {
           features: Json
           id: string
           image: string
+          is_free: boolean
           name: string
           price: number
           price_pkr: number | null
@@ -333,6 +334,7 @@ export type Database = {
           features?: Json
           id: string
           image: string
+          is_free?: boolean
           name: string
           price: number
           price_pkr?: number | null
@@ -353,6 +355,7 @@ export type Database = {
           features?: Json
           id?: string
           image?: string
+          is_free?: boolean
           name?: string
           price?: number
           price_pkr?: number | null
@@ -397,6 +400,13 @@ export type Database = {
         }[]
       }
       claim_first_admin: { Args: never; Returns: boolean }
+      claim_free_product: {
+        Args: { _product_id: string }
+        Returns: {
+          already_owned: boolean
+          order_id: string
+        }[]
+      }
       grant_admin_by_email: {
         Args: { _email: string }
         Returns: {
@@ -433,6 +443,7 @@ export type Database = {
         Returns: {
           email: string
           granted_at: string
+          is_super: boolean
           user_id: string
         }[]
       }
@@ -451,6 +462,13 @@ export type Database = {
           user_id: string
         }[]
       }
+      product_purchase_counts: {
+        Args: never
+        Returns: {
+          product_id: string
+          purchase_count: number
+        }[]
+      }
       refresh_product_stock_count: {
         Args: { _product_id: string }
         Returns: undefined
@@ -459,7 +477,7 @@ export type Database = {
       revoke_admin_invite: { Args: { _email: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "super_admin"
       order_status: "pending" | "approved" | "rejected"
       payment_method_kind:
         | "jazzcash"
@@ -605,7 +623,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "super_admin"],
       order_status: ["pending", "approved", "rejected"],
       payment_method_kind: [
         "jazzcash",

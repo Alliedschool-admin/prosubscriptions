@@ -213,9 +213,25 @@ function ProductsPanel() {
   const { products, refetch } = useProducts();
   const qc = useQueryClient();
 
+  const { data: purchaseCounts = [] } = useQuery({
+    queryKey: ["product-purchase-counts"],
+    queryFn: async () => {
+      const { data, error } = await (
+        supabase.rpc as unknown as (fn: string) => Promise<{
+          data: { product_id: string; purchase_count: number }[] | null;
+          error: { message: string } | null;
+        }>
+      )("product_purchase_counts");
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+  const countByProduct = new Map(purchaseCounts.map((r) => [r.product_id, Number(r.purchase_count)]));
+
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [category, setCategory] = useState<Category>(CAT_OPTIONS[0]);
+  const [isFree, setIsFree] = useState(false);
   const [priceUsd, setPriceUsd] = useState("");
   const [pricePkr, setPricePkr] = useState("");
   const [costUsd, setCostUsd] = useState("");
@@ -231,6 +247,7 @@ function ProductsPanel() {
     setName("");
     setCode("");
     setCategory(CAT_OPTIONS[0]);
+    setIsFree(false);
     setPriceUsd("");
     setPricePkr("");
     setCostUsd("");
@@ -248,21 +265,23 @@ function ProductsPanel() {
       toast.error("Name, tagline and description are required.");
       return;
     }
-    const usdNum = priceUsd.trim() === "" ? null : Number(priceUsd);
-    const pkrNum = pricePkr.trim() === "" ? null : Number(pricePkr);
+    const usdNum = isFree ? 0 : (priceUsd.trim() === "" ? null : Number(priceUsd));
+    const pkrNum = isFree ? 0 : (pricePkr.trim() === "" ? null : Number(pricePkr));
     const costUsdNum = costUsd.trim() === "" ? null : Number(costUsd);
     const costPkrNum = costPkr.trim() === "" ? null : Number(costPkr);
-    if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
-      toast.error("Enter a valid USD price.");
-      return;
-    }
-    if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
-      toast.error("Enter a valid PKR price.");
-      return;
-    }
-    if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
-      toast.error("Set at least one price (USD or PKR).");
-      return;
+    if (!isFree) {
+      if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
+        toast.error("Enter a valid USD price.");
+        return;
+      }
+      if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
+        toast.error("Enter a valid PKR price.");
+        return;
+      }
+      if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
+        toast.error("Set at least one price (USD or PKR), or mark it Free.");
+        return;
+      }
     }
     const featureList = features
       .split("\n")
@@ -275,6 +294,7 @@ function ProductsPanel() {
         name: name.trim(),
         code: code.trim() || `VLT-${String(Math.floor(Math.random() * 900) + 100)}`,
         category,
+        is_free: isFree,
         price_usd: usdNum,
         price_pkr: pkrNum,
         cost_usd: costUsdNum,
@@ -324,12 +344,16 @@ function ProductsPanel() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Price (USD)" hint="Leave blank if USD not offered.">
-            <input type="number" min="0" step="0.01" value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder="29" className="input font-mono" />
+            <input type="number" min="0" step="0.01" disabled={isFree} value={isFree ? "" : priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder={isFree ? "Free" : "29"} className="input font-mono disabled:opacity-50" />
           </Field>
           <Field label="Price (PKR)" hint="Leave blank if PKR not offered.">
-            <input type="number" min="0" step="1" value={pricePkr} onChange={(e) => setPricePkr(e.target.value)} placeholder="7999" className="input font-mono" />
+            <input type="number" min="0" step="1" disabled={isFree} value={isFree ? "" : pricePkr} onChange={(e) => setPricePkr(e.target.value)} placeholder={isFree ? "Free" : "7999"} className="input font-mono disabled:opacity-50" />
           </Field>
         </div>
+        <label className="flex items-center gap-2 rounded-lg border border-border bg-foreground/[0.03] px-3 py-2 text-xs font-bold uppercase tracking-widest text-foreground">
+          <input type="checkbox" checked={isFree} onChange={(e) => setIsFree(e.target.checked)} className="size-4 accent-emerald-500" />
+          Free product · buyers claim instantly with no approval or checkout
+        </label>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Cost (USD)" hint="Your purchase price. Used for profit tracking.">
             <input type="number" min="0" step="0.01" value={costUsd} onChange={(e) => setCostUsd(e.target.value)} placeholder="12" className="input font-mono" />
@@ -387,7 +411,7 @@ function ProductsPanel() {
         ) : (
           <ul className="space-y-3">
             {products.map((p) => (
-              <ProductRow key={p.id} product={p} onDelete={onDelete} />
+              <ProductRow key={p.id} product={p} onDelete={onDelete} purchaseCount={countByProduct.get(p.id) ?? 0} />
             ))}
           </ul>
         )}
@@ -399,26 +423,33 @@ function ProductsPanel() {
 function ProductRow({
   product,
   onDelete,
+  purchaseCount,
 }: {
   product: import("../../lib/mock-data").Product;
   onDelete: (id: string, label: string) => void;
+  purchaseCount: number;
 }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const stock = product.available_stock ?? 0;
+  const isFree = !!product.is_free;
   return (
     <li className="rounded-xl border border-border bg-background p-3">
       <div className="flex items-center gap-3">
         <img src={product.image} alt={product.name} loading="lazy" className="size-12 shrink-0 rounded-lg object-cover" />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold">{product.name}</p>
+          <p className="truncate text-sm font-bold">
+            {product.name}
+            {isFree && <span className="ml-2 rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-600">FREE</span>}
+          </p>
           <p className="truncate font-mono text-[10px] uppercase tracking-widest text-muted">
             {product.code} · {product.category}
-            {product.price_usd != null ? ` · $${Number(product.price_usd)}` : ""}
-            {product.price_pkr != null ? ` · Rs ${Number(product.price_pkr).toLocaleString("en-PK")}` : ""}
+            {!isFree && product.price_usd != null && product.price_usd > 0 ? ` · $${Number(product.price_usd)}` : ""}
+            {!isFree && product.price_pkr != null && product.price_pkr > 0 ? ` · Rs ${Number(product.price_pkr).toLocaleString("en-PK")}` : ""}
+            {` · ${purchaseCount} sold`}
           </p>
         </div>
-        <span
+        {!isFree && (<span
           className={`shrink-0 rounded-full px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest ${
             stock === 0
               ? "bg-destructive/15 text-destructive"
@@ -429,7 +460,7 @@ function ProductRow({
           title="Available stock links"
         >
           {stock} stock
-        </span>
+        </span>)}
         <button
           onClick={() => setEditing((v) => !v)}
           className={`rounded-lg p-2 ${editing ? "bg-primary text-primary-foreground" : "bg-foreground/5 text-muted hover:text-foreground"}`}
@@ -468,6 +499,7 @@ function EditProductForm({
   const [name, setName] = useState(product.name);
   const [code, setCode] = useState(product.code);
   const [category, setCategory] = useState<Category>(product.category);
+  const [isFree, setIsFree] = useState(!!product.is_free);
   const [priceUsd, setPriceUsd] = useState(product.price_usd == null ? "" : String(product.price_usd));
   const [pricePkr, setPricePkr] = useState(product.price_pkr == null ? "" : String(product.price_pkr));
   const [costUsd, setCostUsd] = useState(product.cost_usd == null ? "" : String(product.cost_usd));
@@ -485,19 +517,21 @@ function EditProductForm({
       toast.error("Name, tagline and description are required.");
       return;
     }
-    const usdNum = priceUsd.trim() === "" ? null : Number(priceUsd);
-    const pkrNum = pricePkr.trim() === "" ? null : Number(pricePkr);
-    if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
-      toast.error("Enter a valid USD price.");
-      return;
-    }
-    if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
-      toast.error("Enter a valid PKR price.");
-      return;
-    }
-    if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
-      toast.error("Set at least one price (USD or PKR).");
-      return;
+    const usdNum = isFree ? 0 : (priceUsd.trim() === "" ? null : Number(priceUsd));
+    const pkrNum = isFree ? 0 : (pricePkr.trim() === "" ? null : Number(pricePkr));
+    if (!isFree) {
+      if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
+        toast.error("Enter a valid USD price.");
+        return;
+      }
+      if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
+        toast.error("Enter a valid PKR price.");
+        return;
+      }
+      if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
+        toast.error("Set at least one price (USD or PKR), or mark it Free.");
+        return;
+      }
     }
     const featureList = features.split("\n").map((f) => f.trim()).filter(Boolean);
 
@@ -507,6 +541,7 @@ function EditProductForm({
         name: name.trim(),
         code: code.trim(),
         category,
+        is_free: isFree,
         tagline: tagline.trim(),
         description: description.trim(),
         image: image.trim() || product.image,
@@ -548,12 +583,16 @@ function EditProductForm({
       </div>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Price (USD)">
-          <input type="number" min="0" step="0.01" value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} className="input font-mono" />
+          <input type="number" min="0" step="0.01" disabled={isFree} value={isFree ? "" : priceUsd} onChange={(e) => setPriceUsd(e.target.value)} className="input font-mono disabled:opacity-50" />
         </Field>
         <Field label="Price (PKR)">
-          <input type="number" min="0" step="1" value={pricePkr} onChange={(e) => setPricePkr(e.target.value)} className="input font-mono" />
+          <input type="number" min="0" step="1" disabled={isFree} value={isFree ? "" : pricePkr} onChange={(e) => setPricePkr(e.target.value)} className="input font-mono disabled:opacity-50" />
         </Field>
       </div>
+      <label className="flex items-center gap-2 rounded-lg border border-border bg-foreground/[0.03] px-3 py-2 text-xs font-bold uppercase tracking-widest text-foreground">
+        <input type="checkbox" checked={isFree} onChange={(e) => setIsFree(e.target.checked)} className="size-4 accent-emerald-500" />
+        Free product · unlimited instant claims
+      </label>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Cost (USD)">
           <input type="number" min="0" step="0.01" value={costUsd} onChange={(e) => setCostUsd(e.target.value)} className="input font-mono" />
@@ -1430,10 +1469,10 @@ function RequestAdminRow({
 }
 /* ---------------- Admins ---------------- */
 
-type AdminRow = { user_id: string; email: string; granted_at: string };
+type AdminRow = { user_id: string; email: string; granted_at: string; is_super: boolean };
 
 function AdminsPanel() {
-  const { user } = useAuth();
+  const { user, isSuperAdmin } = useAuth();
   const qc = useQueryClient();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
@@ -1451,6 +1490,7 @@ function AdminsPanel() {
 
   const { data: invites = [] } = useQuery({
     queryKey: ["admin-invites"],
+    enabled: isSuperAdmin,
     queryFn: async () => {
       const { data, error } = await (
         supabase.rpc as unknown as (
@@ -1533,42 +1573,48 @@ function AdminsPanel() {
 
   return (
     <>
-      <form
-        onSubmit={grant}
-        className="space-y-3 rounded-2xl border border-border bg-background p-5"
-      >
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
-          Invite admin
-        </p>
-        <h2 className="text-2xl font-extrabold tracking-tight">INVITE ADMIN</h2>
-        <p className="text-xs text-muted">
-          Enter any email. If they already have an account, they become admin instantly.
-          Otherwise the invite waits and auto-grants admin the moment they sign up with that
-          email.
-        </p>
-        <Field label="Email">
-          <input
-            required
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="teammate@example.com"
-            maxLength={255}
-            className="input"
-          />
-        </Field>
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={busy}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
-          >
-            <UserPlus className="size-4" /> {busy ? "Sending…" : "Invite"}
-          </button>
+      {isSuperAdmin ? (
+        <form
+          onSubmit={grant}
+          className="space-y-3 rounded-2xl border border-border bg-background p-5"
+        >
+          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+            Super admin only
+          </p>
+          <h2 className="text-2xl font-extrabold tracking-tight">INVITE ADMIN</h2>
+          <p className="text-xs text-muted">
+            Enter any email. If they already have an account, they become admin instantly.
+            Otherwise the invite waits and auto-grants admin the moment they sign up with that
+            email.
+          </p>
+          <Field label="Email">
+            <input
+              required
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="teammate@example.com"
+              maxLength={255}
+              className="input"
+            />
+          </Field>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={busy}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
+            >
+              <UserPlus className="size-4" /> {busy ? "Sending…" : "Invite"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-border bg-background p-5 text-sm text-muted">
+          Only the super admin can invite or remove other admins.
         </div>
-      </form>
+      )}
 
-      {invites.length > 0 && (
+      {isSuperAdmin && invites.length > 0 && (
         <section className="mt-8">
           <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Pending</p>
           <h3 className="text-2xl font-extrabold tracking-tight">INVITES</h3>
@@ -1609,7 +1655,8 @@ function AdminsPanel() {
           <ul className="mt-4 space-y-2">
             {admins.map((a) => {
               const isSelf = a.user_id === user?.id;
-              const isLast = admins.length <= 1;
+              const isSuperTarget = a.is_super;
+              const canRemove = isSuperAdmin && !isSuperTarget;
               return (
                 <li
                   key={a.user_id}
@@ -1618,6 +1665,11 @@ function AdminsPanel() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold">
                       {a.email}
+                      {isSuperTarget && (
+                        <span className="ml-2 rounded-full bg-primary px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary-foreground">
+                          super
+                        </span>
+                      )}
                       {isSelf && (
                         <span className="ml-2 rounded-full bg-primary/15 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
                           you
@@ -1628,20 +1680,19 @@ function AdminsPanel() {
                       Since {new Date(a.granted_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <button
-                    onClick={() => revoke(a.user_id, a.email)}
-                    disabled={busyId === a.user_id || isLast}
-                    title={
-                      isLast
-                        ? "Can't remove the last remaining admin"
-                        : isSelf
-                          ? "Remove your own admin access"
-                          : "Remove admin access"
-                    }
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive disabled:opacity-40"
-                  >
-                    <Trash2 className="size-3.5" /> Remove
-                  </button>
+                  {canRemove ? (
+                    <button
+                      onClick={() => revoke(a.user_id, a.email)}
+                      disabled={busyId === a.user_id}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive disabled:opacity-40"
+                    >
+                      <Trash2 className="size-3.5" /> Remove
+                    </button>
+                  ) : (
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                      {isSuperTarget ? "Protected" : "Locked"}
+                    </span>
+                  )}
                 </li>
               );
             })}
