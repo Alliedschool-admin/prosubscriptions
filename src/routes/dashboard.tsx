@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/use-auth";
 import { useMyOrders, type Order } from "../lib/orders-store";
 import { formatMoney, type Currency } from "../lib/price";
 import { useProducts } from "../lib/products-store";
+import { CommunityBanner } from "../components/CommunityBanner";
 import {
   useMyRequests,
   createRequest,
@@ -109,6 +110,10 @@ function Dashboard() {
       </section>
 
       <RequestsSection />
+
+      <section className="mt-10 px-4">
+        <CommunityBanner compact />
+      </section>
     </main>
   );
 }
