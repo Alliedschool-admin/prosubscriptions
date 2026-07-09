@@ -130,40 +130,11 @@ function OrderCard({ order: o, instructions }: { order: Order; instructions: str
       </p>
 
       {o.status === "approved" && o.delivered_content && (
-        <div className="mt-3 space-y-2 rounded-lg bg-primary/5 p-3">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Your download</p>
-          <div className="flex items-center justify-between gap-2 rounded-md border border-primary/20 bg-background px-3 py-2">
-            <span className="min-w-0 flex-1 truncate font-mono text-xs">{o.delivered_content}</span>
-            <div className="flex shrink-0 gap-1">
-              <button
-                onClick={() => copy(o.delivered_content!)}
-                className="inline-flex items-center gap-1 rounded-md bg-foreground/5 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-muted hover:text-foreground"
-              >
-                <Copy className="size-3" /> Copy
-              </button>
-              {/^https?:\/\//.test(o.delivered_content) && (
-                <a
-                  href={o.delivered_content}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground"
-                >
-                  Open
-                </a>
-              )}
-            </div>
-          </div>
-          {instructions && (
-            <div className="mt-2 rounded-md border border-primary/20 bg-background/60 p-3">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
-                How to activate
-              </p>
-              <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-foreground/90">
-                {instructions}
-              </p>
-            </div>
-          )}
-        </div>
+        <DeliveredLinks
+          content={o.delivered_content}
+          instructions={instructions}
+          onCopy={copy}
+        />
       )}
 
       {o.status === "pending" && (
@@ -175,6 +146,85 @@ function OrderCard({ order: o, instructions }: { order: Order; instructions: str
         <p className="mt-3 text-xs text-destructive">Reason: {o.admin_note}</p>
       )}
     </li>
+  );
+}
+
+function DeliveredLinks({
+  content,
+  instructions,
+  onCopy,
+}: {
+  content: string;
+  instructions: string | null;
+  onCopy: (text: string) => void;
+}) {
+  const items = content
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const multi = items.length > 1;
+
+  return (
+    <div className="mt-3 space-y-2 rounded-lg bg-primary/5 p-3">
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+          {multi ? `Your downloads (${items.length})` : "Your download"}
+        </p>
+        {multi && (
+          <button
+            onClick={() => onCopy(items.join("\n"))}
+            className="inline-flex items-center gap-1 rounded-md bg-foreground/5 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-muted hover:text-foreground"
+          >
+            <Copy className="size-3" /> Copy all
+          </button>
+        )}
+      </div>
+
+      <ul className="space-y-2">
+        {items.map((item, idx) => (
+          <li
+            key={`${idx}-${item}`}
+            className="flex items-center gap-2 rounded-md border border-primary/20 bg-background px-3 py-2"
+          >
+            {multi && (
+              <span className="shrink-0 rounded-md bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-primary">
+                {idx + 1}
+              </span>
+            )}
+            <span className="min-w-0 flex-1 truncate font-mono text-xs">{item}</span>
+            <div className="flex shrink-0 gap-1">
+              <button
+                onClick={() => onCopy(item)}
+                className="inline-flex items-center gap-1 rounded-md bg-foreground/5 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-muted hover:text-foreground"
+              >
+                <Copy className="size-3" /> Copy
+              </button>
+              {/^https?:\/\//.test(item) && (
+                <a
+                  href={item}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground"
+                >
+                  Open
+                </a>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {instructions && (
+            <div className="mt-2 rounded-md border border-primary/20 bg-background/60 p-3">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                How to activate
+              </p>
+              <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-foreground/90">
+                {instructions}
+              </p>
+            </div>
+          )}
+    </div>
   );
 }
 
