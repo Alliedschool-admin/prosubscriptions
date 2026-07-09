@@ -16,6 +16,7 @@ import { CartProvider } from "../lib/cart-context";
 import { AuthProvider } from "../hooks/use-auth";
 import { CheckoutSheet } from "../components/CheckoutSheet";
 import { Toaster } from "../components/ui/sonner";
+import { VisitorTracker } from "../components/VisitorTracker";
 
 function NotFoundComponent() {
   return (
@@ -137,6 +138,7 @@ function RootComponent() {
           </div>
           <CheckoutSheet />
           <Toaster />
+          <VisitorTracker />
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
