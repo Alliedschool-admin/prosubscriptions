@@ -1750,12 +1750,11 @@ function PostsAdminPanel() {
   const [busy, setBusy] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const postsTable = supabase.from as unknown as (t: string) => any;
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["admin-posts"],
     queryFn: async () => {
-      const { data, error } = await postsTable("posts")
+      const { data, error } = await supabase.from("posts")
         .select("*")
         .order("pinned", { ascending: false })
         .order("created_at", { ascending: false });
@@ -1789,11 +1788,11 @@ function PostsAdminPanel() {
         pinned,
       };
       if (editingId) {
-        const { error } = await postsTable("posts").update(payload).eq("id", editingId);
+        const { error } = await supabase.from("posts").update(payload).eq("id", editingId);
         if (error) throw new Error(error.message);
         toast.success("Post updated");
       } else {
-        const { error } = await postsTable("posts").insert(payload);
+        const { error } = await supabase.from("posts").insert(payload);
         if (error) throw new Error(error.message);
         toast.success("Post published");
       }
@@ -1808,7 +1807,7 @@ function PostsAdminPanel() {
   }
 
   async function togglePublished(p: PostRow) {
-    const { error } = await postsTable("posts")
+    const { error } = await supabase.from("posts")
       .update({ published: !p.published })
       .eq("id", p.id);
     if (error) return toast.error(error.message);
@@ -1817,7 +1816,7 @@ function PostsAdminPanel() {
   }
 
   async function togglePinned(p: PostRow) {
-    const { error } = await postsTable("posts")
+    const { error } = await supabase.from("posts")
       .update({ pinned: !p.pinned })
       .eq("id", p.id);
     if (error) return toast.error(error.message);
@@ -1827,7 +1826,7 @@ function PostsAdminPanel() {
 
   async function remove(p: PostRow) {
     if (!confirm(`Delete "${p.title}"?`)) return;
-    const { error } = await postsTable("posts").delete().eq("id", p.id);
+    const { error } = await supabase.from("posts").delete().eq("id", p.id);
     if (error) return toast.error(error.message);
     toast.success("Post deleted");
     if (editingId === p.id) reset();
