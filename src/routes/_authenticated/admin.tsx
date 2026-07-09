@@ -176,7 +176,8 @@ function ProductsPanel() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [category, setCategory] = useState<Category>(CAT_OPTIONS[0]);
-  const [price, setPrice] = useState("29");
+  const [priceUsd, setPriceUsd] = useState("");
+  const [pricePkr, setPricePkr] = useState("");
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
@@ -187,7 +188,8 @@ function ProductsPanel() {
     setName("");
     setCode("");
     setCategory(CAT_OPTIONS[0]);
-    setPrice("29");
+    setPriceUsd("");
+    setPricePkr("");
     setTagline("");
     setDescription("");
     setImage("");
@@ -200,9 +202,18 @@ function ProductsPanel() {
       toast.error("Name, tagline and description are required.");
       return;
     }
-    const priceNum = Number(price);
-    if (!Number.isFinite(priceNum) || priceNum < 0) {
-      toast.error("Enter a valid price.");
+    const usdNum = priceUsd.trim() === "" ? null : Number(priceUsd);
+    const pkrNum = pricePkr.trim() === "" ? null : Number(pricePkr);
+    if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
+      toast.error("Enter a valid USD price.");
+      return;
+    }
+    if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
+      toast.error("Enter a valid PKR price.");
+      return;
+    }
+    if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
+      toast.error("Set at least one price (USD or PKR).");
       return;
     }
     const featureList = features
@@ -216,7 +227,8 @@ function ProductsPanel() {
         name: name.trim(),
         code: code.trim() || `VLT-${String(Math.floor(Math.random() * 900) + 100)}`,
         category,
-        price: priceNum,
+        price_usd: usdNum,
+        price_pkr: pkrNum,
         tagline: tagline.trim(),
         description: description.trim(),
         image: image.trim() || DEFAULT_IMG,
@@ -253,15 +265,20 @@ function ProductsPanel() {
           <Field label="Code">
             <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="VLT-042" className="input font-mono" />
           </Field>
-          <Field label="Price (USD)">
-            <input type="number" min="0" step="1" value={price} onChange={(e) => setPrice(e.target.value)} className="input font-mono" />
+          <Field label="Category">
+            <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="input">
+              {CAT_OPTIONS.map((c) => (<option key={c}>{c}</option>))}
+            </select>
           </Field>
         </div>
-        <Field label="Category">
-          <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="input">
-            {CAT_OPTIONS.map((c) => (<option key={c}>{c}</option>))}
-          </select>
-        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Price (USD)" hint="Leave blank if USD not offered.">
+            <input type="number" min="0" step="0.01" value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder="29" className="input font-mono" />
+          </Field>
+          <Field label="Price (PKR)" hint="Leave blank if PKR not offered.">
+            <input type="number" min="0" step="1" value={pricePkr} onChange={(e) => setPricePkr(e.target.value)} placeholder="7999" className="input font-mono" />
+          </Field>
+        </div>
         <Field label="Tagline">
           <input required value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="500 pixel-perfect icons for modern UIs" className="input" />
         </Field>
@@ -307,7 +324,9 @@ function ProductsPanel() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-bold">{p.name}</p>
                   <p className="truncate font-mono text-[10px] uppercase tracking-widest text-muted">
-                    {p.code} · {p.category} · ${p.price}
+                    {p.code} · {p.category}
+                    {p.price_usd != null ? ` · $${Number(p.price_usd)}` : ""}
+                    {p.price_pkr != null ? ` · Rs ${Number(p.price_pkr).toLocaleString("en-PK")}` : ""}
                   </p>
                 </div>
                 <Link to="/products/$id" params={{ id: p.id }} className="rounded-lg bg-foreground/5 p-2 text-muted hover:text-foreground" aria-label="View">
@@ -343,6 +362,7 @@ function MethodsPanel() {
   const qc = useQueryClient();
 
   const [kind, setKind] = useState<PaymentMethodKind>("jazzcash");
+  const [currency, setCurrency] = useState<"USD" | "PKR">("PKR");
   const [label, setLabel] = useState("");
   const [accountName, setAccountName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
@@ -359,6 +379,7 @@ function MethodsPanel() {
     try {
       await createPaymentMethod({
         kind,
+        currency,
         label: label.trim(),
         account_name: accountName.trim() || null,
         account_number: accountNumber.trim(),
@@ -402,12 +423,18 @@ function MethodsPanel() {
   return (
     <>
       <form onSubmit={add} className="space-y-4 rounded-2xl border border-border bg-background p-5">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <Field label="Type">
             <select value={kind} onChange={(e) => setKind(e.target.value as PaymentMethodKind)} className="input">
               {KIND_OPTIONS.map((k) => (
                 <option key={k} value={k}>{PAYMENT_KIND_LABEL[k]}</option>
               ))}
+            </select>
+          </Field>
+          <Field label="Currency">
+            <select value={currency} onChange={(e) => setCurrency(e.target.value as "USD" | "PKR")} className="input">
+              <option value="PKR">PKR</option>
+              <option value="USD">USD</option>
             </select>
           </Field>
           <Field label="Label">
@@ -447,7 +474,7 @@ function MethodsPanel() {
                   <div className="min-w-0">
                     <p className="text-sm font-bold">{m.label}</p>
                     <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
-                      {PAYMENT_KIND_LABEL[m.kind]}
+                      {PAYMENT_KIND_LABEL[m.kind]} · {(m as { currency?: string }).currency ?? "PKR"}
                     </p>
                   </div>
                   <div className="flex gap-1">
