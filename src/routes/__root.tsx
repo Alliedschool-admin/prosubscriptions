@@ -13,7 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { TopNav } from "../components/TopNav";
 import { CartProvider } from "../lib/cart-context";
-import { ProductsProvider } from "../lib/products-store";
+import { AuthProvider } from "../hooks/use-auth";
 import { CheckoutSheet } from "../components/CheckoutSheet";
 import { Toaster } from "../components/ui/sonner";
 
@@ -129,7 +129,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ProductsProvider>
+      <AuthProvider>
         <CartProvider>
           <div className="min-h-screen bg-background text-foreground antialiased">
             <TopNav />
@@ -138,7 +138,7 @@ function RootComponent() {
           <CheckoutSheet />
           <Toaster />
         </CartProvider>
-      </ProductsProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
