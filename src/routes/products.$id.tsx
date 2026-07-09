@@ -194,6 +194,7 @@ function ProductDetail() {
                 subtitle: `${product.category} · ${product.code}`,
                 price_usd: usd,
                 price_pkr: pkr,
+                available_stock: stock,
               })
             }
             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"

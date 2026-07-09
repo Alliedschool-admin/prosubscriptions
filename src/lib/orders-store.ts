@@ -116,6 +116,7 @@ export async function createOrder(input: {
   item_name: string;
   amount: number;
   currency?: string;
+  quantity?: number;
   payment_method_id: string;
   payment_method_label: string;
   sender_name: string;
