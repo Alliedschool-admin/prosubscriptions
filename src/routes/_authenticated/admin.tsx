@@ -1799,6 +1799,7 @@ type PostRow = {
   body: string;
   category: "free_method" | "update" | "announcement";
   link: string | null;
+  image: string | null;
   pinned: boolean;
   published: boolean;
   created_at: string;
@@ -1817,6 +1818,7 @@ function PostsAdminPanel() {
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<PostRow["category"]>("free_method");
   const [link, setLink] = useState("");
+  const [image, setImage] = useState("");
   const [pinned, setPinned] = useState(false);
   const [busy, setBusy] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -1839,6 +1841,7 @@ function PostsAdminPanel() {
     setBody("");
     setCategory("free_method");
     setLink("");
+    setImage("");
     setPinned(false);
     setEditingId(null);
   }
@@ -1856,6 +1859,7 @@ function PostsAdminPanel() {
         body: body.trim(),
         category,
         link: link.trim() || null,
+        image: image.trim() || null,
         pinned,
       };
       if (editingId) {
@@ -1911,6 +1915,7 @@ function PostsAdminPanel() {
     setBody(p.body);
     setCategory(p.category);
     setLink(p.link ?? "");
+    setImage(p.image ?? "");
     setPinned(p.pinned);
   }
 
@@ -1957,6 +1962,12 @@ function PostsAdminPanel() {
               placeholder="Optional link (https://…)"
               className="input w-full"
             />
+          </div>
+          <div>
+            <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+              Cover image (optional)
+            </p>
+            <ImageInput value={image} onChange={setImage} folder="posts" />
           </div>
           <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted">
             <input
