@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { categories } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
+import { CommunityBanner } from "../components/CommunityBanner";
 
 export const Route = createFileRoute("/")({
   component: Discovery,
@@ -38,6 +39,10 @@ function Discovery() {
           builders who ship.
         </p>
       </header>
+
+      <div className="mb-8">
+        <CommunityBanner />
+      </div>
 
       <div className="mb-6 flex items-center rounded-xl border border-border bg-background px-3 py-2">
         <Search className="size-4 text-muted" />
