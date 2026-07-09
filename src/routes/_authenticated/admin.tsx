@@ -213,6 +213,21 @@ function ProductsPanel() {
   const { products, refetch } = useProducts();
   const qc = useQueryClient();
 
+  const { data: purchaseCounts = [] } = useQuery({
+    queryKey: ["product-purchase-counts"],
+    queryFn: async () => {
+      const { data, error } = await (
+        supabase.rpc as unknown as (fn: string) => Promise<{
+          data: { product_id: string; purchase_count: number }[] | null;
+          error: { message: string } | null;
+        }>
+      )("product_purchase_counts");
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+  const countByProduct = new Map(purchaseCounts.map((r) => [r.product_id, Number(r.purchase_count)]));
+
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [category, setCategory] = useState<Category>(CAT_OPTIONS[0]);
