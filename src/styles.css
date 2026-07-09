@@ -63,38 +63,40 @@
 
 :root {
   --radius: 0.625rem;
-  --background: hsl(0 0% 98%);
-  --foreground: hsl(0 0% 7%);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: hsl(15 100% 50%);
-  --primary-foreground: hsl(0 0% 100%);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: hsl(0 0% 45%);
-  --muted-foreground: hsl(0 0% 45%);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: hsl(0 0% 0% / 0.1);
-  --input: hsl(0 0% 0% / 0.1);
-  --ring: hsl(15 100% 50%);
+  /* Ember Noir — charcoal with molten orange/gold */
+  --background: hsl(0 0% 4%);
+  --foreground: hsl(40 30% 96%);
+  --card: hsl(0 0% 8% / 0.7);
+  --card-foreground: hsl(40 30% 96%);
+  --popover: hsl(0 0% 8%);
+  --popover-foreground: hsl(40 30% 96%);
+  --primary: hsl(22 95% 55%);
+  --primary-foreground: hsl(0 0% 6%);
+  --primary-glow: hsl(38 96% 60%);
+  --secondary: hsl(0 0% 12%);
+  --secondary-foreground: hsl(40 30% 96%);
+  --muted: hsl(30 6% 62%);
+  --muted-foreground: hsl(30 6% 62%);
+  --accent: hsl(38 96% 60%);
+  --accent-foreground: hsl(0 0% 6%);
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(40 20% 100% / 0.08);
+  --input: hsl(40 20% 100% / 0.1);
+  --ring: hsl(22 95% 55%);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --sidebar: hsl(0 0% 6%);
+  --sidebar-foreground: hsl(40 30% 96%);
+  --sidebar-primary: hsl(22 95% 55%);
+  --sidebar-primary-foreground: hsl(0 0% 6%);
+  --sidebar-accent: hsl(0 0% 12%);
+  --sidebar-accent-foreground: hsl(40 30% 96%);
+  --sidebar-border: hsl(40 20% 100% / 0.08);
+  --sidebar-ring: hsl(22 95% 55%);
 }
 
 .dark {
@@ -140,15 +142,20 @@
   body {
     background-color: var(--color-background);
     background-image:
-      radial-gradient(1200px 600px at 85% -10%, color-mix(in oklab, var(--primary) 14%, transparent) 0%, transparent 60%),
-      radial-gradient(900px 500px at -10% 10%, color-mix(in oklab, var(--primary) 8%, transparent) 0%, transparent 55%),
-      radial-gradient(700px 700px at 50% 110%, color-mix(in oklab, var(--foreground) 6%, transparent) 0%, transparent 60%),
-      linear-gradient(180deg, color-mix(in oklab, var(--background) 92%, var(--foreground) 8%) 0%, var(--background) 40%);
+      radial-gradient(1100px 700px at 82% -8%, color-mix(in oklab, var(--primary) 45%, transparent) 0%, transparent 60%),
+      radial-gradient(900px 600px at -10% 15%, color-mix(in oklab, var(--accent) 28%, transparent) 0%, transparent 55%),
+      radial-gradient(800px 800px at 50% 115%, color-mix(in oklab, var(--primary) 22%, transparent) 0%, transparent 60%),
+      linear-gradient(180deg, hsl(0 0% 6%) 0%, hsl(0 0% 3%) 100%);
     background-attachment: fixed;
     background-repeat: no-repeat;
     color: var(--color-foreground);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Work Sans', system-ui, sans-serif;
     position: relative;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    letter-spacing: -0.02em;
   }
 
   body::before {
@@ -158,11 +165,11 @@
     pointer-events: none;
     z-index: 0;
     background-image:
-      linear-gradient(to right, color-mix(in oklab, var(--foreground) 4%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 4%, transparent) 1px, transparent 1px);
+      linear-gradient(to right, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
     background-size: 56px 56px;
     mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 75%);
-    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 75%);
+    animation: ember-drift 24s ease-in-out infinite alternate;
   }
 
   body::after {
@@ -171,7 +178,7 @@
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.5;
+    opacity: 0.35;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   }
@@ -195,4 +202,34 @@
 }
 .animate-vault-up {
   animation: vault-slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes ember-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(-20px, -12px, 0) scale(1.04); }
+}
+
+@keyframes ember-glow {
+  0%, 100% { opacity: 0.85; filter: blur(40px); }
+  50%      { opacity: 1;    filter: blur(60px); }
+}
+
+@utility glass-card {
+  background: color-mix(in oklab, var(--card) 70%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in oklab, var(--foreground) 6%, transparent) inset,
+    0 20px 60px -30px color-mix(in oklab, var(--primary) 40%, transparent);
+}
+
+@utility ember-gradient {
+  background-image: linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%);
+}
+
+@utility text-ember-gradient {
+  background-image: linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
