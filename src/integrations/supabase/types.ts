@@ -14,6 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
+      orders: {
+        Row: {
+          admin_note: string | null
+          amount: number
+          buyer_id: string
+          created_at: string
+          currency: string
+          id: string
+          item_id: string
+          item_kind: string
+          item_name: string
+          payment_method_id: string | null
+          payment_method_label: string | null
+          proof_path: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sender_contact: string
+          sender_name: string
+          status: Database["public"]["Enums"]["order_status"]
+          transaction_ref: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount: number
+          buyer_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          item_id: string
+          item_kind: string
+          item_name: string
+          payment_method_id?: string | null
+          payment_method_label?: string | null
+          proof_path?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_contact: string
+          sender_name: string
+          status?: Database["public"]["Enums"]["order_status"]
+          transaction_ref?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount?: number
+          buyer_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          item_id?: string
+          item_kind?: string
+          item_name?: string
+          payment_method_id?: string | null
+          payment_method_label?: string | null
+          proof_path?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_contact?: string
+          sender_name?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          transaction_ref?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          account_name: string | null
+          account_number: string
+          active: boolean
+          created_at: string
+          id: string
+          instructions: string | null
+          kind: Database["public"]["Enums"]["payment_method_kind"]
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          account_name?: string | null
+          account_number: string
+          active?: boolean
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          kind: Database["public"]["Enums"]["payment_method_kind"]
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string | null
+          account_number?: string
+          active?: boolean
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          kind?: Database["public"]["Enums"]["payment_method_kind"]
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
@@ -96,6 +209,16 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      order_status: "pending" | "approved" | "rejected"
+      payment_method_kind:
+        | "jazzcash"
+        | "easypaisa"
+        | "nayapay"
+        | "sadapay"
+        | "bank"
+        | "binance_pay"
+        | "crypto"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -224,6 +347,17 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      order_status: ["pending", "approved", "rejected"],
+      payment_method_kind: [
+        "jazzcash",
+        "easypaisa",
+        "nayapay",
+        "sadapay",
+        "bank",
+        "binance_pay",
+        "crypto",
+        "other",
+      ],
     },
   },
 } as const

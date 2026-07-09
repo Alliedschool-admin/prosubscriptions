@@ -1,43 +1,122 @@
-import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Lock, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { CheckCircle2, Copy, Lock, Upload, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { useCart } from "../lib/cart-context";
 import { promoCodes } from "../lib/mock-data";
+import { useAuth } from "../hooks/use-auth";
+import {
+  usePaymentMethods,
+  createOrder,
+  uploadPaymentProof,
+  useOrdersInvalidator,
+  PAYMENT_KIND_LABEL,
+  type PaymentMethod,
+} from "../lib/orders-store";
+import { toast } from "sonner";
 
 export function CheckoutSheet() {
   const { item, isOpen, close } = useCart();
+  const { user } = useAuth();
+  const { data: methods = [], isLoading: methodsLoading } = usePaymentMethods({ activeOnly: true });
+  const invalidateOrders = useOrdersInvalidator();
+
   const [code, setCode] = useState("");
   const [applied, setApplied] = useState<{ code: string; discount: number } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
+
+  const [selectedMethodId, setSelectedMethodId] = useState<string>("");
+  const [senderName, setSenderName] = useState("");
+  const [senderContact, setSenderContact] = useState("");
+  const [txRef, setTxRef] = useState("");
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+
+  const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
-  const [orderId] = useState(() => `VLT-${Math.floor(100000 + Math.random() * 899999)}`);
+  const [orderRef, setOrderRef] = useState<string>("");
 
   useEffect(() => {
     if (isOpen) {
       setCode("");
       setApplied(null);
-      setError(null);
+      setPromoError(null);
+      setSenderName("");
+      setSenderContact("");
+      setTxRef("");
+      setProofFile(null);
       setConfirmed(false);
+      setOrderRef("");
     }
   }, [isOpen, item?.id]);
 
-  const subtotal = item?.price ?? 0;
-  const discount = useMemo(() => {
-    if (!applied) return 0;
-    return applied.discount;
-  }, [applied]);
-  const total = Math.max(0, subtotal - discount);
+  useEffect(() => {
+    if (!selectedMethodId && methods.length) setSelectedMethodId(methods[0].id);
+  }, [methods, selectedMethodId]);
 
-  function apply() {
+  const subtotal = item?.price ?? 0;
+  const discount = useMemo(() => applied?.discount ?? 0, [applied]);
+  const total = Math.max(0, subtotal - discount);
+  const selectedMethod: PaymentMethod | undefined = methods.find((m) => m.id === selectedMethodId);
+
+  function applyPromo() {
     const key = code.trim().toUpperCase();
     const promo = promoCodes[key];
     if (!promo) {
-      setError("Invalid or expired code.");
+      setPromoError("Invalid or expired code.");
       setApplied(null);
       return;
     }
     const off = promo.kind === "percent" ? (subtotal * promo.value) / 100 : promo.value;
     setApplied({ code: key, discount: Math.round(off * 100) / 100 });
-    setError(null);
+    setPromoError(null);
+  }
+
+  async function submitOrder() {
+    if (!user || !item) return;
+    if (!selectedMethod) {
+      toast.error("Choose a payment method.");
+      return;
+    }
+    if (!senderName.trim() || !senderContact.trim()) {
+      toast.error("Enter your name and contact.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      let proofPath: string | null = null;
+      if (proofFile) {
+        proofPath = await uploadPaymentProof(user.id, proofFile);
+      }
+      const order = await createOrder({
+        buyer_id: user.id,
+        item_kind: item.kind,
+        item_id: item.id,
+        item_name: item.name,
+        amount: total,
+        currency: "USD",
+        payment_method_id: selectedMethod.id,
+        payment_method_label: `${PAYMENT_KIND_LABEL[selectedMethod.kind]} · ${selectedMethod.label}`,
+        sender_name: senderName.trim(),
+        sender_contact: senderContact.trim(),
+        transaction_ref: txRef.trim() || null,
+        proof_path: proofPath,
+      });
+      invalidateOrders();
+      setOrderRef(`VLT-${order.id.slice(0, 6).toUpperCase()}`);
+      setConfirmed(true);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to submit order";
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function copy(text: string) {
+    navigator.clipboard.writeText(text).then(
+      () => toast.success("Copied"),
+      () => toast.error("Copy failed"),
+    );
   }
 
   if (!item) return null;
@@ -59,7 +138,7 @@ export function CheckoutSheet() {
           <div className="relative flex items-center justify-center border-b border-border p-4">
             <div className="absolute left-1/2 top-2 h-1 w-12 -translate-x-1/2 rounded-full bg-foreground/10 sm:hidden" />
             <h2 className="text-lg font-extrabold tracking-tight">
-              {confirmed ? "ORDER CONFIRMED" : "CHECKOUT"}
+              {confirmed ? "ORDER SUBMITTED" : "CHECKOUT"}
             </h2>
             <button
               onClick={close}
@@ -75,15 +154,14 @@ export function CheckoutSheet() {
               <div className="grid size-16 place-items-center rounded-full bg-primary/10">
                 <CheckCircle2 className="size-8 text-primary" />
               </div>
-              <h3 className="text-2xl font-extrabold tracking-tight">You&apos;re in.</h3>
+              <h3 className="text-2xl font-extrabold tracking-tight">Awaiting verification</h3>
               <p className="max-w-xs text-sm text-muted">
-                {item.kind === "plan"
-                  ? `Your ${item.name} is active. A receipt has been sent to your inbox.`
-                  : `${item.name} is now in your Vault library, ready to download.`}
+                We&apos;ve received your order for <span className="font-bold text-foreground">{item.name}</span>.
+                Once we confirm your transfer, it will unlock in your dashboard. This usually takes a few hours.
               </p>
               <div className="rounded-xl border border-border px-4 py-2">
                 <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Order</p>
-                <p className="font-mono text-sm font-bold">{orderId}</p>
+                <p className="font-mono text-sm font-bold">{orderRef}</p>
               </div>
               <button
                 onClick={close}
@@ -91,6 +169,31 @@ export function CheckoutSheet() {
               >
                 Back to Vault
               </button>
+            </div>
+          ) : !user ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
+              <h3 className="text-xl font-extrabold tracking-tight">Sign in to check out</h3>
+              <p className="max-w-xs text-sm text-muted">
+                We need an account to track your order and unlock the download after verification.
+              </p>
+              <Link
+                to="/auth"
+                onClick={close}
+                className="w-full max-w-xs rounded-xl bg-primary py-3 text-center text-sm font-extrabold uppercase tracking-widest text-primary-foreground"
+              >
+                Sign in / Sign up
+              </Link>
+            </div>
+          ) : methodsLoading ? (
+            <div className="flex flex-1 items-center justify-center px-8 text-sm text-muted">
+              Loading payment options…
+            </div>
+          ) : methods.length === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
+              <h3 className="text-lg font-extrabold tracking-tight">Checkout unavailable</h3>
+              <p className="max-w-xs text-sm text-muted">
+                No payment methods are configured yet. Please try again later.
+              </p>
             </div>
           ) : (
             <>
@@ -107,25 +210,114 @@ export function CheckoutSheet() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="font-mono text-[10px] uppercase tracking-widest text-muted">
-                    Payment (simulated)
-                  </label>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                    1 · Choose payment method
+                  </p>
+                  <div className="grid gap-2">
+                    {methods.map((m) => {
+                      const active = m.id === selectedMethodId;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => setSelectedMethodId(m.id)}
+                          className={`rounded-xl border p-3 text-left transition ${
+                            active
+                              ? "border-primary bg-primary/5"
+                              : "border-border bg-background hover:border-foreground/20"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-sm">{m.label}</span>
+                            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                              {PAYMENT_KIND_LABEL[m.kind]}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {selectedMethod && (
+                  <div className="space-y-2 rounded-2xl bg-foreground/[0.03] p-4">
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                      2 · Send ${total.toFixed(2)} to
+                    </p>
+                    {selectedMethod.account_name && (
+                      <p className="text-sm">
+                        <span className="text-muted">Name: </span>
+                        <span className="font-bold">{selectedMethod.account_name}</span>
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-background px-3 py-2">
+                      <span className="truncate font-mono text-sm font-bold">
+                        {selectedMethod.account_number}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => copy(selectedMethod.account_number)}
+                        className="shrink-0 inline-flex items-center gap-1 rounded-md bg-foreground/5 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-muted hover:text-foreground"
+                      >
+                        <Copy className="size-3" /> Copy
+                      </button>
+                    </div>
+                    {selectedMethod.instructions && (
+                      <p className="whitespace-pre-line text-xs text-muted">
+                        {selectedMethod.instructions}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                    3 · Confirm your transfer
+                  </p>
                   <input
-                    className="w-full rounded-lg border-none bg-foreground/5 px-4 py-3 font-mono text-sm outline-none placeholder:text-muted focus:ring-2 focus:ring-primary/30"
-                    placeholder="4242 4242 4242 4242"
-                    defaultValue="4242 4242 4242 4242"
+                    value={senderName}
+                    onChange={(e) => setSenderName(e.target.value)}
+                    placeholder="Your name (as on the transfer)"
+                    maxLength={80}
+                    className="w-full rounded-lg border-none bg-foreground/5 px-4 py-3 text-sm outline-none placeholder:text-muted focus:ring-2 focus:ring-primary/30"
                   />
-                  <div className="grid grid-cols-2 gap-2">
+                  <input
+                    value={senderContact}
+                    onChange={(e) => setSenderContact(e.target.value)}
+                    placeholder="Your phone or email"
+                    maxLength={120}
+                    className="w-full rounded-lg border-none bg-foreground/5 px-4 py-3 text-sm outline-none placeholder:text-muted focus:ring-2 focus:ring-primary/30"
+                  />
+                  <input
+                    value={txRef}
+                    onChange={(e) => setTxRef(e.target.value)}
+                    placeholder="Transaction ID / TXID (optional)"
+                    maxLength={120}
+                    className="w-full rounded-lg border-none bg-foreground/5 px-4 py-3 font-mono text-sm outline-none placeholder:text-muted focus:ring-2 focus:ring-primary/30"
+                  />
+                  <div>
                     <input
-                      className="rounded-lg border-none bg-foreground/5 px-4 py-3 font-mono text-sm outline-none placeholder:text-muted"
-                      placeholder="MM / YY"
-                      defaultValue="08 / 29"
+                      ref={fileRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setProofFile(e.target.files?.[0] ?? null)}
+                      className="hidden"
                     />
-                    <input
-                      className="rounded-lg border-none bg-foreground/5 px-4 py-3 font-mono text-sm outline-none placeholder:text-muted"
-                      placeholder="CVC"
-                      defaultValue="123"
-                    />
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      className="flex w-full items-center justify-between gap-2 rounded-lg border border-dashed border-border px-4 py-3 text-left text-sm hover:border-foreground/30"
+                    >
+                      <span className="flex items-center gap-2 text-muted">
+                        <Upload className="size-4" />
+                        {proofFile ? "Change screenshot" : "Upload payment screenshot (optional)"}
+                      </span>
+                      {proofFile && (
+                        <span className="truncate max-w-[45%] font-mono text-[10px] uppercase text-primary">
+                          {proofFile.name}
+                        </span>
+                      )}
+                    </button>
                   </div>
                 </div>
 
@@ -138,13 +330,13 @@ export function CheckoutSheet() {
                       value={code}
                       onChange={(e) => {
                         setCode(e.target.value);
-                        setError(null);
+                        setPromoError(null);
                       }}
                       placeholder="TRY VAULT10"
                       className="flex-1 rounded-lg border-none bg-foreground/5 px-4 py-3 font-mono text-sm uppercase outline-none placeholder:text-muted focus:ring-2 focus:ring-primary/30"
                     />
                     <button
-                      onClick={apply}
+                      onClick={applyPromo}
                       className="rounded-lg bg-foreground px-4 py-3 text-xs font-bold uppercase tracking-widest text-background"
                     >
                       Apply
@@ -155,9 +347,9 @@ export function CheckoutSheet() {
                       ✓ {applied.code} applied · -${applied.discount.toFixed(2)}
                     </p>
                   )}
-                  {error && (
+                  {promoError && (
                     <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-destructive">
-                      {error}
+                      {promoError}
                     </p>
                   )}
                 </div>
@@ -183,13 +375,14 @@ export function CheckoutSheet() {
 
               <div className="border-t border-border p-6">
                 <button
-                  onClick={() => setConfirmed(true)}
-                  className="w-full rounded-xl bg-primary py-4 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-transform active:scale-[0.98]"
+                  onClick={submitOrder}
+                  disabled={submitting}
+                  className="w-full rounded-xl bg-primary py-4 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-transform active:scale-[0.98] disabled:opacity-60"
                 >
-                  Confirm Order · ${total.toFixed(2)}
+                  {submitting ? "Submitting…" : `Submit for verification · $${total.toFixed(2)}`}
                 </button>
                 <p className="mt-3 flex items-center justify-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted">
-                  <Lock className="size-3" /> Secure transaction · Encrypted Vault
+                  <Lock className="size-3" /> Manually verified · No card data stored
                 </p>
               </div>
             </>
