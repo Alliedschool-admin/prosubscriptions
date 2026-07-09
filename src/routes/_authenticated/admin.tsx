@@ -1573,42 +1573,48 @@ function AdminsPanel() {
 
   return (
     <>
-      <form
-        onSubmit={grant}
-        className="space-y-3 rounded-2xl border border-border bg-background p-5"
-      >
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
-          Invite admin
-        </p>
-        <h2 className="text-2xl font-extrabold tracking-tight">INVITE ADMIN</h2>
-        <p className="text-xs text-muted">
-          Enter any email. If they already have an account, they become admin instantly.
-          Otherwise the invite waits and auto-grants admin the moment they sign up with that
-          email.
-        </p>
-        <Field label="Email">
-          <input
-            required
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="teammate@example.com"
-            maxLength={255}
-            className="input"
-          />
-        </Field>
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={busy}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
-          >
-            <UserPlus className="size-4" /> {busy ? "Sending…" : "Invite"}
-          </button>
+      {isSuperAdmin ? (
+        <form
+          onSubmit={grant}
+          className="space-y-3 rounded-2xl border border-border bg-background p-5"
+        >
+          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+            Super admin only
+          </p>
+          <h2 className="text-2xl font-extrabold tracking-tight">INVITE ADMIN</h2>
+          <p className="text-xs text-muted">
+            Enter any email. If they already have an account, they become admin instantly.
+            Otherwise the invite waits and auto-grants admin the moment they sign up with that
+            email.
+          </p>
+          <Field label="Email">
+            <input
+              required
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="teammate@example.com"
+              maxLength={255}
+              className="input"
+            />
+          </Field>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={busy}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
+            >
+              <UserPlus className="size-4" /> {busy ? "Sending…" : "Invite"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-border bg-background p-5 text-sm text-muted">
+          Only the super admin can invite or remove other admins.
         </div>
-      </form>
+      )}
 
-      {invites.length > 0 && (
+      {isSuperAdmin && invites.length > 0 && (
         <section className="mt-8">
           <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Pending</p>
           <h3 className="text-2xl font-extrabold tracking-tight">INVITES</h3>
@@ -1649,7 +1655,8 @@ function AdminsPanel() {
           <ul className="mt-4 space-y-2">
             {admins.map((a) => {
               const isSelf = a.user_id === user?.id;
-              const isLast = admins.length <= 1;
+              const isSuperTarget = a.is_super;
+              const canRemove = isSuperAdmin && !isSuperTarget;
               return (
                 <li
                   key={a.user_id}
@@ -1658,6 +1665,11 @@ function AdminsPanel() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold">
                       {a.email}
+                      {isSuperTarget && (
+                        <span className="ml-2 rounded-full bg-primary px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary-foreground">
+                          super
+                        </span>
+                      )}
                       {isSelf && (
                         <span className="ml-2 rounded-full bg-primary/15 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
                           you
@@ -1668,20 +1680,19 @@ function AdminsPanel() {
                       Since {new Date(a.granted_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <button
-                    onClick={() => revoke(a.user_id, a.email)}
-                    disabled={busyId === a.user_id || isLast}
-                    title={
-                      isLast
-                        ? "Can't remove the last remaining admin"
-                        : isSelf
-                          ? "Remove your own admin access"
-                          : "Remove admin access"
-                    }
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive disabled:opacity-40"
-                  >
-                    <Trash2 className="size-3.5" /> Remove
-                  </button>
+                  {canRemove ? (
+                    <button
+                      onClick={() => revoke(a.user_id, a.email)}
+                      disabled={busyId === a.user_id}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive disabled:opacity-40"
+                    >
+                      <Trash2 className="size-3.5" /> Remove
+                    </button>
+                  ) : (
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                      {isSuperTarget ? "Protected" : "Locked"}
+                    </span>
+                  )}
                 </li>
               );
             })}
