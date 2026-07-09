@@ -1,19 +1,15 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronLeft, Check, Download } from "lucide-react";
-import { getProduct, products } from "../lib/mock-data";
+import { getProduct as getSeedProduct } from "../lib/mock-data";
+import { useProducts } from "../lib/products-store";
 import { useCart } from "../lib/cart-context";
 
 export const Route = createFileRoute("/products/$id")({
-  loader: ({ params }) => {
-    const product = getProduct(params.id);
-    if (!product) throw notFound();
-    return { product };
-  },
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return { meta: [{ title: "Product not found · Vault.01" }, { name: "robots", content: "noindex" }] };
+  head: ({ params }) => {
+    const product = getSeedProduct(params.id);
+    if (!product) {
+      return { meta: [{ title: "Product · Vault.01" }] };
     }
-    const { product } = loaderData;
     const title = `${product.name} — Vault.01`;
     return {
       meta: [
@@ -30,8 +26,26 @@ export const Route = createFileRoute("/products/$id")({
 });
 
 function ProductDetail() {
-  const { product } = Route.useLoaderData();
+  const { id } = Route.useParams();
+  const { getProduct, products } = useProducts();
   const { openWith } = useCart();
+  const product = getProduct(id);
+
+  if (!product) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-24 text-center">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-primary">404</p>
+        <h1 className="mt-2 text-2xl font-extrabold tracking-tight">Asset not found</h1>
+        <p className="mt-2 text-sm text-muted">This item may have been removed from the vault.</p>
+        <Link
+          to="/"
+          className="mt-6 inline-flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-primary"
+        >
+          <ChevronLeft className="size-3" /> Back to Vault
+        </Link>
+      </main>
+    );
+  }
 
   const related = products.filter((p) => p.id !== product.id).slice(0, 2);
 

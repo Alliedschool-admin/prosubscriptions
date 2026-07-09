@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { TopNav } from "../components/TopNav";
 import { CartProvider } from "../lib/cart-context";
+import { ProductsProvider } from "../lib/products-store";
 import { CheckoutSheet } from "../components/CheckoutSheet";
 import { Toaster } from "../components/ui/sonner";
 
@@ -128,14 +129,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <div className="min-h-screen bg-background text-foreground antialiased">
-          <TopNav />
-          <Outlet />
-        </div>
-        <CheckoutSheet />
-        <Toaster />
-      </CartProvider>
+      <ProductsProvider>
+        <CartProvider>
+          <div className="min-h-screen bg-background text-foreground antialiased">
+            <TopNav />
+            <Outlet />
+          </div>
+          <CheckoutSheet />
+          <Toaster />
+        </CartProvider>
+      </ProductsProvider>
     </QueryClientProvider>
   );
 }

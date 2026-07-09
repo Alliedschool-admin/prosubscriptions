@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowUpRight, Search } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
-import { categories, plans, products } from "../lib/mock-data";
+import { categories, plans } from "../lib/mock-data";
+import { useProducts } from "../lib/products-store";
 import { useCart } from "../lib/cart-context";
 
 export const Route = createFileRoute("/")({
@@ -14,6 +15,7 @@ function Discovery() {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<(typeof categories)[number]>("All");
   const { openWith } = useCart();
+  const { products } = useProducts();
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -21,7 +23,7 @@ function Discovery() {
       const matchesC = cat === "All" || p.category === cat;
       return matchesQ && matchesC;
     });
-  }, [query, cat]);
+  }, [query, cat, products]);
 
   return (
     <main className="mx-auto max-w-2xl px-4 pb-32 pt-8">
