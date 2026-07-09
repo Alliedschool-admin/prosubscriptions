@@ -16,6 +16,9 @@ import {
   ImageIcon,
   Pencil,
   Save,
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
@@ -34,6 +37,7 @@ import {
   useAllOrders,
   reviewOrder,
   approveOrder,
+  deleteOrder,
   getProofSignedUrl,
   PAYMENT_KIND_LABEL,
   useOrdersInvalidator,
@@ -61,7 +65,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: Admin,
 });
 
-type Tab = "products" | "methods" | "orders";
+type Tab = "products" | "methods" | "orders" | "accounts";
 
 function Admin() {
   const { user, isAdmin, refresh, signOut } = useAuth();
@@ -135,6 +139,7 @@ function Admin() {
             { id: "products", label: "Products", icon: Package },
             { id: "methods", label: "Payment", icon: Wallet },
             { id: "orders", label: "Orders", icon: Inbox },
+            { id: "accounts", label: "Accounts", icon: BarChart3 },
           ] as const
         ).map(({ id, label, icon: Icon }) => (
           <button
@@ -152,6 +157,7 @@ function Admin() {
       {tab === "products" && <ProductsPanel />}
       {tab === "methods" && <MethodsPanel />}
       {tab === "orders" && <OrdersPanel />}
+      {tab === "accounts" && <AccountsPanel />}
 
       <style>{`
         .input {
@@ -188,6 +194,8 @@ function ProductsPanel() {
   const [category, setCategory] = useState<Category>(CAT_OPTIONS[0]);
   const [priceUsd, setPriceUsd] = useState("");
   const [pricePkr, setPricePkr] = useState("");
+  const [costUsd, setCostUsd] = useState("");
+  const [costPkr, setCostPkr] = useState("");
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
@@ -201,6 +209,8 @@ function ProductsPanel() {
     setCategory(CAT_OPTIONS[0]);
     setPriceUsd("");
     setPricePkr("");
+    setCostUsd("");
+    setCostPkr("");
     setTagline("");
     setDescription("");
     setImage("");
@@ -216,6 +226,8 @@ function ProductsPanel() {
     }
     const usdNum = priceUsd.trim() === "" ? null : Number(priceUsd);
     const pkrNum = pricePkr.trim() === "" ? null : Number(pricePkr);
+    const costUsdNum = costUsd.trim() === "" ? null : Number(costUsd);
+    const costPkrNum = costPkr.trim() === "" ? null : Number(costPkr);
     if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
       toast.error("Enter a valid USD price.");
       return;
@@ -241,6 +253,8 @@ function ProductsPanel() {
         category,
         price_usd: usdNum,
         price_pkr: pkrNum,
+        cost_usd: costUsdNum,
+        cost_pkr: costPkrNum,
         tagline: tagline.trim(),
         description: description.trim(),
         image: image.trim() || DEFAULT_IMG,
@@ -290,6 +304,14 @@ function ProductsPanel() {
           </Field>
           <Field label="Price (PKR)" hint="Leave blank if PKR not offered.">
             <input type="number" min="0" step="1" value={pricePkr} onChange={(e) => setPricePkr(e.target.value)} placeholder="7999" className="input font-mono" />
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Cost (USD)" hint="Your purchase price. Used for profit tracking.">
+            <input type="number" min="0" step="0.01" value={costUsd} onChange={(e) => setCostUsd(e.target.value)} placeholder="12" className="input font-mono" />
+          </Field>
+          <Field label="Cost (PKR)" hint="Your purchase price. Used for profit tracking.">
+            <input type="number" min="0" step="1" value={costPkr} onChange={(e) => setCostPkr(e.target.value)} placeholder="3200" className="input font-mono" />
           </Field>
         </div>
         <Field label="Tagline">
@@ -424,6 +446,8 @@ function EditProductForm({
   const [category, setCategory] = useState<Category>(product.category);
   const [priceUsd, setPriceUsd] = useState(product.price_usd == null ? "" : String(product.price_usd));
   const [pricePkr, setPricePkr] = useState(product.price_pkr == null ? "" : String(product.price_pkr));
+  const [costUsd, setCostUsd] = useState(product.cost_usd == null ? "" : String(product.cost_usd));
+  const [costPkr, setCostPkr] = useState(product.cost_pkr == null ? "" : String(product.cost_pkr));
   const [tagline, setTagline] = useState(product.tagline);
   const [description, setDescription] = useState(product.description);
   const [image, setImage] = useState(product.image);
@@ -465,6 +489,8 @@ function EditProductForm({
         features: featureList.length ? featureList : product.features,
         price_usd: usdNum,
         price_pkr: pkrNum,
+        cost_usd: costUsd.trim() === "" ? null : Number(costUsd),
+        cost_pkr: costPkr.trim() === "" ? null : Number(costPkr),
         delivery_instructions: deliveryInstructions.trim() || null,
       });
       toast.success("Product updated.");
@@ -502,6 +528,14 @@ function EditProductForm({
         </Field>
         <Field label="Price (PKR)">
           <input type="number" min="0" step="1" value={pricePkr} onChange={(e) => setPricePkr(e.target.value)} className="input font-mono" />
+        </Field>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Cost (USD)">
+          <input type="number" min="0" step="0.01" value={costUsd} onChange={(e) => setCostUsd(e.target.value)} className="input font-mono" />
+        </Field>
+        <Field label="Cost (PKR)">
+          <input type="number" min="0" step="1" value={costPkr} onChange={(e) => setCostPkr(e.target.value)} className="input font-mono" />
         </Field>
       </div>
       <Field label="Tagline">
@@ -841,6 +875,20 @@ function OrdersPanel() {
     }
   }
 
+  async function remove(id: string) {
+    if (!confirm("Delete this order? It will be removed from your account totals.")) return;
+    setBusyId(id);
+    try {
+      await deleteOrder(id);
+      toast.success("Order deleted.");
+      invalidate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function viewProof(path: string) {
     try {
       const url = await getProofSignedUrl(path);
@@ -931,6 +979,16 @@ function OrdersPanel() {
                     </button>
                   </>
                 )}
+                {o.status !== "pending" && (
+                  <button
+                    onClick={() => remove(o.id)}
+                    disabled={busyId === o.id}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive disabled:opacity-60"
+                    title="Delete order and remove from account"
+                  >
+                    <Trash2 className="size-3.5" /> Delete
+                  </button>
+                )}
               </div>
             </li>
           ))}
@@ -971,5 +1029,201 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
       </div>
       {children}
     </label>
+  );
+}
+
+/* ---------------- Accounts ---------------- */
+
+function AccountsPanel() {
+  const { data: orders = [], isLoading } = useAllOrders();
+  const { products } = useProducts();
+  const invalidate = useOrdersInvalidator();
+  const [currency, setCurrency] = useState<"USD" | "PKR">("PKR");
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const productMap = new Map(products.map((p) => [p.id, p]));
+
+  const approved = orders.filter(
+    (o) => o.status === "approved" && String(o.currency).toUpperCase() === currency,
+  );
+
+  let revenue = 0;
+  let cogs = 0;
+  for (const o of approved) {
+    const qty = Number(o.quantity ?? 1);
+    revenue += Number(o.amount) || 0;
+    const p = productMap.get(o.item_id);
+    const unitCost =
+      currency === "USD" ? Number(p?.cost_usd ?? 0) : Number(p?.cost_pkr ?? 0);
+    cogs += (Number.isFinite(unitCost) ? unitCost : 0) * qty;
+  }
+  const profit = revenue - cogs;
+
+  let inventoryValue = 0;
+  for (const p of products) {
+    const stock = Number(p.available_stock ?? 0);
+    const unitCost =
+      currency === "USD" ? Number(p.cost_usd ?? 0) : Number(p.cost_pkr ?? 0);
+    inventoryValue += (Number.isFinite(unitCost) ? unitCost : 0) * stock;
+  }
+
+  const fmt = (n: number) =>
+    currency === "USD"
+      ? `$${n.toFixed(2)}`
+      : `Rs ${Math.round(n).toLocaleString("en-PK")}`;
+
+  async function remove(id: string, name: string) {
+    if (
+      !confirm(
+        `Delete sale "${name}"? This removes it from your account totals and cannot be undone.`,
+      )
+    )
+      return;
+    setBusyId(id);
+    try {
+      await deleteOrder(id);
+      toast.success("Sale removed from account.");
+      invalidate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  return (
+    <>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            Store performance
+          </p>
+          <h2 className="text-2xl font-extrabold tracking-tight">ACCOUNTS</h2>
+        </div>
+        <div className="flex gap-1 rounded-xl border border-border bg-background p-1">
+          {(["PKR", "USD"] as const).map((c) => (
+            <button
+              key={c}
+              onClick={() => setCurrency(c)}
+              className={`rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest ${
+                currency === c
+                  ? "bg-foreground text-background"
+                  : "text-muted hover:text-foreground"
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Stat label="Revenue" value={fmt(revenue)} tone="neutral" />
+        <Stat label="Cost of goods" value={fmt(cogs)} tone="neutral" />
+        <Stat
+          label={profit >= 0 ? "Profit" : "Loss"}
+          value={fmt(Math.abs(profit))}
+          tone={profit >= 0 ? "up" : "down"}
+        />
+        <Stat label="Inventory value" value={fmt(inventoryValue)} tone="neutral" />
+      </div>
+
+      <div className="mt-3 rounded-xl border border-dashed border-border bg-background p-3 text-[11px] text-muted">
+        Revenue and profit include only <span className="font-bold text-foreground">approved</span>{" "}
+        sales in {currency}. Profit uses the cost you set per product. Deleting a sale below removes
+        it from these totals.
+      </div>
+
+      <section className="mt-6">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+          Approved sales · {currency}
+        </p>
+        <h3 className="text-lg font-extrabold tracking-tight">SELL DETAILS</h3>
+
+        {isLoading ? (
+          <p className="mt-3 text-sm text-muted">Loading…</p>
+        ) : approved.length === 0 ? (
+          <div className="mt-3 grid place-items-center rounded-2xl border border-dashed border-border p-10 text-center">
+            <BarChart3 className="size-6 text-muted" />
+            <p className="mt-3 text-sm text-muted">No approved {currency} sales yet.</p>
+          </div>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {approved.map((o) => {
+              const p = productMap.get(o.item_id);
+              const qty = Number(o.quantity ?? 1);
+              const unitCost =
+                currency === "USD" ? Number(p?.cost_usd ?? 0) : Number(p?.cost_pkr ?? 0);
+              const rowCogs = (Number.isFinite(unitCost) ? unitCost : 0) * qty;
+              const rowProfit = Number(o.amount) - rowCogs;
+              return (
+                <li
+                  key={o.id}
+                  className="rounded-xl border border-border bg-background p-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold">
+                        {o.item_name}{" "}
+                        <span className="text-xs font-normal text-muted">× {qty}</span>
+                      </p>
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                        {new Date(o.reviewed_at ?? o.created_at).toLocaleString()} ·{" "}
+                        {o.sender_name}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => remove(o.id, o.item_name)}
+                      disabled={busyId === o.id}
+                      className="shrink-0 rounded-lg bg-destructive/10 p-2 text-destructive hover:bg-destructive/15 disabled:opacity-60"
+                      aria-label="Delete sale from account"
+                      title="Delete sale and remove from account"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
+                  <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
+                    <Info label="Revenue" value={fmt(Number(o.amount))} />
+                    <Info label="Cost" value={fmt(rowCogs)} />
+                    <Info
+                      label={rowProfit >= 0 ? "Profit" : "Loss"}
+                      value={fmt(Math.abs(rowProfit))}
+                      mono
+                    />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+    </>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "up" | "down" | "neutral";
+}) {
+  const toneClass =
+    tone === "up"
+      ? "text-primary"
+      : tone === "down"
+        ? "text-destructive"
+        : "text-foreground";
+  const Icon = tone === "up" ? TrendingUp : tone === "down" ? TrendingDown : BarChart3;
+  return (
+    <div className="rounded-2xl border border-border bg-background p-4">
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted">{label}</p>
+        <Icon className={`size-3.5 ${toneClass}`} />
+      </div>
+      <p className={`mt-2 text-xl font-extrabold tracking-tight ${toneClass}`}>{value}</p>
+    </div>
   );
 }

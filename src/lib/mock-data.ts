@@ -19,6 +19,8 @@ export type Product = {
   features: string[];
   available_stock?: number;
   delivery_instructions?: string | null;
+  cost_usd?: number | null;
+  cost_pkr?: number | null;
 };
 
 export const products: Product[] = [

@@ -147,6 +147,11 @@ export async function reviewOrder(
   if (error) throw error;
 }
 
+export async function deleteOrder(id: string) {
+  const { error } = await supabase.from("orders").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function approveOrder(id: string, note?: string) {
   const { data, error } = await supabase.rpc("approve_order", {
     _order_id: id,
