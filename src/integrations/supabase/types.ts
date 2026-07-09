@@ -360,6 +360,21 @@ export type Database = {
           user_id: string
         }[]
       }
+      list_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          is_admin: boolean
+          last_sign_in_at: string
+          order_count: number
+          phone: string
+          provider: string
+          total_spent: number
+          user_id: string
+        }[]
+      }
       refresh_product_stock_count: {
         Args: { _product_id: string }
         Returns: undefined
