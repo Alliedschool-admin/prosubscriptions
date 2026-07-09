@@ -149,7 +149,7 @@ function ProductDetail() {
           <p className="mt-1 text-sm text-muted">{product.tagline}</p>
           <div className="mt-2">
             {isFree ? (
-              <StockBadge stock={stock} freeLabel />
+              <StockBadge stock={stock} free />
             ) : (
               <StockBadge stock={stock} />
             )}
@@ -281,12 +281,19 @@ function ProductDetail() {
   );
 }
 
-function StockBadge({ stock }: { stock: number }) {
+function StockBadge({ stock, free = false }: { stock: number; free?: boolean }) {
   if (stock === 0) {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-background">
         <span className="size-1.5 animate-pulse rounded-full bg-primary" />
         Restocking soon — check back in a few hours
+      </span>
+    );
+  }
+  if (free) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-600">
+        Free · {stock} in stock
       </span>
     );
   }
