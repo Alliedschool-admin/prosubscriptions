@@ -162,6 +162,19 @@ export async function approveOrder(id: string, note?: string) {
   return row as { order_id: string; delivered: boolean; out_of_stock: boolean };
 }
 
+export async function claimFreeProduct(productId: string) {
+  const { data, error } = await (
+    supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: { order_id: string; already_owned: boolean }[] | null; error: { message: string } | null }>
+  )("claim_free_product", { _product_id: productId });
+  if (error) throw new Error(error.message);
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) throw new Error("Claim failed — please try again");
+  return row;
+}
+
 export function useOrdersInvalidator() {
   const qc = useQueryClient();
   return () => {
