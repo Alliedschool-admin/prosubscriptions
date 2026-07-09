@@ -14,12 +14,15 @@ import {
   Eye,
   EyeOff,
   ImageIcon,
+  Pencil,
+  Save,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
 import {
   useProducts,
   createProduct,
+  updateProduct,
   deleteProduct as deleteProductRow,
   PRODUCTS_QUERY_KEY,
 } from "../../lib/products-store";
@@ -355,6 +358,7 @@ function ProductRow({
   onDelete: (id: string, label: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
   const stock = product.available_stock ?? 0;
   return (
     <li className="rounded-xl border border-border bg-background p-3">
@@ -381,6 +385,13 @@ function ProductRow({
           {stock} stock
         </span>
         <button
+          onClick={() => setEditing((v) => !v)}
+          className={`rounded-lg p-2 ${editing ? "bg-primary text-primary-foreground" : "bg-foreground/5 text-muted hover:text-foreground"}`}
+          aria-label="Edit product"
+        >
+          <Pencil className="size-4" />
+        </button>
+        <button
           onClick={() => setOpen((v) => !v)}
           className="rounded-lg bg-foreground/5 p-2 text-muted hover:text-foreground"
           aria-label="Manage stock"
@@ -394,8 +405,142 @@ function ProductRow({
           <Trash2 className="size-4" />
         </button>
       </div>
+      {editing && <EditProductForm product={product} onDone={() => setEditing(false)} />}
       {open && <StockManager productId={product.id} />}
     </li>
+  );
+}
+
+function EditProductForm({
+  product,
+  onDone,
+}: {
+  product: import("../../lib/mock-data").Product;
+  onDone: () => void;
+}) {
+  const qc = useQueryClient();
+  const [name, setName] = useState(product.name);
+  const [code, setCode] = useState(product.code);
+  const [category, setCategory] = useState<Category>(product.category);
+  const [priceUsd, setPriceUsd] = useState(product.price_usd == null ? "" : String(product.price_usd));
+  const [pricePkr, setPricePkr] = useState(product.price_pkr == null ? "" : String(product.price_pkr));
+  const [tagline, setTagline] = useState(product.tagline);
+  const [description, setDescription] = useState(product.description);
+  const [image, setImage] = useState(product.image);
+  const [features, setFeatures] = useState((product.features ?? []).join("\n"));
+  const [deliveryInstructions, setDeliveryInstructions] = useState(product.delivery_instructions ?? "");
+  const [busy, setBusy] = useState(false);
+
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    if (!name.trim() || !tagline.trim() || !description.trim()) {
+      toast.error("Name, tagline and description are required.");
+      return;
+    }
+    const usdNum = priceUsd.trim() === "" ? null : Number(priceUsd);
+    const pkrNum = pricePkr.trim() === "" ? null : Number(pricePkr);
+    if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
+      toast.error("Enter a valid USD price.");
+      return;
+    }
+    if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
+      toast.error("Enter a valid PKR price.");
+      return;
+    }
+    if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
+      toast.error("Set at least one price (USD or PKR).");
+      return;
+    }
+    const featureList = features.split("\n").map((f) => f.trim()).filter(Boolean);
+
+    setBusy(true);
+    try {
+      await updateProduct(product.id, {
+        name: name.trim(),
+        code: code.trim(),
+        category,
+        tagline: tagline.trim(),
+        description: description.trim(),
+        image: image.trim() || product.image,
+        features: featureList.length ? featureList : product.features,
+        price_usd: usdNum,
+        price_pkr: pkrNum,
+        delivery_instructions: deliveryInstructions.trim() || null,
+      });
+      toast.success("Product updated.");
+      qc.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY });
+      onDone();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={save}
+      className="mt-3 space-y-3 rounded-lg border border-primary/30 bg-primary/[0.03] p-3"
+    >
+      <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Edit product</p>
+      <Field label="Name">
+        <input value={name} onChange={(e) => setName(e.target.value)} className="input" />
+      </Field>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Code">
+          <input value={code} onChange={(e) => setCode(e.target.value)} className="input font-mono" />
+        </Field>
+        <Field label="Category">
+          <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="input">
+            {CAT_OPTIONS.map((c) => (<option key={c}>{c}</option>))}
+          </select>
+        </Field>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Price (USD)">
+          <input type="number" min="0" step="0.01" value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} className="input font-mono" />
+        </Field>
+        <Field label="Price (PKR)">
+          <input type="number" min="0" step="1" value={pricePkr} onChange={(e) => setPricePkr(e.target.value)} className="input font-mono" />
+        </Field>
+      </div>
+      <Field label="Tagline">
+        <input value={tagline} onChange={(e) => setTagline(e.target.value)} className="input" />
+      </Field>
+      <Field label="Description">
+        <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="input resize-none" />
+      </Field>
+      <Field label="Image URL">
+        <input value={image} onChange={(e) => setImage(e.target.value)} className="input" />
+      </Field>
+      <Field label="Features" hint="One per line.">
+        <textarea rows={3} value={features} onChange={(e) => setFeatures(e.target.value)} className="input resize-none" />
+      </Field>
+      <Field label="Delivery / activation instructions">
+        <textarea
+          rows={4}
+          value={deliveryInstructions}
+          onChange={(e) => setDeliveryInstructions(e.target.value)}
+          className="input resize-none"
+        />
+      </Field>
+      <div className="flex items-center justify-end gap-2 pt-1">
+        <button
+          type="button"
+          onClick={onDone}
+          className="rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-widest text-muted hover:text-foreground"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={busy}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground disabled:opacity-60"
+        >
+          <Save className="size-3.5" /> {busy ? "Saving…" : "Save changes"}
+        </button>
+      </div>
+    </form>
   );
 }
 
