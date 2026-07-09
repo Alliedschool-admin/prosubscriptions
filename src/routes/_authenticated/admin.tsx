@@ -301,6 +301,15 @@ function ProductsPanel() {
         <Field label="Features" hint="One per line.">
           <textarea rows={4} value={features} onChange={(e) => setFeatures(e.target.value)} className="input resize-none" />
         </Field>
+        <Field label="Delivery / activation instructions" hint="Shown to the buyer next to their delivered link after approval. Explain how to redeem, install, or activate.">
+          <textarea
+            rows={5}
+            value={deliveryInstructions}
+            onChange={(e) => setDeliveryInstructions(e.target.value)}
+            placeholder={"1. Open the link\n2. Sign in with the email you used at checkout\n3. Paste the license key into Settings → Activate"}
+            className="input resize-none"
+          />
+        </Field>
         <div className="flex items-center justify-between pt-2">
           <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
             {products.length} live in the vault
