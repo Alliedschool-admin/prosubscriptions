@@ -21,6 +21,8 @@ import {
   TrendingDown,
   MessageSquare,
   Send,
+  UserPlus,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
@@ -63,7 +65,7 @@ import {
 } from "../../lib/stock-store";
 import { useAuth } from "../../hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -76,7 +78,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: Admin,
 });
 
-type Tab = "products" | "methods" | "orders" | "accounts" | "requests";
+type Tab = "products" | "methods" | "orders" | "accounts" | "requests" | "admins";
 
 function Admin() {
   const { user, isAdmin, refresh, signOut } = useAuth();
@@ -152,6 +154,7 @@ function Admin() {
             { id: "orders", label: "Orders", icon: Inbox },
             { id: "accounts", label: "Accounts", icon: BarChart3 },
             { id: "requests", label: "Requests", icon: MessageSquare },
+            { id: "admins", label: "Admins", icon: Users },
           ] as const
         ).map(({ id, label, icon: Icon }) => (
           <button
@@ -171,6 +174,7 @@ function Admin() {
       {tab === "orders" && <OrdersPanel />}
       {tab === "accounts" && <AccountsPanel />}
       {tab === "requests" && <RequestsAdminPanel />}
+      {tab === "admins" && <AdminsPanel />}
 
       <style>{`
         .input {
@@ -1415,5 +1419,158 @@ function RequestAdminRow({
         </div>
       </div>
     </li>
+  );
+}
+/* ---------------- Admins ---------------- */
+
+type AdminRow = { user_id: string; email: string; granted_at: string };
+
+function AdminsPanel() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const { data: admins = [], isLoading } = useQuery({
+    queryKey: ["admins"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("list_admins");
+      if (error) throw error;
+      return (data ?? []) as AdminRow[];
+    },
+  });
+
+  async function grant(e: FormEvent) {
+    e.preventDefault();
+    const value = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      toast.error("Enter a valid email address.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.rpc("grant_admin_by_email", {
+        _email: value,
+      });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      if (row?.granted === false) {
+        toast(`${row.email} is already an admin.`);
+      } else {
+        toast.success(`${row?.email ?? value} is now an admin.`);
+      }
+      setEmail("");
+      qc.invalidateQueries({ queryKey: ["admins"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to grant admin");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function revoke(userId: string, targetEmail: string) {
+    if (!confirm(`Remove admin access from ${targetEmail}?`)) return;
+    setBusyId(userId);
+    try {
+      const { error } = await supabase.rpc("revoke_admin", { _user_id: userId });
+      if (error) throw error;
+      toast.success(`${targetEmail} is no longer an admin.`);
+      qc.invalidateQueries({ queryKey: ["admins"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to revoke");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  return (
+    <>
+      <form
+        onSubmit={grant}
+        className="space-y-3 rounded-2xl border border-border bg-background p-5"
+      >
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+          Grant admin access
+        </p>
+        <h2 className="text-2xl font-extrabold tracking-tight">ADD ADMIN</h2>
+        <p className="text-xs text-muted">
+          The person must already have a customer account. Enter the exact email they signed up
+          with.
+        </p>
+        <Field label="Email">
+          <input
+            required
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="teammate@example.com"
+            maxLength={255}
+            className="input"
+          />
+        </Field>
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={busy}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
+          >
+            <UserPlus className="size-4" /> {busy ? "Granting…" : "Make admin"}
+          </button>
+        </div>
+      </form>
+
+      <section className="mt-8">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Current</p>
+        <h3 className="text-2xl font-extrabold tracking-tight">ADMINS</h3>
+
+        {isLoading ? (
+          <p className="mt-4 text-sm text-muted">Loading…</p>
+        ) : admins.length === 0 ? (
+          <p className="mt-4 text-sm text-muted">No admins yet.</p>
+        ) : (
+          <ul className="mt-4 space-y-2">
+            {admins.map((a) => {
+              const isSelf = a.user_id === user?.id;
+              const isLast = admins.length <= 1;
+              return (
+                <li
+                  key={a.user_id}
+                  className="flex items-center justify-between gap-2 rounded-xl border border-border bg-background p-3"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold">
+                      {a.email}
+                      {isSelf && (
+                        <span className="ml-2 rounded-full bg-primary/15 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
+                          you
+                        </span>
+                      )}
+                    </p>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                      Since {new Date(a.granted_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => revoke(a.user_id, a.email)}
+                    disabled={busyId === a.user_id || isLast}
+                    title={
+                      isLast
+                        ? "Can't remove the last remaining admin"
+                        : isSelf
+                          ? "Remove your own admin access"
+                          : "Remove admin access"
+                    }
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive disabled:opacity-40"
+                  >
+                    <Trash2 className="size-3.5" /> Remove
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+    </>
   );
 }
