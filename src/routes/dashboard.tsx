@@ -8,9 +8,9 @@ import { formatMoney, type Currency } from "../lib/price";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Your Library — Pro Subscriptions" },
+      { title: "My Purchases — Pro Subscriptions" },
       { name: "description", content: "Your orders and purchased download links." },
-      { property: "og:title", content: "Your Library" },
+      { property: "og:title", content: "My Purchases" },
       { property: "og:description", content: "Your orders and purchased download links." },
       { name: "robots", content: "noindex" },
     ],
@@ -25,7 +25,7 @@ function Dashboard() {
   if (!user) {
     return (
       <main className="mx-auto max-w-md px-4 py-20 text-center">
-        <h1 className="text-2xl font-extrabold tracking-tight">Sign in to see your library</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight">Sign in to see your purchases</h1>
         <p className="mt-2 text-sm text-muted">Your purchases and delivered links appear here.</p>
         <Link
           to="/auth"
@@ -63,7 +63,7 @@ function Dashboard() {
         <div className="mb-4 flex items-end justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Your orders</p>
-            <h2 className="text-2xl font-extrabold tracking-tight">MY LIBRARY</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight">MY PURCHASES</h2>
           </div>
           <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-primary">
             {orders.length} order{orders.length === 1 ? "" : "s"}
