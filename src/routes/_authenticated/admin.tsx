@@ -329,12 +329,16 @@ function ProductsPanel() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Price (USD)" hint="Leave blank if USD not offered.">
-            <input type="number" min="0" step="0.01" value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder="29" className="input font-mono" />
+            <input type="number" min="0" step="0.01" disabled={isFree} value={isFree ? "" : priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder={isFree ? "Free" : "29"} className="input font-mono disabled:opacity-50" />
           </Field>
           <Field label="Price (PKR)" hint="Leave blank if PKR not offered.">
-            <input type="number" min="0" step="1" value={pricePkr} onChange={(e) => setPricePkr(e.target.value)} placeholder="7999" className="input font-mono" />
+            <input type="number" min="0" step="1" disabled={isFree} value={isFree ? "" : pricePkr} onChange={(e) => setPricePkr(e.target.value)} placeholder={isFree ? "Free" : "7999"} className="input font-mono disabled:opacity-50" />
           </Field>
         </div>
+        <label className="flex items-center gap-2 rounded-lg border border-border bg-foreground/[0.03] px-3 py-2 text-xs font-bold uppercase tracking-widest text-foreground">
+          <input type="checkbox" checked={isFree} onChange={(e) => setIsFree(e.target.checked)} className="size-4 accent-emerald-500" />
+          Free product · buyers claim instantly with no approval or checkout
+        </label>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Cost (USD)" hint="Your purchase price. Used for profit tracking.">
             <input type="number" min="0" step="0.01" value={costUsd} onChange={(e) => setCostUsd(e.target.value)} placeholder="12" className="input font-mono" />
