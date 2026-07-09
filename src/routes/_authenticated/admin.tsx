@@ -1240,3 +1240,180 @@ function Stat({
     </div>
   );
 }
+
+/* ---------------- Requests ---------------- */
+
+const REQUEST_STATUSES: ProductRequestStatus[] = [
+  "new",
+  "in_review",
+  "responded",
+  "fulfilled",
+  "declined",
+];
+
+function RequestsAdminPanel() {
+  const { data: requests = [], isLoading } = useAllRequests();
+  const invalidate = useRequestsInvalidator();
+  const [filter, setFilter] = useState<ProductRequestStatus | "all">("all");
+
+  const filtered = filter === "all" ? requests : requests.filter((r) => r.status === filter);
+
+  async function remove(id: string) {
+    if (!confirm("Delete this request?")) return;
+    try {
+      await deleteRequest(id);
+      invalidate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    }
+  }
+
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap gap-2">
+        {(["all", ...REQUEST_STATUSES] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest ${
+              filter === f
+                ? "bg-foreground text-background"
+                : "bg-foreground/5 text-muted hover:text-foreground"
+            }`}
+          >
+            {f === "all" ? "All" : REQUEST_STATUS_LABEL[f]}
+          </button>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <p className="text-sm text-muted">Loading requests…</p>
+      ) : filtered.length === 0 ? (
+        <div className="grid place-items-center rounded-2xl border border-dashed border-border p-10 text-center">
+          <MessageSquare className="size-6 text-muted" />
+          <p className="mt-3 text-sm text-muted">No customer requests here yet.</p>
+        </div>
+      ) : (
+        <ul className="space-y-3">
+          {filtered.map((r) => (
+            <RequestAdminRow
+              key={r.id}
+              req={r}
+              onDelete={remove}
+              onSaved={invalidate}
+            />
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
+
+function RequestAdminRow({
+  req,
+  onDelete,
+  onSaved,
+}: {
+  req: ProductRequest;
+  onDelete: (id: string) => void;
+  onSaved: () => void;
+}) {
+  const [reply, setReply] = useState(req.admin_response ?? "");
+  const [status, setStatus] = useState<ProductRequestStatus>(req.status);
+  const [busy, setBusy] = useState(false);
+
+  async function save() {
+    if (reply.trim().length < 2) {
+      toast.error("Write a short response first.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await respondToRequest(req.id, {
+        admin_response: reply.trim().slice(0, 2000),
+        status,
+      });
+      toast.success("Response sent to customer.");
+      onSaved();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <li className="rounded-xl border border-border bg-background p-4">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold">{req.product_name}</p>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            {new Date(req.created_at).toLocaleString()}
+          </p>
+        </div>
+        <StatusBadge status={req.status} />
+      </div>
+
+      {req.details && (
+        <p className="mt-2 whitespace-pre-line text-xs text-muted">{req.details}</p>
+      )}
+      <div className="mt-2 grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
+        {req.reference_link && (
+          <a
+            href={req.reference_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="truncate font-mono text-[11px] text-primary hover:underline"
+          >
+            {req.reference_link}
+          </a>
+        )}
+        {req.contact && <Info label="Contact" value={req.contact} />}
+      </div>
+
+      <div className="mt-3 space-y-2 rounded-lg border border-primary/30 bg-primary/[0.03] p-3">
+        <Field label="Your response">
+          <textarea
+            rows={3}
+            maxLength={2000}
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            placeholder="Yes, we can source this within 24h for Rs 2,500 — reply to confirm."
+            className="input resize-none"
+          />
+        </Field>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <label className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-muted">
+            Status
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as ProductRequestStatus)}
+              className="input !w-auto !py-1.5"
+            >
+              {REQUEST_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {REQUEST_STATUS_LABEL[s]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onDelete(req.id)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive"
+            >
+              <Trash2 className="size-3.5" /> Delete
+            </button>
+            <button
+              onClick={save}
+              disabled={busy}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground disabled:opacity-60"
+            >
+              <Send className="size-3.5" /> {busy ? "Sending…" : "Send reply"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </li>
+  );
+}
