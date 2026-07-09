@@ -19,6 +19,8 @@ import {
   BarChart3,
   TrendingUp,
   TrendingDown,
+  MessageSquare,
+  Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
@@ -45,6 +47,15 @@ import {
   type PaymentMethodKind,
 } from "../../lib/orders-store";
 import {
+  useAllRequests,
+  respondToRequest,
+  deleteRequest,
+  useRequestsInvalidator,
+  REQUEST_STATUS_LABEL,
+  type ProductRequest,
+  type ProductRequestStatus,
+} from "../../lib/requests-store";
+import {
   useProductStock,
   addStockItems,
   deleteStockItem,
@@ -65,7 +76,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: Admin,
 });
 
-type Tab = "products" | "methods" | "orders" | "accounts";
+type Tab = "products" | "methods" | "orders" | "accounts" | "requests";
 
 function Admin() {
   const { user, isAdmin, refresh, signOut } = useAuth();
@@ -140,6 +151,7 @@ function Admin() {
             { id: "methods", label: "Payment", icon: Wallet },
             { id: "orders", label: "Orders", icon: Inbox },
             { id: "accounts", label: "Accounts", icon: BarChart3 },
+            { id: "requests", label: "Requests", icon: MessageSquare },
           ] as const
         ).map(({ id, label, icon: Icon }) => (
           <button
@@ -158,6 +170,7 @@ function Admin() {
       {tab === "methods" && <MethodsPanel />}
       {tab === "orders" && <OrdersPanel />}
       {tab === "accounts" && <AccountsPanel />}
+      {tab === "requests" && <RequestsAdminPanel />}
 
       <style>{`
         .input {
