@@ -68,6 +68,7 @@ import {
 import { useAuth } from "../../hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ImageInput } from "@/components/ImageInput";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -343,8 +344,8 @@ function ProductsPanel() {
         <Field label="Description">
           <textarea required rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className="input resize-none" />
         </Field>
-        <Field label="Image URL" hint="Leave blank to use a default cover.">
-          <input value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://…" className="input" />
+        <Field label="Product image" hint="Paste a URL or upload from your device. Leave blank to use a default cover.">
+          <ImageInput value={image} onChange={setImage} folder="products" />
         </Field>
         <Field label="Features" hint="One per line.">
           <textarea rows={4} value={features} onChange={(e) => setFeatures(e.target.value)} className="input resize-none" />
@@ -567,8 +568,8 @@ function EditProductForm({
       <Field label="Description">
         <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="input resize-none" />
       </Field>
-      <Field label="Image URL">
-        <input value={image} onChange={(e) => setImage(e.target.value)} className="input" />
+      <Field label="Product image">
+        <ImageInput value={image} onChange={setImage} folder="products" />
       </Field>
       <Field label="Features" hint="One per line.">
         <textarea rows={3} value={features} onChange={(e) => setFeatures(e.target.value)} className="input resize-none" />
@@ -1798,6 +1799,7 @@ type PostRow = {
   body: string;
   category: "free_method" | "update" | "announcement";
   link: string | null;
+  image: string | null;
   pinned: boolean;
   published: boolean;
   created_at: string;
@@ -1816,6 +1818,7 @@ function PostsAdminPanel() {
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<PostRow["category"]>("free_method");
   const [link, setLink] = useState("");
+  const [image, setImage] = useState("");
   const [pinned, setPinned] = useState(false);
   const [busy, setBusy] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -1838,6 +1841,7 @@ function PostsAdminPanel() {
     setBody("");
     setCategory("free_method");
     setLink("");
+    setImage("");
     setPinned(false);
     setEditingId(null);
   }
@@ -1855,6 +1859,7 @@ function PostsAdminPanel() {
         body: body.trim(),
         category,
         link: link.trim() || null,
+        image: image.trim() || null,
         pinned,
       };
       if (editingId) {
@@ -1910,6 +1915,7 @@ function PostsAdminPanel() {
     setBody(p.body);
     setCategory(p.category);
     setLink(p.link ?? "");
+    setImage(p.image ?? "");
     setPinned(p.pinned);
   }
 
@@ -1956,6 +1962,12 @@ function PostsAdminPanel() {
               placeholder="Optional link (https://…)"
               className="input w-full"
             />
+          </div>
+          <div>
+            <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+              Cover image (optional)
+            </p>
+            <ImageInput value={image} onChange={setImage} folder="posts" />
           </div>
           <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted">
             <input
