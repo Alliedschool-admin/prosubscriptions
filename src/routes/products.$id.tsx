@@ -1,15 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, Check, Download, Gift } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { getProduct as getSeedProduct } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
 import { useCart } from "../lib/cart-context";
 import { availableCurrencies, formatMoney, productPrice } from "../lib/price";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "../hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
-import { MY_ORDERS_QUERY_KEY } from "../lib/orders-store";
+import { MY_ORDERS_QUERY_KEY, claimFreeProduct } from "../lib/orders-store";
+
+const PENDING_CLAIM_KEY = "pending-free-claim";
 
 export const Route = createFileRoute("/products/$id")({
   head: ({ params }) => {
@@ -41,6 +42,7 @@ function ProductDetail() {
   const qc = useQueryClient();
   const [claiming, setClaiming] = useState(false);
   const product = getProduct(id);
+  const autoRan = useRef(false);
   const currencies = product ? availableCurrencies(product) : [];
   const usd = product ? productPrice(product, "USD") : null;
   const pkr = product ? productPrice(product, "PKR") : null;
@@ -51,20 +53,17 @@ function ProductDetail() {
   async function claimFree() {
     if (!product) return;
     if (!user) {
+      try {
+        localStorage.setItem(PENDING_CLAIM_KEY, product.id);
+      } catch { /* ignore */ }
+      toast.info("Sign in to claim this free product");
       navigate({ to: "/auth" });
       return;
     }
     setClaiming(true);
     try {
-      const { data, error } = await (
-        supabase.rpc as unknown as (
-          fn: string,
-          args: Record<string, unknown>,
-        ) => Promise<{ data: { order_id: string; already_owned: boolean }[] | null; error: { message: string } | null }>
-      )("claim_free_product", { _product_id: product.id });
-      if (error) throw new Error(error.message);
-      const row = Array.isArray(data) ? data[0] : data;
-      toast.success(row?.already_owned ? "Already in your purchases" : "Added to your purchases");
+      const row = await claimFreeProduct(product.id);
+      toast.success(row.already_owned ? "Already in your purchases" : "Added to your purchases");
       qc.invalidateQueries({ queryKey: MY_ORDERS_QUERY_KEY });
       navigate({ to: "/dashboard" });
     } catch (err) {
@@ -73,6 +72,23 @@ function ProductDetail() {
       setClaiming(false);
     }
   }
+
+  // Auto-complete a pending claim after the user signs in and returns here.
+  useEffect(() => {
+    if (autoRan.current) return;
+    if (!product || !isFree || !user) return;
+    let pending: string | null = null;
+    try {
+      pending = localStorage.getItem(PENDING_CLAIM_KEY);
+    } catch { /* ignore */ }
+    if (pending !== product.id) return;
+    autoRan.current = true;
+    try {
+      localStorage.removeItem(PENDING_CLAIM_KEY);
+    } catch { /* ignore */ }
+    claimFree();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, product?.id, isFree]);
 
   if (loading && !product) {
     return (
