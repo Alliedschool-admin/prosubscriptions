@@ -16,6 +16,9 @@ import {
   ImageIcon,
   Pencil,
   Save,
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
@@ -34,6 +37,7 @@ import {
   useAllOrders,
   reviewOrder,
   approveOrder,
+  deleteOrder,
   getProofSignedUrl,
   PAYMENT_KIND_LABEL,
   useOrdersInvalidator,
@@ -61,7 +65,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: Admin,
 });
 
-type Tab = "products" | "methods" | "orders";
+type Tab = "products" | "methods" | "orders" | "accounts";
 
 function Admin() {
   const { user, isAdmin, refresh, signOut } = useAuth();
@@ -135,6 +139,7 @@ function Admin() {
             { id: "products", label: "Products", icon: Package },
             { id: "methods", label: "Payment", icon: Wallet },
             { id: "orders", label: "Orders", icon: Inbox },
+            { id: "accounts", label: "Accounts", icon: BarChart3 },
           ] as const
         ).map(({ id, label, icon: Icon }) => (
           <button
@@ -152,6 +157,7 @@ function Admin() {
       {tab === "products" && <ProductsPanel />}
       {tab === "methods" && <MethodsPanel />}
       {tab === "orders" && <OrdersPanel />}
+      {tab === "accounts" && <AccountsPanel />}
 
       <style>{`
         .input {
