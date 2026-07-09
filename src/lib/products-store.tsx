@@ -29,11 +29,15 @@ type ProductRow = {
   features: string[] | null;
   available_stock?: number | null;
   delivery_instructions?: string | null;
+  cost_usd?: number | string | null;
+  cost_pkr?: number | string | null;
 };
 
 function rowToProduct(r: ProductRow): Product {
   const usd = r.price_usd == null ? null : Number(r.price_usd);
   const pkr = r.price_pkr == null ? null : Number(r.price_pkr);
+  const costUsd = r.cost_usd == null ? null : Number(r.cost_usd);
+  const costPkr = r.cost_pkr == null ? null : Number(r.cost_pkr);
   return {
     id: r.id,
     code: r.code,
@@ -48,6 +52,8 @@ function rowToProduct(r: ProductRow): Product {
     features: Array.isArray(r.features) ? r.features : [],
     available_stock: r.available_stock == null ? 0 : Number(r.available_stock),
     delivery_instructions: r.delivery_instructions ?? null,
+    cost_usd: costUsd,
+    cost_pkr: costPkr,
   };
 }
 
@@ -56,7 +62,7 @@ export const PRODUCTS_QUERY_KEY = ["products"] as const;
 async function fetchProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions")
+    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data as ProductRow[]).map(rowToProduct);
@@ -108,13 +114,15 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
       price: priceLegacy,
       price_usd: input.price_usd ?? null,
       price_pkr: input.price_pkr ?? null,
+      cost_usd: input.cost_usd ?? null,
+      cost_pkr: input.cost_pkr ?? null,
       category: input.category,
       image: input.image || "",
       features: input.features,
       delivery_instructions: input.delivery_instructions ?? null,
       created_by: userData.user?.id ?? null,
     })
-    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions")
+    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr")
     .single();
   if (error) throw error;
   return rowToProduct(data as ProductRow);
@@ -141,6 +149,8 @@ export async function updateProduct(
       ...(patch.features !== undefined && { features: patch.features }),
       ...(patch.price_usd !== undefined && { price_usd: patch.price_usd }),
       ...(patch.price_pkr !== undefined && { price_pkr: patch.price_pkr }),
+      ...(patch.cost_usd !== undefined && { cost_usd: patch.cost_usd }),
+      ...(patch.cost_pkr !== undefined && { cost_pkr: patch.cost_pkr }),
       ...(patch.delivery_instructions !== undefined && {
         delivery_instructions: patch.delivery_instructions,
       }),
@@ -148,7 +158,7 @@ export async function updateProduct(
     })
     .eq("id", id)
     .select(
-      "id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions",
+      "id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr",
     )
     .single();
   if (error) throw error;
