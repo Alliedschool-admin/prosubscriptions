@@ -365,6 +365,30 @@ export type Database = {
         }
         Relationships: []
       }
+      site_visits: {
+        Row: {
+          created_at: string
+          id: string
+          path: string | null
+          user_agent: string | null
+          visitor_key: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          path?: string | null
+          user_agent?: string | null
+          visitor_key?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          path?: string | null
+          user_agent?: string | null
+          visitor_key?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -469,12 +493,26 @@ export type Database = {
           purchase_count: number
         }[]
       }
+      record_site_visit: {
+        Args: { _path: string; _user_agent: string; _visitor_key: string }
+        Returns: undefined
+      }
       refresh_product_stock_count: {
         Args: { _product_id: string }
         Returns: undefined
       }
       revoke_admin: { Args: { _user_id: string }; Returns: boolean }
       revoke_admin_invite: { Args: { _email: string }; Returns: boolean }
+      visitor_stats: {
+        Args: never
+        Returns: {
+          total_visits: number
+          unique_visitors: number
+          visits_30d: number
+          visits_7d: number
+          visits_today: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "super_admin"
