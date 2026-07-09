@@ -149,7 +149,7 @@ export async function reviewOrder(
 export async function approveOrder(id: string, note?: string) {
   const { data, error } = await supabase.rpc("approve_order", {
     _order_id: id,
-    _note: note ?? null,
+    ...(note ? { _note: note } : {}),
   });
   if (error) throw error;
   const row = Array.isArray(data) ? data[0] : data;
