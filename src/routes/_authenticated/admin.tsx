@@ -23,6 +23,7 @@ import {
   Send,
   UserPlus,
   Users,
+  Contact,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
@@ -78,7 +79,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: Admin,
 });
 
-type Tab = "products" | "methods" | "orders" | "accounts" | "requests" | "admins";
+type Tab = "products" | "methods" | "orders" | "accounts" | "requests" | "admins" | "users";
 
 function Admin() {
   const { user, isAdmin, refresh, signOut } = useAuth();
@@ -155,6 +156,7 @@ function Admin() {
             { id: "accounts", label: "Accounts", icon: BarChart3 },
             { id: "requests", label: "Requests", icon: MessageSquare },
             { id: "admins", label: "Admins", icon: Users },
+            { id: "users", label: "Users", icon: Contact },
           ] as const
         ).map(({ id, label, icon: Icon }) => (
           <button
@@ -175,6 +177,7 @@ function Admin() {
       {tab === "accounts" && <AccountsPanel />}
       {tab === "requests" && <RequestsAdminPanel />}
       {tab === "admins" && <AdminsPanel />}
+      {tab === "users" && <UsersPanel />}
 
       <style>{`
         .input {
