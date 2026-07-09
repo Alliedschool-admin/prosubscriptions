@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_invites: {
+        Row: {
+          created_at: string
+          email: string
+          invited_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          invited_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          invited_by?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           admin_note: string | null
@@ -391,6 +409,22 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_admin_by_email: {
+        Args: { _email: string }
+        Returns: {
+          email: string
+          granted: boolean
+          invited: boolean
+        }[]
+      }
+      list_admin_invites: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          invited_by_email: string
+        }[]
+      }
       list_admins: {
         Args: never
         Returns: {
@@ -419,6 +453,7 @@ export type Database = {
         Returns: undefined
       }
       revoke_admin: { Args: { _user_id: string }; Returns: boolean }
+      revoke_admin_invite: { Args: { _email: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
