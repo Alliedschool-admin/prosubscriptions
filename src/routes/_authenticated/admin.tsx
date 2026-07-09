@@ -477,6 +477,7 @@ function EditProductForm({
   const [name, setName] = useState(product.name);
   const [code, setCode] = useState(product.code);
   const [category, setCategory] = useState<Category>(product.category);
+  const [isFree, setIsFree] = useState(!!product.is_free);
   const [priceUsd, setPriceUsd] = useState(product.price_usd == null ? "" : String(product.price_usd));
   const [pricePkr, setPricePkr] = useState(product.price_pkr == null ? "" : String(product.price_pkr));
   const [costUsd, setCostUsd] = useState(product.cost_usd == null ? "" : String(product.cost_usd));
@@ -494,19 +495,21 @@ function EditProductForm({
       toast.error("Name, tagline and description are required.");
       return;
     }
-    const usdNum = priceUsd.trim() === "" ? null : Number(priceUsd);
-    const pkrNum = pricePkr.trim() === "" ? null : Number(pricePkr);
-    if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
-      toast.error("Enter a valid USD price.");
-      return;
-    }
-    if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
-      toast.error("Enter a valid PKR price.");
-      return;
-    }
-    if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
-      toast.error("Set at least one price (USD or PKR).");
-      return;
+    const usdNum = isFree ? 0 : (priceUsd.trim() === "" ? null : Number(priceUsd));
+    const pkrNum = isFree ? 0 : (pricePkr.trim() === "" ? null : Number(pricePkr));
+    if (!isFree) {
+      if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
+        toast.error("Enter a valid USD price.");
+        return;
+      }
+      if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
+        toast.error("Enter a valid PKR price.");
+        return;
+      }
+      if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
+        toast.error("Set at least one price (USD or PKR), or mark it Free.");
+        return;
+      }
     }
     const featureList = features.split("\n").map((f) => f.trim()).filter(Boolean);
 
@@ -516,6 +519,7 @@ function EditProductForm({
         name: name.trim(),
         code: code.trim(),
         category,
+        is_free: isFree,
         tagline: tagline.trim(),
         description: description.trim(),
         image: image.trim() || product.image,
