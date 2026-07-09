@@ -1577,3 +1577,144 @@ function AdminsPanel() {
     </>
   );
 }
+
+type UserRow = {
+  user_id: string;
+  email: string | null;
+  phone: string | null;
+  full_name: string | null;
+  provider: string | null;
+  created_at: string;
+  last_sign_in_at: string | null;
+  is_admin: boolean;
+  order_count: number;
+  total_spent: number;
+};
+
+function UsersPanel() {
+  const [query, setQuery] = useState("");
+  const { data: users = [], isLoading, error } = useQuery({
+    queryKey: ["admin-users"],
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as unknown as (fn: string) => Promise<{ data: UserRow[] | null; error: { message: string } | null }>)("list_users");
+      if (error) throw new Error(error.message);
+      return (data ?? []) as UserRow[];
+    },
+  });
+
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? users.filter((u) =>
+        [u.email, u.phone, u.full_name, u.user_id].some((v) => v && v.toLowerCase().includes(q)),
+      )
+    : users;
+
+  function copy(text: string | null, label: string) {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(
+      () => toast.success(`${label} copied`),
+      () => toast.error("Copy failed"),
+    );
+  }
+
+  return (
+    <section className="rounded-2xl border border-border bg-background p-5">
+      <div className="flex items-center gap-2">
+        <Contact className="size-4 text-primary" />
+        <h2 className="text-sm font-extrabold uppercase tracking-widest">Signed-in users</h2>
+        <span className="ml-auto rounded-full bg-muted/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted">
+          {users.length} total
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-muted">
+        Everyone who has signed up. Use this to reach out about orders or inquiries.
+      </p>
+
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search by email, name, phone or id…"
+        className="input mt-4 w-full"
+      />
+
+      {isLoading ? (
+        <p className="mt-4 text-sm text-muted">Loading users…</p>
+      ) : error ? (
+        <p className="mt-4 text-sm text-destructive">
+          {error instanceof Error ? error.message : "Failed to load users"}
+        </p>
+      ) : filtered.length === 0 ? (
+        <p className="mt-4 text-sm text-muted">No users match.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {filtered.map((u) => (
+            <li key={u.user_id} className="rounded-xl border border-border bg-card p-4">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="truncate text-sm font-bold">{u.full_name || u.email || u.user_id}</p>
+                    {u.is_admin && (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-primary">
+                        Admin
+                      </span>
+                    )}
+                    {u.provider && (
+                      <span className="rounded-full bg-muted/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-muted">
+                        {u.provider}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 truncate font-mono text-xs text-muted">{u.email ?? "—"}</p>
+                  {u.phone && (
+                    <p className="truncate font-mono text-xs text-muted">📞 {u.phone}</p>
+                  )}
+                </div>
+                <div className="text-right text-[10px] font-mono uppercase tracking-widest text-muted">
+                  <p>Joined {new Date(u.created_at).toLocaleDateString()}</p>
+                  {u.last_sign_in_at && (
+                    <p>Last {new Date(u.last_sign_in_at).toLocaleDateString()}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3 text-[11px]">
+                <span className="rounded-lg bg-muted/10 px-2 py-1 font-mono text-muted">
+                  {u.order_count} order{u.order_count === 1 ? "" : "s"}
+                </span>
+                <span className="rounded-lg bg-muted/10 px-2 py-1 font-mono text-muted">
+                  PKR {Number(u.total_spent || 0).toLocaleString()}
+                </span>
+                <div className="ml-auto flex gap-1.5">
+                  {u.email && (
+                    <button
+                      onClick={() => copy(u.email, "Email")}
+                      className="rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/10"
+                    >
+                      Copy email
+                    </button>
+                  )}
+                  {u.phone && (
+                    <button
+                      onClick={() => copy(u.phone, "Phone")}
+                      className="rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/10"
+                    >
+                      Copy phone
+                    </button>
+                  )}
+                  {u.email && (
+                    <a
+                      href={`mailto:${u.email}`}
+                      className="rounded-lg bg-foreground px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-background hover:opacity-90"
+                    >
+                      Email
+                    </a>
+                  )}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
