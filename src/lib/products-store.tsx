@@ -1,18 +1,78 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { products as seedProducts, type Product, type Category } from "./mock-data";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { type Category, type Product } from "./mock-data";
+import kineticImg from "../assets/products/kinetic.jpg";
+import swissImg from "../assets/products/swiss.jpg";
+import neuralImg from "../assets/products/neural.jpg";
+import edgeImg from "../assets/products/edge.jpg";
 
-const STORAGE_KEY = "vault01.custom-products.v1";
-
-type ProductsContextValue = {
-  products: Product[];
-  customProducts: Product[];
-  getProduct: (id: string) => Product | undefined;
-  addProduct: (input: Omit<Product, "id"> & { id?: string }) => Product;
-  updateProduct: (id: string, patch: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
+// Map seed product IDs to their bundled image assets so DB rows created via
+// migration keep working even though the DB stores a placeholder path.
+const SEED_IMAGES: Record<string, string> = {
+  "kinetic-presets": kineticImg,
+  "swiss-grid-system": swissImg,
+  "neural-prompts": neuralImg,
+  "edge-stack-template": edgeImg,
 };
 
-const ProductsContext = createContext<ProductsContextValue | null>(null);
+type ProductRow = {
+  id: string;
+  code: string;
+  name: string;
+  tagline: string;
+  description: string;
+  price: number | string;
+  category: string;
+  image: string;
+  features: string[] | null;
+};
+
+function rowToProduct(r: ProductRow): Product {
+  return {
+    id: r.id,
+    code: r.code,
+    name: r.name,
+    tagline: r.tagline,
+    description: r.description,
+    price: Number(r.price),
+    category: r.category as Category,
+    image: SEED_IMAGES[r.id] ?? r.image,
+    features: Array.isArray(r.features) ? r.features : [],
+  };
+}
+
+export const PRODUCTS_QUERY_KEY = ["products"] as const;
+
+async function fetchProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, code, name, tagline, description, price, category, image, features")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as ProductRow[]).map(rowToProduct);
+}
+
+export function useProducts() {
+  const qc = useQueryClient();
+  const query = useQuery({
+    queryKey: PRODUCTS_QUERY_KEY,
+    queryFn: fetchProducts,
+    staleTime: 30_000,
+  });
+  const products = query.data ?? [];
+  return {
+    products,
+    loading: query.isLoading,
+    error: query.error as Error | null,
+    getProduct: (id: string) => products.find((p) => p.id === id),
+    refetch: () => qc.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY }),
+  };
+}
+
+export type NewProductInput = Omit<Product, "id" | "image"> & {
+  id?: string;
+  image?: string;
+};
 
 function slugify(s: string) {
   return s
@@ -22,72 +82,30 @@ function slugify(s: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-function loadCustom(): Product[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as Product[]) : [];
-  } catch {
-    return [];
-  }
+export async function createProduct(input: NewProductInput): Promise<Product> {
+  const id = (input.id?.trim() || slugify(input.name) || `vlt-${Date.now()}`).slice(0, 60);
+  const { data: userData } = await supabase.auth.getUser();
+  const { data, error } = await supabase
+    .from("products")
+    .insert({
+      id,
+      code: input.code,
+      name: input.name,
+      tagline: input.tagline,
+      description: input.description,
+      price: input.price,
+      category: input.category,
+      image: input.image || "",
+      features: input.features,
+      created_by: userData.user?.id ?? null,
+    })
+    .select("id, code, name, tagline, description, price, category, image, features")
+    .single();
+  if (error) throw error;
+  return rowToProduct(data as ProductRow);
 }
 
-export function ProductsProvider({ children }: { children: ReactNode }) {
-  const [customProducts, setCustomProducts] = useState<Product[]>([]);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setCustomProducts(loadCustom());
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(customProducts));
-    } catch {
-      /* ignore quota */
-    }
-  }, [customProducts, hydrated]);
-
-  const value = useMemo<ProductsContextValue>(() => {
-    const all = [...customProducts, ...seedProducts];
-    return {
-      products: all,
-      customProducts,
-      getProduct: (id) => all.find((p) => p.id === id),
-      addProduct: (input) => {
-        const baseId = input.id?.trim() || slugify(input.name) || `vlt-${Date.now()}`;
-        let id = baseId;
-        let n = 1;
-        while (all.some((p) => p.id === id)) id = `${baseId}-${n++}`;
-        const product: Product = {
-          id,
-          code: input.code || `VLT-${String(Math.floor(Math.random() * 900) + 100)}`,
-          name: input.name,
-          tagline: input.tagline,
-          description: input.description,
-          price: input.price,
-          category: input.category as Category,
-          image: input.image,
-          features: input.features,
-        };
-        setCustomProducts((prev) => [product, ...prev]);
-        return product;
-      },
-      updateProduct: (id, patch) =>
-        setCustomProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p))),
-      deleteProduct: (id) => setCustomProducts((prev) => prev.filter((p) => p.id !== id)),
-    };
-  }, [customProducts]);
-
-  return <ProductsContext.Provider value={value}>{children}</ProductsContext.Provider>;
-}
-
-export function useProducts() {
-  const ctx = useContext(ProductsContext);
-  if (!ctx) throw new Error("useProducts must be used within ProductsProvider");
-  return ctx;
+export async function deleteProduct(id: string): Promise<void> {
+  const { error } = await supabase.from("products").delete().eq("id", id);
+  if (error) throw error;
 }
