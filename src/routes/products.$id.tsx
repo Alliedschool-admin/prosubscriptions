@@ -127,7 +127,13 @@ function ProductDetail() {
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{product.name}</h1>
           <p className="mt-1 text-sm text-muted">{product.tagline}</p>
           <div className="mt-2">
-            <StockBadge stock={stock} />
+            {isFree ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-600">
+                Free · unlimited access
+              </span>
+            ) : (
+              <StockBadge stock={stock} />
+            )}
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
