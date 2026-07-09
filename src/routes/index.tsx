@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { categories } from "../lib/mock-data";
@@ -13,16 +13,24 @@ export const Route = createFileRoute("/")({
 
 function Discovery() {
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [cat, setCat] = useState<(typeof categories)[number]>("All");
   const { products, loading } = useProducts();
 
+  // Debounce search input so filtering doesn't run on every keystroke.
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQuery(query), 150);
+    return () => clearTimeout(id);
+  }, [query]);
+
   const filtered = useMemo(() => {
+    const q = debouncedQuery.trim().toLowerCase();
     return products.filter((p) => {
-      const matchesQ = query.trim() === "" || p.name.toLowerCase().includes(query.toLowerCase()) || p.tagline.toLowerCase().includes(query.toLowerCase());
+      const matchesQ = q === "" || p.name.toLowerCase().includes(q) || p.tagline.toLowerCase().includes(q);
       const matchesC = cat === "All" || p.category === cat;
       return matchesQ && matchesC;
     });
-  }, [query, cat, products]);
+  }, [debouncedQuery, cat, products]);
 
   return (
     <main className="mx-auto max-w-2xl px-4 pb-32 pt-8">
@@ -53,6 +61,7 @@ function Discovery() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search the vault…"
+          aria-label="Search the vault"
           className="flex-1 border-none bg-transparent px-3 text-sm outline-none placeholder:text-muted"
         />
       </div>

@@ -136,6 +136,9 @@ function ProductDetail() {
           alt={product.name}
           width={1024}
           height={1024}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           className="aspect-square w-full object-cover"
         />
       </div>
