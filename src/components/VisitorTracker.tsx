@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 function getVisitorKey(): string {
@@ -17,16 +16,19 @@ function getVisitorKey(): string {
 }
 
 export function VisitorTracker() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
     if (typeof window === "undefined") return;
     const key = getVisitorKey();
-    // fire and forget
-    void supabase.rpc("record_site_visit", {
-      _visitor_key: key,
-      _path: pathname,
-      _user_agent: navigator.userAgent.slice(0, 500),
-    });
-  }, [pathname]);
+    const path = window.location.pathname;
+    supabase
+      .rpc("record_site_visit", {
+        _visitor_key: key,
+        _path: path,
+        _user_agent: navigator.userAgent.slice(0, 500),
+      })
+      .then(({ error }) => {
+        if (error) console.warn("[VisitorTracker] record_site_visit failed", error.message);
+      });
+  }, []);
   return null;
 }
