@@ -411,7 +411,7 @@ function ProductsPanel() {
         ) : (
           <ul className="space-y-3">
             {products.map((p) => (
-              <ProductRow key={p.id} product={p} onDelete={onDelete} />
+              <ProductRow key={p.id} product={p} onDelete={onDelete} purchaseCount={countByProduct.get(p.id) ?? 0} />
             ))}
           </ul>
         )}
