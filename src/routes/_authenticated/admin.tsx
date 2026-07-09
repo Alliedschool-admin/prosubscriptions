@@ -24,6 +24,7 @@ import {
   UserPlus,
   Users,
   Contact,
+  Megaphone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
@@ -79,7 +80,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: Admin,
 });
 
-type Tab = "products" | "methods" | "orders" | "accounts" | "requests" | "admins" | "users";
+type Tab = "products" | "methods" | "orders" | "accounts" | "requests" | "admins" | "users" | "posts";
 
 function Admin() {
   const { user, isAdmin, refresh, signOut } = useAuth();
@@ -157,6 +158,7 @@ function Admin() {
             { id: "requests", label: "Requests", icon: MessageSquare },
             { id: "admins", label: "Admins", icon: Users },
             { id: "users", label: "Users", icon: Contact },
+            { id: "posts", label: "Posts", icon: Megaphone },
           ] as const
         ).map(({ id, label, icon: Icon }) => (
           <button
@@ -178,6 +180,7 @@ function Admin() {
       {tab === "requests" && <RequestsAdminPanel />}
       {tab === "admins" && <AdminsPanel />}
       {tab === "users" && <UsersPanel />}
+      {tab === "posts" && <PostsAdminPanel />}
 
       <style>{`
         .input {
@@ -1716,5 +1719,286 @@ function UsersPanel() {
         </ul>
       )}
     </section>
+  );
+}
+
+type PostRow = {
+  id: string;
+  title: string;
+  body: string;
+  category: "free_method" | "update" | "announcement";
+  link: string | null;
+  pinned: boolean;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+const POST_CATEGORY_LABEL: Record<PostRow["category"], string> = {
+  free_method: "Free method",
+  update: "Update",
+  announcement: "Announcement",
+};
+
+function PostsAdminPanel() {
+  const qc = useQueryClient();
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [category, setCategory] = useState<PostRow["category"]>("free_method");
+  const [link, setLink] = useState("");
+  const [pinned, setPinned] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const postsTable = supabase.from as unknown as (t: string) => any;
+
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ["admin-posts"],
+    queryFn: async () => {
+      const { data, error } = await postsTable("posts")
+        .select("*")
+        .order("pinned", { ascending: false })
+        .order("created_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      return (data ?? []) as PostRow[];
+    },
+  });
+
+  function reset() {
+    setTitle("");
+    setBody("");
+    setCategory("free_method");
+    setLink("");
+    setPinned(false);
+    setEditingId(null);
+  }
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!title.trim() || !body.trim()) {
+      toast.error("Title and body are required");
+      return;
+    }
+    setBusy(true);
+    try {
+      const payload = {
+        title: title.trim(),
+        body: body.trim(),
+        category,
+        link: link.trim() || null,
+        pinned,
+      };
+      if (editingId) {
+        const { error } = await postsTable("posts").update(payload).eq("id", editingId);
+        if (error) throw new Error(error.message);
+        toast.success("Post updated");
+      } else {
+        const { error } = await postsTable("posts").insert(payload);
+        if (error) throw new Error(error.message);
+        toast.success("Post published");
+      }
+      reset();
+      qc.invalidateQueries({ queryKey: ["admin-posts"] });
+      qc.invalidateQueries({ queryKey: ["posts"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save post");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function togglePublished(p: PostRow) {
+    const { error } = await postsTable("posts")
+      .update({ published: !p.published })
+      .eq("id", p.id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["admin-posts"] });
+    qc.invalidateQueries({ queryKey: ["posts"] });
+  }
+
+  async function togglePinned(p: PostRow) {
+    const { error } = await postsTable("posts")
+      .update({ pinned: !p.pinned })
+      .eq("id", p.id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["admin-posts"] });
+    qc.invalidateQueries({ queryKey: ["posts"] });
+  }
+
+  async function remove(p: PostRow) {
+    if (!confirm(`Delete "${p.title}"?`)) return;
+    const { error } = await postsTable("posts").delete().eq("id", p.id);
+    if (error) return toast.error(error.message);
+    toast.success("Post deleted");
+    if (editingId === p.id) reset();
+    qc.invalidateQueries({ queryKey: ["admin-posts"] });
+    qc.invalidateQueries({ queryKey: ["posts"] });
+  }
+
+  function edit(p: PostRow) {
+    setEditingId(p.id);
+    setTitle(p.title);
+    setBody(p.body);
+    setCategory(p.category);
+    setLink(p.link ?? "");
+    setPinned(p.pinned);
+  }
+
+  return (
+    <>
+      <section className="rounded-2xl border border-border bg-background p-5">
+        <div className="flex items-center gap-2">
+          <Megaphone className="size-4 text-primary" />
+          <h2 className="text-sm font-extrabold uppercase tracking-widest">
+            {editingId ? "Edit post" : "Publish a post"}
+          </h2>
+        </div>
+        <p className="mt-1 text-xs text-muted">
+          Share free methods, product updates and announcements with your customers.
+        </p>
+
+        <form onSubmit={submit} className="mt-4 space-y-3">
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Title"
+            className="input w-full"
+          />
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="Write the details customers should see…"
+            rows={5}
+            className="input w-full resize-y"
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as PostRow["category"])}
+              className="input w-full"
+            >
+              <option value="free_method">Free method</option>
+              <option value="update">Update</option>
+              <option value="announcement">Announcement</option>
+            </select>
+            <input
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              placeholder="Optional link (https://…)"
+              className="input w-full"
+            />
+          </div>
+          <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted">
+            <input
+              type="checkbox"
+              checked={pinned}
+              onChange={(e) => setPinned(e.target.checked)}
+            />
+            Pin to top
+          </label>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={busy}
+              className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-extrabold uppercase tracking-widest text-primary-foreground disabled:opacity-60"
+            >
+              {busy ? "Saving…" : editingId ? "Save changes" : "Publish post"}
+            </button>
+            {editingId && (
+              <button
+                type="button"
+                onClick={reset}
+                className="rounded-xl border border-border px-4 text-xs font-bold uppercase tracking-widest"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-border bg-background p-5">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-extrabold uppercase tracking-widest">All posts</h3>
+          <span className="ml-auto rounded-full bg-muted/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted">
+            {posts.length}
+          </span>
+        </div>
+
+        {isLoading ? (
+          <p className="mt-4 text-sm text-muted">Loading…</p>
+        ) : posts.length === 0 ? (
+          <p className="mt-4 text-sm text-muted">No posts yet.</p>
+        ) : (
+          <ul className="mt-4 space-y-3">
+            {posts.map((p) => (
+              <li key={p.id} className="rounded-xl border border-border bg-card p-4">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-muted/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-muted">
+                        {POST_CATEGORY_LABEL[p.category]}
+                      </span>
+                      {p.pinned && (
+                        <span className="rounded-full bg-foreground/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-foreground">
+                          Pinned
+                        </span>
+                      )}
+                      {!p.published && (
+                        <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-destructive">
+                          Hidden
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 truncate text-sm font-bold">{p.title}</p>
+                    <p className="mt-1 line-clamp-2 text-xs text-muted">{p.body}</p>
+                    {p.link && (
+                      <a
+                        href={p.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+                      >
+                        {p.link} <ExternalLink className="size-3" />
+                      </a>
+                    )}
+                  </div>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                    {new Date(p.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-1.5 border-t border-border pt-3">
+                  <button
+                    onClick={() => edit(p)}
+                    className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/10"
+                  >
+                    <Pencil className="size-3" /> Edit
+                  </button>
+                  <button
+                    onClick={() => togglePublished(p)}
+                    className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/10"
+                  >
+                    {p.published ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+                    {p.published ? "Hide" : "Publish"}
+                  </button>
+                  <button
+                    onClick={() => togglePinned(p)}
+                    className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/10"
+                  >
+                    {p.pinned ? "Unpin" : "Pin"}
+                  </button>
+                  <button
+                    onClick={() => remove(p)}
+                    className="ml-auto inline-flex items-center gap-1 rounded-lg bg-destructive/10 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-destructive"
+                  >
+                    <Trash2 className="size-3" /> Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </>
   );
 }

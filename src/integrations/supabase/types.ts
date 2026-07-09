@@ -146,6 +146,45 @@ export type Database = {
         }
         Relationships: []
       }
+      posts: {
+        Row: {
+          body: string
+          category: Database["public"]["Enums"]["post_category"]
+          created_at: string
+          created_by: string | null
+          id: string
+          link: string | null
+          pinned: boolean
+          published: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          category?: Database["public"]["Enums"]["post_category"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          link?: string | null
+          pinned?: boolean
+          published?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          category?: Database["public"]["Enums"]["post_category"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          link?: string | null
+          pinned?: boolean
+          published?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_requests: {
         Row: {
           admin_response: string | null
@@ -393,6 +432,7 @@ export type Database = {
         | "binance_pay"
         | "crypto"
         | "other"
+      post_category: "free_method" | "update" | "announcement"
       product_request_status:
         | "new"
         | "in_review"
@@ -539,6 +579,7 @@ export const Constants = {
         "crypto",
         "other",
       ],
+      post_category: ["free_method", "update", "announcement"],
       product_request_status: [
         "new",
         "in_review",
