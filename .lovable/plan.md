@@ -1,53 +1,101 @@
-## Vault.01 — Digital tools & Pro subscription marketplace
+# Vault.01 — Improvement Plan
 
-Mobile-first web app built on the selected "Hardware vault" direction. Fully client-side with mock data (no backend). Preview will be switched to mobile viewport.
+A prioritized set of upgrades across performance, UX, i18n, admin, and quality. Grouped so you can approve everything or cherry-pick.
 
-### Design tokens (locked from chosen direction)
-- Fonts: Inter (display, 400/700/800) + JetBrains Mono (mono, 400/500), loaded via `<link>` in `__root.tsx`.
-- Colors in `src/styles.css` `@theme`: background `hsl(0 0% 98%)`, foreground `hsl(0 0% 7%)`, primary `hsl(15 100% 50%)` (vault orange), muted `hsl(0 0% 45%)`, border `hsl(0 0% 0% / 0.1)`.
-- Motion: `slideUp`, `slideInRight` keyframes; `ease-out-expo` easing.
-- Radii: `rounded-xl` / `rounded-2xl`. Sharp mono pill price tags.
+---
 
-### Routes (TanStack Router, files in `src/routes/`)
-```
-__root.tsx           shell: fonts, meta, nav + <Outlet/>
-index.tsx            Discovery: hero, Single/Sub toggle, search, category chips, product grid
-products.$id.tsx     Product detail w/ screenshots, features, sticky Buy Now
-pricing.tsx          Free / Monthly Pro / Annual Pro (Best Value) tiers
-dashboard.tsx        Profile, My Library downloads, Subscription status widget
-```
-Each route defines its own `head()` metadata (title/description/og).
+## 1. Translation system (biggest win)
 
-### Shared components (`src/components/`)
-- `TopNav.tsx` — sticky VAULT.01 nav w/ status dot + links (Discover, Pricing, Dashboard).
-- `ProductCard.tsx` — square tile with VLT-xxx id, name, tagline, mono price chip.
-- `CategoryChips.tsx`, `PurchaseToggle.tsx` (Single Tools ↔ Pro Sub).
-- `CheckoutSheet.tsx` — slide-over modal: line item, promo input (`APPLY`), live totals, `CONFIRM ORDER`, success state with checkmark + order id.
-- `StickyBuyBar.tsx` — bottom bar on product detail launching CheckoutSheet.
-- `SubscriptionWidget.tsx` — plan, renewal date, Manage Subscription (simulated).
+Current: every visible text node is sent to the AI gateway on language switch — slow, expensive, and flickers.
 
-### Mock data (`src/lib/mock-data.ts`)
-- 4 products: `KINETIC PRESETS ($49, Presets)`, `SWISS GRID SYSTEM ($29, UI Kits)`, `NEURAL PROMPTS PACK ($19, AI Tools)`, `EDGE STACK TEMPLATE ($59, Dev Templates)`. Each has id, code (VLT-042 etc), tagline, description, features[], screenshots[] (generated square images).
-- 2 subscription plans surfaced on pricing: Monthly Pro ($19/mo) and Annual Pro ($179/yr, Best Value badge, ~22% off). Free tier shown alongside.
-- 3 promo codes: `VAULT10` (10% off), `LAUNCH25` (25%), `PRO50` ($50 flat).
-- Mock user: "Marcus Vane", Pro Active, renews 2026-08-08, library with 2 owned single products.
+Improvements:
+- Ship a **static dictionary** for all built-in UI strings (nav, buttons, tabs, product card labels, checkout, admin). Instant switch, zero API calls for the app shell.
+- Keep the AI DOM-translator **only as a fallback** for dynamic/user content (product names, descriptions, posts).
+- Precompute translations for mock product data (name, tagline, description) at build time and store alongside `mock-data.ts`.
+- Add a small **language switch spinner** + skeleton so users see progress instead of English flashing.
+- Persist cache with a version key so dictionary updates invalidate cleanly.
 
-### State
-- Zustand-light via React context: `CartContext` (current checkout item + open/close sheet), `PromoContext` inside sheet. Toggle + filters are local `useState` on discovery.
+## 2. Theming & design polish
 
-### Images
-- Generate 4 product hero images (square, hardware/chrome/typographic aesthetic) into `src/assets/products/` and import into `mock-data.ts`.
+- Fix any remaining light-mode contrast issues (ember accent on light bg, borders, muted text).
+- Add smooth theme-transition (200ms) on `color`, `background`, `border` — avoid jarring flash.
+- Respect `prefers-reduced-motion` for the subtle/premium motion set.
+- Ensure focus rings visible in both themes (currently faint in dark).
 
-### Interactions
-- Toggle Single/Sub switches grid between products and plan cards.
-- Search filters by name; chip filters by category.
-- Product detail Buy Now opens `CheckoutSheet` with that product; pricing tier CTAs open sheet with subscription line item.
-- Promo apply updates discount + total live; invalid code shows inline error.
-- Confirm order → success screen with fake order ID and "Back to Vault".
-- Dashboard Download buttons trigger a toast ("Download started").
+## 3. Admin panel (mobile responsiveness)
 
-### SEO/meta
-Distinct `head()` per route. No og:image on root; leaf routes get generated product image for og where applicable.
+- Convert the tabs bar into a **horizontal scroll-snap** row with fade edges on <640px, and a **grouped dropdown** ("More ▾") on very small screens.
+- Sticky sub-header per tab with search + primary action.
+- Tables → **card list** on mobile (already partial); finish for Orders, Requests, Users.
+- Add empty states and skeleton loaders per tab.
 
-### Out of scope
-No auth, no database, no real payments. Dashboard user is hardcoded mock. Cloud is not enabled.
+## 4. Performance
+
+- Route-level **code splitting** for admin (heaviest bundle).
+- Lazy-load product images with `loading="lazy"` + blurred placeholder.
+- Prefetch on `<Link>` hover for product detail.
+- Debounce search input (150ms).
+- Move translation cache to IndexedDB when it exceeds ~200KB.
+
+## 5. SEO & metadata
+
+- Unique `head()` per route with real titles/descriptions (some still generic).
+- Add JSON-LD `Product` schema on product detail pages.
+- Generate an `og:image` per product (already have hero art — wire it in).
+- Add `sitemap.xml` + `robots.txt` route.
+
+## 6. Auth & account UX
+
+- Post-login redirect back to the originally requested page.
+- "Forgot password" flow polish (already exists — add success toast + resend cooldown).
+- Show provider (Google / email) on the account panel.
+- Session-expired toast + auto-redirect to `/auth`.
+
+## 7. Checkout & orders
+
+- Persist cart in `localStorage` so refresh doesn't lose it.
+- Order confirmation email (via Lovable Cloud — optional).
+- "Recent orders" widget on dashboard with re-download.
+
+## 8. Community / posts
+
+- Optimistic UI on like / comment.
+- Image upload with client-side compression before upload.
+- Report / hide post action for admins.
+
+## 9. Accessibility
+
+- Audit color contrast (WCAG AA) in both themes.
+- Add `aria-label` on icon-only buttons (lang switcher, theme toggle, nav).
+- Trap focus in `CheckoutSheet` and close on Esc.
+- Announce language change to screen readers.
+
+## 10. Developer quality
+
+- Add `eslint-plugin-jsx-a11y` rules.
+- Wire a `bunx vitest` smoke test for translate function + cart reducer.
+- Add error boundary per route with retry.
+
+---
+
+## Suggested first slice (if you want a smaller scope)
+
+**Phase A (high impact, ~1 pass):**
+- #1 Static dictionary + fallback AI translator
+- #3 Admin mobile tabs (scroll-snap + More menu)
+- #2 Theme transition + focus rings
+- #5 Per-route metadata + product JSON-LD
+
+**Phase B (next):**
+- #4 Perf (code split admin, lazy images)
+- #6 Auth redirect + session toast
+- #7 Cart persistence
+- #9 A11y pass
+
+**Phase C (polish):**
+- #8 Community optimistic UI
+- #10 Tests + a11y lint
+
+---
+
+Approve the whole plan, pick a phase, or tell me which numbered items to build.
