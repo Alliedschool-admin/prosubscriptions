@@ -94,6 +94,7 @@ export type Database = {
           account_number: string
           active: boolean
           created_at: string
+          currency: string
           id: string
           instructions: string | null
           kind: Database["public"]["Enums"]["payment_method_kind"]
@@ -106,6 +107,7 @@ export type Database = {
           account_number: string
           active?: boolean
           created_at?: string
+          currency?: string
           id?: string
           instructions?: string | null
           kind: Database["public"]["Enums"]["payment_method_kind"]
@@ -118,6 +120,7 @@ export type Database = {
           account_number?: string
           active?: boolean
           created_at?: string
+          currency?: string
           id?: string
           instructions?: string | null
           kind?: Database["public"]["Enums"]["payment_method_kind"]
@@ -139,6 +142,8 @@ export type Database = {
           image: string
           name: string
           price: number
+          price_pkr: number | null
+          price_usd: number | null
           tagline: string
           updated_at: string
         }
@@ -153,6 +158,8 @@ export type Database = {
           image: string
           name: string
           price: number
+          price_pkr?: number | null
+          price_usd?: number | null
           tagline: string
           updated_at?: string
         }
@@ -167,6 +174,8 @@ export type Database = {
           image?: string
           name?: string
           price?: number
+          price_pkr?: number | null
+          price_usd?: number | null
           tagline?: string
           updated_at?: string
         }
