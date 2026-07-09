@@ -136,33 +136,39 @@ async function translatePass() {
 
   // Dedup by original text to save tokens.
   const uniq = Array.from(new Set(uncached.map((p) => p.original.trim())));
-  const batches = chunk(uniq, 40);
+  const batches = chunk(uniq, 60);
 
-  for (const batch of batches) {
-    if (activeLang !== lang) return; // user switched; abandon.
-    try {
-      const { translations } = await translateStrings({ data: { lang, strings: batch } });
-      batch.forEach((src, i) => {
-        const out = translations[i];
-        if (out) cache[src] = out;
-      });
-      // Apply everything for this batch.
-      for (const p of uncached) {
-        const key = p.original.trim();
-        const hit = cache[key];
-        if (!hit) continue;
-        if (p.node.parentElement?.getAttribute(MARK_ATTR) === lang) continue;
-        const leading = p.original.match(/^\s*/)?.[0] ?? "";
-        const trailing = p.original.match(/\s*$/)?.[0] ?? "";
-        p.node.data = leading + hit + trailing;
-        p.node.parentElement?.setAttribute(MARK_ATTR, lang);
-      }
-      saveCache(lang);
-    } catch (err) {
-      console.warn("[i18n] translate batch failed", err);
-      break;
+  function applyCached() {
+    for (const p of uncached) {
+      const key = p.original.trim();
+      const hit = cache[key];
+      if (!hit) continue;
+      if (p.node.parentElement?.getAttribute(MARK_ATTR) === lang) continue;
+      const leading = p.original.match(/^\s*/)?.[0] ?? "";
+      const trailing = p.original.match(/\s*$/)?.[0] ?? "";
+      p.node.data = leading + hit + trailing;
+      p.node.parentElement?.setAttribute(MARK_ATTR, lang);
     }
   }
+
+  // Run all batches in parallel — apply as each resolves so UI updates progressively.
+  await Promise.all(
+    batches.map(async (batch) => {
+      if (activeLang !== lang) return;
+      try {
+        const { translations } = await translateStrings({ data: { lang, strings: batch } });
+        if (activeLang !== lang) return;
+        batch.forEach((src, i) => {
+          const out = translations[i];
+          if (out) cache[src] = out;
+        });
+        applyCached();
+        saveCache(lang);
+      } catch (err) {
+        console.warn("[i18n] translate batch failed", err);
+      }
+    }),
+  );
 }
 
 function restoreOriginals() {
