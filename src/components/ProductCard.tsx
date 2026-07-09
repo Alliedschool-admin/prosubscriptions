@@ -14,7 +14,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
   const isFree = !!product.is_free;
   const tags = isFree ? ["FREE"] : formatPriceTags(product);
   const stock = product.available_stock ?? 0;
-  const outOfStock = !isFree && stock === 0;
+  const outOfStock = stock === 0;
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -23,6 +23,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
   async function handleFreeClaim(e: MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
+    if (outOfStock) return;
     if (!user) {
       try { localStorage.setItem(PENDING_CLAIM_KEY, product.id); } catch { /* ignore */ }
       toast.info("Sign in to claim this free product");
@@ -32,6 +33,10 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
     setClaiming(true);
     try {
       const row = await claimFreeProduct(product.id);
+      if (row.out_of_stock) {
+        toast.error("Out of stock — please check back soon");
+        return;
+      }
       toast.success(row.already_owned ? "Already in your purchases" : "Added to your purchases");
       qc.invalidateQueries({ queryKey: MY_ORDERS_QUERY_KEY });
       navigate({ to: "/dashboard" });
@@ -63,7 +68,9 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         <span
           className={`absolute left-2 top-2 rounded-full px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest ${
             isFree
-              ? "bg-emerald-500 text-white"
+              ? outOfStock
+                ? "bg-foreground text-background"
+                : "bg-emerald-500 text-white"
               : outOfStock
               ? "bg-foreground text-background"
               : stock <= 3
@@ -72,7 +79,9 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           }`}
         >
           {isFree
-            ? "FREE · unlimited"
+            ? outOfStock
+              ? "Restocking soon"
+              : `FREE · ${stock} in stock`
             : outOfStock
             ? "Restocking soon"
             : stock <= 3
@@ -100,10 +109,10 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         <button
           type="button"
           onClick={handleFreeClaim}
-          disabled={claiming}
-          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-xs font-extrabold uppercase tracking-widest text-white shadow-sm shadow-emerald-500/20 disabled:opacity-60"
+          disabled={claiming || outOfStock}
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-xs font-extrabold uppercase tracking-widest text-white shadow-sm shadow-emerald-500/20 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
         >
-          <Gift className="size-3.5" /> {claiming ? "Claiming…" : "Get it free"}
+          <Gift className="size-3.5" /> {outOfStock ? "Sold out" : claiming ? "Claiming…" : "Get it free"}
         </button>
       )}
     </Link>

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "../hooks/use-auth";
+import { isDisposableEmail } from "../lib/disposable-emails";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -42,6 +43,9 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
+      if (isDisposableEmail(email)) {
+        throw new Error("Temporary / disposable email addresses are not allowed. Please use a real email.");
+      }
       if (mode === "reset") {
         if (!email) throw new Error("Enter your email first");
         const { error } = await supabase.auth.resetPasswordForEmail(email, {

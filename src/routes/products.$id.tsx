@@ -48,10 +48,11 @@ function ProductDetail() {
   const pkr = product ? productPrice(product, "PKR") : null;
   const isFree = !!product?.is_free;
   const stock = product?.available_stock ?? 0;
-  const outOfStock = !isFree && stock === 0;
+  const outOfStock = stock === 0;
 
   async function claimFree() {
     if (!product) return;
+    if (outOfStock) return;
     if (!user) {
       try {
         localStorage.setItem(PENDING_CLAIM_KEY, product.id);
@@ -63,6 +64,10 @@ function ProductDetail() {
     setClaiming(true);
     try {
       const row = await claimFreeProduct(product.id);
+      if (row.out_of_stock) {
+        toast.error("Out of stock — please check back soon");
+        return;
+      }
       toast.success(row.already_owned ? "Already in your purchases" : "Added to your purchases");
       qc.invalidateQueries({ queryKey: MY_ORDERS_QUERY_KEY });
       navigate({ to: "/dashboard" });
@@ -144,9 +149,7 @@ function ProductDetail() {
           <p className="mt-1 text-sm text-muted">{product.tagline}</p>
           <div className="mt-2">
             {isFree ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-600">
-                Free · unlimited access
-              </span>
+              <StockBadge stock={stock} free />
             ) : (
               <StockBadge stock={stock} />
             )}
@@ -247,11 +250,11 @@ function ProductDetail() {
           </div>
           {isFree ? (
             <button
-              disabled={claiming}
+              disabled={claiming || outOfStock}
               onClick={claimFree}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 disabled:opacity-60"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
             >
-              <Gift className="size-4" /> {claiming ? "Claiming…" : "Get it free"}
+              <Gift className="size-4" /> {outOfStock ? "Sold out — restocking" : claiming ? "Claiming…" : "Get it free"}
             </button>
           ) : (
           <button
@@ -278,12 +281,19 @@ function ProductDetail() {
   );
 }
 
-function StockBadge({ stock }: { stock: number }) {
+function StockBadge({ stock, free = false }: { stock: number; free?: boolean }) {
   if (stock === 0) {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-background">
         <span className="size-1.5 animate-pulse rounded-full bg-primary" />
         Restocking soon — check back in a few hours
+      </span>
+    );
+  }
+  if (free) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-600">
+        Free · {stock} in stock
       </span>
     );
   }
