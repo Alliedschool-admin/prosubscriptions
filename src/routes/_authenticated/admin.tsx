@@ -530,6 +530,14 @@ function EditProductForm({
           <input type="number" min="0" step="1" value={pricePkr} onChange={(e) => setPricePkr(e.target.value)} className="input font-mono" />
         </Field>
       </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Cost (USD)">
+          <input type="number" min="0" step="0.01" value={costUsd} onChange={(e) => setCostUsd(e.target.value)} className="input font-mono" />
+        </Field>
+        <Field label="Cost (PKR)">
+          <input type="number" min="0" step="1" value={costPkr} onChange={(e) => setCostPkr(e.target.value)} className="input font-mono" />
+        </Field>
+      </div>
       <Field label="Tagline">
         <input value={tagline} onChange={(e) => setTagline(e.target.value)} className="input" />
       </Field>
