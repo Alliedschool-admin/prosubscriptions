@@ -33,12 +33,13 @@ export const translateStrings = createServerFn({ method: "POST" })
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        "Lovable-API-Key": apiKey,
         "content-type": "application/json",
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-lite",
         response_format: { type: "json_object" },
+        temperature: 0,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Translate to ${targetName}:\n${numbered}` },
