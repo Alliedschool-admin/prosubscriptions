@@ -429,6 +429,7 @@ export type Database = {
         Returns: {
           already_owned: boolean
           order_id: string
+          out_of_stock: boolean
         }[]
       }
       grant_admin_by_email: {
