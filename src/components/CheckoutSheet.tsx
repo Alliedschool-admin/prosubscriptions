@@ -332,7 +332,7 @@ export function CheckoutSheet() {
                         setCode(e.target.value);
                         setPromoError(null);
                       }}
-                      placeholder="TRY VAULT10"
+                      placeholder="TRY PRO10"
                       className="flex-1 rounded-lg border-none bg-foreground/5 px-4 py-3 font-mono text-sm uppercase outline-none placeholder:text-muted focus:ring-2 focus:ring-primary/30"
                     />
                     <button
