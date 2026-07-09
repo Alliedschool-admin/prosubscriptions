@@ -199,6 +199,8 @@ export type Database = {
           available_stock: number
           category: string
           code: string
+          cost_pkr: number | null
+          cost_usd: number | null
           created_at: string
           created_by: string | null
           delivery_instructions: string | null
@@ -217,6 +219,8 @@ export type Database = {
           available_stock?: number
           category: string
           code: string
+          cost_pkr?: number | null
+          cost_usd?: number | null
           created_at?: string
           created_by?: string | null
           delivery_instructions?: string | null
@@ -235,6 +239,8 @@ export type Database = {
           available_stock?: number
           category?: string
           code?: string
+          cost_pkr?: number | null
+          cost_usd?: number | null
           created_at?: string
           created_by?: string | null
           delivery_instructions?: string | null
