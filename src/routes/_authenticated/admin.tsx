@@ -561,12 +561,16 @@ function EditProductForm({
       </div>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Price (USD)">
-          <input type="number" min="0" step="0.01" value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} className="input font-mono" />
+          <input type="number" min="0" step="0.01" disabled={isFree} value={isFree ? "" : priceUsd} onChange={(e) => setPriceUsd(e.target.value)} className="input font-mono disabled:opacity-50" />
         </Field>
         <Field label="Price (PKR)">
-          <input type="number" min="0" step="1" value={pricePkr} onChange={(e) => setPricePkr(e.target.value)} className="input font-mono" />
+          <input type="number" min="0" step="1" disabled={isFree} value={isFree ? "" : pricePkr} onChange={(e) => setPricePkr(e.target.value)} className="input font-mono disabled:opacity-50" />
         </Field>
       </div>
+      <label className="flex items-center gap-2 rounded-lg border border-border bg-foreground/[0.03] px-3 py-2 text-xs font-bold uppercase tracking-widest text-foreground">
+        <input type="checkbox" checked={isFree} onChange={(e) => setIsFree(e.target.checked)} className="size-4 accent-emerald-500" />
+        Free product · unlimited instant claims
+      </label>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Cost (USD)">
           <input type="number" min="0" step="0.01" value={costUsd} onChange={(e) => setCostUsd(e.target.value)} className="input font-mono" />
