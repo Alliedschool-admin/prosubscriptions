@@ -68,6 +68,7 @@ import {
 import { useAuth } from "../../hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ImageInput } from "@/components/ImageInput";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -343,8 +344,8 @@ function ProductsPanel() {
         <Field label="Description">
           <textarea required rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className="input resize-none" />
         </Field>
-        <Field label="Image URL" hint="Leave blank to use a default cover.">
-          <input value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://…" className="input" />
+        <Field label="Product image" hint="Paste a URL or upload from your device. Leave blank to use a default cover.">
+          <ImageInput value={image} onChange={setImage} folder="products" />
         </Field>
         <Field label="Features" hint="One per line.">
           <textarea rows={4} value={features} onChange={(e) => setFeatures(e.target.value)} className="input resize-none" />
@@ -567,8 +568,8 @@ function EditProductForm({
       <Field label="Description">
         <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="input resize-none" />
       </Field>
-      <Field label="Image URL">
-        <input value={image} onChange={(e) => setImage(e.target.value)} className="input" />
+      <Field label="Product image">
+        <ImageInput value={image} onChange={setImage} folder="products" />
       </Field>
       <Field label="Features" hint="One per line.">
         <textarea rows={3} value={features} onChange={(e) => setFeatures(e.target.value)} className="input resize-none" />
