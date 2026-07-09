@@ -1469,10 +1469,10 @@ function RequestAdminRow({
 }
 /* ---------------- Admins ---------------- */
 
-type AdminRow = { user_id: string; email: string; granted_at: string };
+type AdminRow = { user_id: string; email: string; granted_at: string; is_super: boolean };
 
 function AdminsPanel() {
-  const { user } = useAuth();
+  const { user, isSuperAdmin } = useAuth();
   const qc = useQueryClient();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
@@ -1490,6 +1490,7 @@ function AdminsPanel() {
 
   const { data: invites = [] } = useQuery({
     queryKey: ["admin-invites"],
+    enabled: isSuperAdmin,
     queryFn: async () => {
       const { data, error } = await (
         supabase.rpc as unknown as (
