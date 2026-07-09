@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download, Settings2 } from "lucide-react";
+import { Download } from "lucide-react";
 import { toast } from "sonner";
-import { getProduct, mockLibrary, mockUser, plans } from "../lib/mock-data";
+import { getProduct, mockLibrary, mockUser } from "../lib/mock-data";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -17,8 +17,6 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function Dashboard() {
-  const activePlan = plans.find((p) => p.name === mockUser.plan)!;
-
   return (
     <main className="mx-auto max-w-2xl pb-32">
       {/* Profile header */}
@@ -29,7 +27,7 @@ function Dashboard() {
           </div>
           <div className="min-w-0">
             <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
-              Pro · Member since {mockUser.memberSince}
+              Member since {mockUser.memberSince}
             </p>
             <h1 className="truncate text-2xl font-extrabold tracking-tight">{mockUser.name}</h1>
             <p className="truncate text-sm text-muted">{mockUser.handle}</p>
@@ -37,38 +35,11 @@ function Dashboard() {
         </div>
       </section>
 
-      {/* Subscription widget */}
-      <section className="mt-8 px-4">
-        <div className="rounded-2xl bg-foreground p-6 text-background">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
-                Subscription · {mockUser.status}
-              </p>
-              <h2 className="mt-1 text-xl font-extrabold tracking-tight">{activePlan.name}</h2>
-              <p className="mt-1 text-sm text-background/60">Renews {mockUser.renews}</p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-extrabold">
-                ${activePlan.price}
-                <span className="text-xs font-normal text-background/60">{activePlan.cadence}</span>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={() => toast("Manage Subscription", { description: "Simulated portal opened." })}
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-background/10 px-3 py-2 text-xs font-bold uppercase tracking-widest text-background hover:bg-background/15"
-          >
-            <Settings2 className="size-3.5" /> Manage subscription
-          </button>
-        </div>
-      </section>
-
       {/* Library */}
-      <section className="mt-10 px-4">
+      <section className="mt-8 px-4">
         <div className="mb-4 flex items-end justify-between">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Owned single tools</p>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Your purchases</p>
             <h2 className="text-2xl font-extrabold tracking-tight">MY LIBRARY</h2>
           </div>
           <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-primary">
