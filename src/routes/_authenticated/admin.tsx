@@ -149,6 +149,8 @@ function Admin() {
         </p>
       </header>
 
+      <VisitorStats />
+
       <nav className="mb-6 flex gap-1 rounded-xl border border-border bg-background p-1">
         {(
           [
