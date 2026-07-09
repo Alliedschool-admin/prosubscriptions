@@ -1,12 +1,47 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useState, type MouseEvent } from "react";
+import { Gift } from "lucide-react";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import type { Product } from "../lib/mock-data";
 import { formatPriceTags } from "../lib/price";
+import { useAuth } from "../hooks/use-auth";
+import { claimFreeProduct, MY_ORDERS_QUERY_KEY } from "../lib/orders-store";
+
+const PENDING_CLAIM_KEY = "pending-free-claim";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
   const isFree = !!product.is_free;
   const tags = isFree ? ["FREE"] : formatPriceTags(product);
   const stock = product.available_stock ?? 0;
   const outOfStock = !isFree && stock === 0;
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [claiming, setClaiming] = useState(false);
+
+  async function handleFreeClaim(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      try { localStorage.setItem(PENDING_CLAIM_KEY, product.id); } catch { /* ignore */ }
+      toast.info("Sign in to claim this free product");
+      navigate({ to: "/auth" });
+      return;
+    }
+    setClaiming(true);
+    try {
+      const row = await claimFreeProduct(product.id);
+      toast.success(row.already_owned ? "Already in your purchases" : "Added to your purchases");
+      qc.invalidateQueries({ queryKey: MY_ORDERS_QUERY_KEY });
+      navigate({ to: "/dashboard" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to claim");
+    } finally {
+      setClaiming(false);
+    }
+  }
+
   return (
     <Link
       to="/products/$id"
@@ -61,6 +96,16 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           ))}
         </div>
       </div>
+      {isFree && (
+        <button
+          type="button"
+          onClick={handleFreeClaim}
+          disabled={claiming}
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-xs font-extrabold uppercase tracking-widest text-white shadow-sm shadow-emerald-500/20 disabled:opacity-60"
+        >
+          <Gift className="size-3.5" /> {claiming ? "Claiming…" : "Get it free"}
+        </button>
+      )}
     </Link>
   );
 }
