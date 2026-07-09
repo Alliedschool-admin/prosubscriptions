@@ -30,6 +30,9 @@ export function CheckoutSheet() {
   }, [item]);
   const [currency, setCurrency] = useState<Currency>("USD");
 
+  const [quantity, setQuantity] = useState<number>(1);
+  const maxQty = Math.min(item?.available_stock ?? 100, 100) || 1;
+
   const [code, setCode] = useState("");
   const [applied, setApplied] = useState<{ code: string; discount: number } | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
@@ -58,6 +61,7 @@ export function CheckoutSheet() {
       setOrderRef("");
       if (availableCurrencies.length) setCurrency(availableCurrencies[0]);
       setSelectedMethodId("");
+      setQuantity(1);
     }
   }, [isOpen, item?.id, availableCurrencies]);
 
@@ -76,11 +80,12 @@ export function CheckoutSheet() {
     }
   }, [filteredMethods, selectedMethodId]);
 
-  const subtotal = useMemo(() => {
+  const unitPrice = useMemo(() => {
     if (!item) return 0;
     const raw = currency === "USD" ? item.price_usd : item.price_pkr;
     return raw == null ? 0 : Number(raw);
   }, [item, currency]);
+  const subtotal = unitPrice * quantity;
   const discount = useMemo(() => applied?.discount ?? 0, [applied]);
   const total = Math.max(0, subtotal - discount);
   const selectedMethod: PaymentMethod | undefined = filteredMethods.find((m) => m.id === selectedMethodId);
@@ -122,6 +127,7 @@ export function CheckoutSheet() {
         item_name: item.name,
         amount: total,
         currency,
+        quantity,
         payment_method_id: selectedMethod.id,
         payment_method_label: `${PAYMENT_KIND_LABEL[selectedMethod.kind]} · ${selectedMethod.label}`,
         sender_name: senderName.trim(),
