@@ -666,8 +666,17 @@ function OrdersPanel() {
   async function decide(id: string, status: "approved" | "rejected") {
     setBusyId(id);
     try {
-      await reviewOrder(id, status);
-      toast.success(`Order ${status}.`);
+      if (status === "approved") {
+        const res = await approveOrder(id);
+        if (res?.out_of_stock) {
+          toast.error("Out of stock — add more stock links before approving.");
+        } else {
+          toast.success("Order approved · stock item delivered.");
+        }
+      } else {
+        await reviewOrder(id, status);
+        toast.success("Order rejected.");
+      }
       invalidate();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed");
@@ -729,6 +738,15 @@ function OrdersPanel() {
                 <Info label="Contact" value={o.sender_contact} />
                 {o.transaction_ref && <Info label="Tx ref" value={o.transaction_ref} mono />}
               </div>
+
+              {o.status === "approved" && o.delivered_content && (
+                <div className="mt-3 rounded-lg bg-primary/5 p-3">
+                  <p className="font-mono text-[9px] uppercase tracking-widest text-primary">
+                    Delivered link
+                  </p>
+                  <p className="mt-1 truncate font-mono text-xs">{o.delivered_content}</p>
+                </div>
+              )}
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {o.proof_path && (
