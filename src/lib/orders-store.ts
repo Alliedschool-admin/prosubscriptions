@@ -167,7 +167,7 @@ export async function claimFreeProduct(productId: string) {
     supabase.rpc as unknown as (
       fn: string,
       args: Record<string, unknown>,
-    ) => Promise<{ data: { order_id: string; already_owned: boolean }[] | null; error: { message: string } | null }>
+    ) => Promise<{ data: { order_id: string | null; already_owned: boolean; out_of_stock: boolean }[] | null; error: { message: string } | null }>
   )("claim_free_product", { _product_id: productId });
   if (error) throw new Error(error.message);
   const row = Array.isArray(data) ? data[0] : data;
