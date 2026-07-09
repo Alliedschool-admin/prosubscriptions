@@ -337,6 +337,14 @@ export type Database = {
         }[]
       }
       claim_first_admin: { Args: never; Returns: boolean }
+      grant_admin_by_email: {
+        Args: { _email: string }
+        Returns: {
+          email: string
+          granted: boolean
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -344,10 +352,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_admins: {
+        Args: never
+        Returns: {
+          email: string
+          granted_at: string
+          user_id: string
+        }[]
+      }
       refresh_product_stock_count: {
         Args: { _product_id: string }
         Returns: undefined
       }
+      revoke_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
