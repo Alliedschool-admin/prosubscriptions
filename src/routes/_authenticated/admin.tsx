@@ -423,26 +423,33 @@ function ProductsPanel() {
 function ProductRow({
   product,
   onDelete,
+  purchaseCount,
 }: {
   product: import("../../lib/mock-data").Product;
   onDelete: (id: string, label: string) => void;
+  purchaseCount: number;
 }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const stock = product.available_stock ?? 0;
+  const isFree = !!product.is_free;
   return (
     <li className="rounded-xl border border-border bg-background p-3">
       <div className="flex items-center gap-3">
         <img src={product.image} alt={product.name} loading="lazy" className="size-12 shrink-0 rounded-lg object-cover" />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold">{product.name}</p>
+          <p className="truncate text-sm font-bold">
+            {product.name}
+            {isFree && <span className="ml-2 rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-600">FREE</span>}
+          </p>
           <p className="truncate font-mono text-[10px] uppercase tracking-widest text-muted">
             {product.code} · {product.category}
-            {product.price_usd != null ? ` · $${Number(product.price_usd)}` : ""}
-            {product.price_pkr != null ? ` · Rs ${Number(product.price_pkr).toLocaleString("en-PK")}` : ""}
+            {!isFree && product.price_usd != null && product.price_usd > 0 ? ` · $${Number(product.price_usd)}` : ""}
+            {!isFree && product.price_pkr != null && product.price_pkr > 0 ? ` · Rs ${Number(product.price_pkr).toLocaleString("en-PK")}` : ""}
+            {` · ${purchaseCount} sold`}
           </p>
         </div>
-        <span
+        {!isFree && (<span
           className={`shrink-0 rounded-full px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest ${
             stock === 0
               ? "bg-destructive/15 text-destructive"
@@ -453,7 +460,7 @@ function ProductRow({
           title="Available stock links"
         >
           {stock} stock
-        </span>
+        </span>)}
         <button
           onClick={() => setEditing((v) => !v)}
           className={`rounded-lg p-2 ${editing ? "bg-primary text-primary-foreground" : "bg-foreground/5 text-muted hover:text-foreground"}`}
