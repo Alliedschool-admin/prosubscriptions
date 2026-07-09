@@ -252,15 +252,16 @@ function Admin() {
         .input {
           width: 100%;
           border-radius: 0.75rem;
-          border: 1px solid hsl(var(--border));
-          background: hsl(var(--background));
+          border: 1px solid var(--border);
+          background: var(--background);
+          color: var(--foreground);
           padding: 0.625rem 0.75rem;
           font-size: 0.875rem;
           outline: none;
         }
         .input:focus {
-          border-color: hsl(var(--primary));
-          box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15);
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
         }
       `}</style>
     </main>
