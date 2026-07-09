@@ -1,10 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Copy, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Copy, Clock, CheckCircle2, XCircle, Plus, MessageSquare, Trash2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { useState, type FormEvent } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useMyOrders, type Order } from "../lib/orders-store";
 import { formatMoney, type Currency } from "../lib/price";
 import { useProducts } from "../lib/products-store";
+import {
+  useMyRequests,
+  createRequest,
+  deleteRequest,
+  useRequestsInvalidator,
+  REQUEST_STATUS_LABEL,
+  type ProductRequest,
+} from "../lib/requests-store";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -98,7 +107,232 @@ function Dashboard() {
           </ul>
         )}
       </section>
+
+      <RequestsSection />
     </main>
+  );
+}
+
+function RequestsSection() {
+  const { user } = useAuth();
+  const { data: requests = [], isLoading } = useMyRequests();
+  const invalidate = useRequestsInvalidator();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [details, setDetails] = useState("");
+  const [link, setLink] = useState("");
+  const [contact, setContact] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!user) return;
+    if (name.trim().length < 2) {
+      toast.error("Enter the product you want.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await createRequest({
+        user_id: user.id,
+        product_name: name.trim().slice(0, 120),
+        details: details.trim().slice(0, 1000) || null,
+        reference_link: link.trim().slice(0, 500) || null,
+        contact: contact.trim().slice(0, 120) || null,
+      });
+      toast.success("Request sent. Admin will get back to you.");
+      setName("");
+      setDetails("");
+      setLink("");
+      setContact("");
+      setOpen(false);
+      invalidate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send request");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Delete this request?")) return;
+    try {
+      await deleteRequest(id);
+      invalidate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    }
+  }
+
+  return (
+    <section className="mt-10 px-4">
+      <div className="mb-4 flex items-end justify-between gap-3">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            Don't see what you need?
+          </p>
+          <h2 className="text-2xl font-extrabold tracking-tight">REQUEST A PRODUCT</h2>
+        </div>
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20"
+        >
+          <Plus className="size-3.5" /> {open ? "Close" : "New request"}
+        </button>
+      </div>
+
+      {open && (
+        <form
+          onSubmit={submit}
+          className="mb-4 space-y-3 rounded-2xl border border-primary/30 bg-primary/[0.03] p-4"
+        >
+          <label className="block">
+            <span className="mb-1 block font-mono text-[10px] font-bold uppercase tracking-widest">
+              Product you want *
+            </span>
+            <input
+              required
+              maxLength={120}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. ChatGPT Plus 1 month"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block font-mono text-[10px] font-bold uppercase tracking-widest">
+              Details / requirements
+            </span>
+            <textarea
+              rows={3}
+              maxLength={1000}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              placeholder="Plan tier, duration, region, quantity, deadline…"
+              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+          </label>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block font-mono text-[10px] font-bold uppercase tracking-widest">
+                Reference link
+              </span>
+              <input
+                maxLength={500}
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                placeholder="https://…"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-mono outline-none focus:border-primary"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block font-mono text-[10px] font-bold uppercase tracking-widest">
+                Best contact
+              </span>
+              <input
+                maxLength={120}
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+                placeholder="WhatsApp / Telegram / email"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={busy}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-extrabold uppercase tracking-widest text-primary-foreground disabled:opacity-60"
+            >
+              <Sparkles className="size-3.5" /> {busy ? "Sending…" : "Send request"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {isLoading ? (
+        <p className="py-6 text-center text-sm text-muted">Loading…</p>
+      ) : requests.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted">
+          You haven't requested anything yet. Tell us what to stock and we'll try to arrange it.
+        </div>
+      ) : (
+        <ul className="space-y-3">
+          {requests.map((r) => (
+            <RequestCard key={r.id} req={r} onDelete={remove} />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function RequestCard({
+  req,
+  onDelete,
+}: {
+  req: ProductRequest;
+  onDelete: (id: string) => void;
+}) {
+  const answered = !!req.admin_response;
+  return (
+    <li className="rounded-xl border border-border bg-background p-4">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold">{req.product_name}</p>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            {new Date(req.created_at).toLocaleString()}
+          </p>
+        </div>
+        <span
+          className={`shrink-0 rounded-full px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest ${
+            req.status === "fulfilled"
+              ? "bg-primary/15 text-primary"
+              : req.status === "declined"
+                ? "bg-destructive/15 text-destructive"
+                : req.status === "responded"
+                  ? "bg-primary/10 text-primary"
+                  : "bg-foreground/5 text-muted"
+          }`}
+        >
+          {REQUEST_STATUS_LABEL[req.status]}
+        </span>
+      </div>
+      {req.details && (
+        <p className="mt-2 whitespace-pre-line text-xs text-muted">{req.details}</p>
+      )}
+      {req.reference_link && (
+        <a
+          href={req.reference_link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1 inline-block truncate font-mono text-[11px] text-primary hover:underline"
+        >
+          {req.reference_link}
+        </a>
+      )}
+      {answered && (
+        <div className="mt-3 rounded-lg border border-primary/30 bg-primary/[0.05] p-3">
+          <p className="flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-widest text-primary">
+            <MessageSquare className="size-3" /> Admin reply
+            {req.responded_at ? (
+              <span className="ml-1 font-normal text-muted">
+                · {new Date(req.responded_at).toLocaleString()}
+              </span>
+            ) : null}
+          </p>
+          <p className="mt-1 whitespace-pre-line text-sm">{req.admin_response}</p>
+        </div>
+      )}
+      <div className="mt-3 flex justify-end">
+        <button
+          onClick={() => onDelete(req.id)}
+          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold uppercase tracking-widest text-muted hover:text-destructive"
+        >
+          <Trash2 className="size-3" /> Delete
+        </button>
+      </div>
+    </li>
   );
 }
 

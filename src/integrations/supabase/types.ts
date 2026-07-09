@@ -146,6 +146,51 @@ export type Database = {
         }
         Relationships: []
       }
+      product_requests: {
+        Row: {
+          admin_response: string | null
+          contact: string | null
+          created_at: string
+          details: string | null
+          id: string
+          product_name: string
+          reference_link: string | null
+          responded_at: string | null
+          responded_by: string | null
+          status: Database["public"]["Enums"]["product_request_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          contact?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          product_name: string
+          reference_link?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: Database["public"]["Enums"]["product_request_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          contact?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          product_name?: string
+          reference_link?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: Database["public"]["Enums"]["product_request_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       product_stock_items: {
         Row: {
           assigned_order_id: string | null
@@ -316,6 +361,12 @@ export type Database = {
         | "binance_pay"
         | "crypto"
         | "other"
+      product_request_status:
+        | "new"
+        | "in_review"
+        | "responded"
+        | "fulfilled"
+        | "declined"
       stock_status: "available" | "sold"
     }
     CompositeTypes: {
@@ -455,6 +506,13 @@ export const Constants = {
         "binance_pay",
         "crypto",
         "other",
+      ],
+      product_request_status: [
+        "new",
+        "in_review",
+        "responded",
+        "fulfilled",
+        "declined",
       ],
       stock_status: ["available", "sold"],
     },
