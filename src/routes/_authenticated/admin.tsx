@@ -194,6 +194,8 @@ function ProductsPanel() {
   const [category, setCategory] = useState<Category>(CAT_OPTIONS[0]);
   const [priceUsd, setPriceUsd] = useState("");
   const [pricePkr, setPricePkr] = useState("");
+  const [costUsd, setCostUsd] = useState("");
+  const [costPkr, setCostPkr] = useState("");
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
@@ -207,6 +209,8 @@ function ProductsPanel() {
     setCategory(CAT_OPTIONS[0]);
     setPriceUsd("");
     setPricePkr("");
+    setCostUsd("");
+    setCostPkr("");
     setTagline("");
     setDescription("");
     setImage("");
@@ -222,6 +226,8 @@ function ProductsPanel() {
     }
     const usdNum = priceUsd.trim() === "" ? null : Number(priceUsd);
     const pkrNum = pricePkr.trim() === "" ? null : Number(pricePkr);
+    const costUsdNum = costUsd.trim() === "" ? null : Number(costUsd);
+    const costPkrNum = costPkr.trim() === "" ? null : Number(costPkr);
     if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
       toast.error("Enter a valid USD price.");
       return;
@@ -247,6 +253,8 @@ function ProductsPanel() {
         category,
         price_usd: usdNum,
         price_pkr: pkrNum,
+        cost_usd: costUsdNum,
+        cost_pkr: costPkrNum,
         tagline: tagline.trim(),
         description: description.trim(),
         image: image.trim() || DEFAULT_IMG,
