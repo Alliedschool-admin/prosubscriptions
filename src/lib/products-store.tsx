@@ -124,3 +124,33 @@ export async function deleteProduct(id: string): Promise<void> {
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) throw error;
 }
+
+export async function updateProduct(
+  id: string,
+  patch: Partial<Omit<NewProductInput, "id">>,
+): Promise<Product> {
+  const payload: Record<string, unknown> = {};
+  if (patch.code !== undefined) payload.code = patch.code;
+  if (patch.name !== undefined) payload.name = patch.name;
+  if (patch.tagline !== undefined) payload.tagline = patch.tagline;
+  if (patch.description !== undefined) payload.description = patch.description;
+  if (patch.category !== undefined) payload.category = patch.category;
+  if (patch.image !== undefined) payload.image = patch.image;
+  if (patch.features !== undefined) payload.features = patch.features;
+  if (patch.price_usd !== undefined) payload.price_usd = patch.price_usd;
+  if (patch.price_pkr !== undefined) payload.price_pkr = patch.price_pkr;
+  if (patch.delivery_instructions !== undefined)
+    payload.delivery_instructions = patch.delivery_instructions;
+  if (patch.price !== undefined) payload.price = patch.price;
+
+  const { data, error } = await supabase
+    .from("products")
+    .update(payload)
+    .eq("id", id)
+    .select(
+      "id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions",
+    )
+    .single();
+  if (error) throw error;
+  return rowToProduct(data as ProductRow);
+}
