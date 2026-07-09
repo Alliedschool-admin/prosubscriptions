@@ -243,10 +243,48 @@ export function CheckoutSheet() {
                     <p className="text-xs text-muted">{item.subtitle}</p>
                   </div>
                   <p className="font-mono text-sm font-bold">
-                    {money(subtotal)}
+                    {money(unitPrice)}
                     {item.cadence ? <span className="text-muted"> {item.cadence}</span> : null}
                   </p>
                 </div>
+
+                {item.kind === "product" && (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                        Quantity
+                      </p>
+                      <p className="text-xs text-muted">
+                        {item.available_stock != null
+                          ? `${item.available_stock} in stock`
+                          : "How many units?"}
+                      </p>
+                    </div>
+                    <div className="inline-flex items-center rounded-xl bg-foreground/5 p-1">
+                      <button
+                        type="button"
+                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        disabled={quantity <= 1}
+                        className="grid size-9 place-items-center rounded-lg text-lg font-bold text-foreground disabled:text-muted"
+                        aria-label="Decrease quantity"
+                      >
+                        −
+                      </button>
+                      <span className="min-w-10 text-center font-mono text-base font-bold">
+                        {quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
+                        disabled={quantity >= maxQty}
+                        className="grid size-9 place-items-center rounded-lg text-lg font-bold text-foreground disabled:text-muted"
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {availableCurrencies.length > 1 && (
                   <div className="space-y-3">
