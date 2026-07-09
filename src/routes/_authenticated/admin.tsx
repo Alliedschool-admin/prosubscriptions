@@ -446,6 +446,8 @@ function EditProductForm({
   const [category, setCategory] = useState<Category>(product.category);
   const [priceUsd, setPriceUsd] = useState(product.price_usd == null ? "" : String(product.price_usd));
   const [pricePkr, setPricePkr] = useState(product.price_pkr == null ? "" : String(product.price_pkr));
+  const [costUsd, setCostUsd] = useState(product.cost_usd == null ? "" : String(product.cost_usd));
+  const [costPkr, setCostPkr] = useState(product.cost_pkr == null ? "" : String(product.cost_pkr));
   const [tagline, setTagline] = useState(product.tagline);
   const [description, setDescription] = useState(product.description);
   const [image, setImage] = useState(product.image);
@@ -487,6 +489,8 @@ function EditProductForm({
         features: featureList.length ? featureList : product.features,
         price_usd: usdNum,
         price_pkr: pkrNum,
+        cost_usd: costUsd.trim() === "" ? null : Number(costUsd),
+        cost_pkr: costPkr.trim() === "" ? null : Number(costPkr),
         delivery_instructions: deliveryInstructions.trim() || null,
       });
       toast.success("Product updated.");
