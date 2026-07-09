@@ -422,6 +422,54 @@ function ProductsPanel() {
   );
 }
 
+function VisitorStats() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["visitor-stats"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("visitor_stats");
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return row as {
+        total_visits: number;
+        unique_visitors: number;
+        visits_today: number;
+        visits_7d: number;
+        visits_30d: number;
+      } | null;
+    },
+    refetchInterval: 60_000,
+  });
+
+  const stats = [
+    { label: "Lifetime visits", value: data?.total_visits },
+    { label: "Unique visitors", value: data?.unique_visitors },
+    { label: "Today", value: data?.visits_today },
+    { label: "Last 7 days", value: data?.visits_7d },
+    { label: "Last 30 days", value: data?.visits_30d },
+  ];
+
+  return (
+    <section className="mb-6 rounded-xl border border-border bg-background p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
+          Site traffic
+        </p>
+        {isLoading && <span className="text-[10px] text-muted">Loading…</span>}
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        {stats.map((s) => (
+          <div key={s.label} className="rounded-lg border border-border p-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted">{s.label}</p>
+            <p className="mt-1 text-xl font-extrabold tabular-nums">
+              {s.value?.toLocaleString() ?? "—"}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ProductRow({
   product,
   onDelete,
