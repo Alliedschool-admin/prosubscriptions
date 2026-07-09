@@ -1,17 +1,20 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut } from "lucide-react";
+import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut, Sun, Moon, Monitor, Languages } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
-
-const baseLinks = [
-  { to: "/", label: "Discover", icon: Compass },
-  { to: "/dashboard", label: "Library", icon: LayoutDashboard },
-] as const;
+import { useI18n, LANG_META, type Lang } from "../lib/i18n";
+import { useTheme, type ThemeChoice } from "../lib/theme";
+import { useEffect, useRef, useState } from "react";
 
 export function TopNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { session, isAdmin, signOut } = useAuth();
+  const { t } = useI18n();
+  const baseLinks = [
+    { to: "/", label: t("nav.discover"), icon: Compass },
+    { to: "/dashboard", label: t("nav.library"), icon: LayoutDashboard },
+  ] as const;
   const links = isAdmin
-    ? [...baseLinks, { to: "/admin", label: "Admin", icon: ShieldCheck } as const]
+    ? [...baseLinks, { to: "/admin", label: t("nav.admin"), icon: ShieldCheck } as const]
     : baseLinks;
   const cols = links.length;
   return (
@@ -22,7 +25,7 @@ export function TopNav() {
             <span className="grid size-7 place-items-center rounded-full bg-foreground">
               <span className="size-2 animate-pulse rounded-full bg-primary" />
             </span>
-            <span className="text-lg font-extrabold tracking-tighter">PRO SUBSCRIPTIONS</span>
+            <span className="text-base font-extrabold tracking-tighter sm:text-lg">PRO SUBSCRIPTIONS</span>
           </Link>
           <div className="hidden items-center gap-1 sm:flex">
             {links.map((l) => {
@@ -39,27 +42,31 @@ export function TopNav() {
                 </Link>
               );
             })}
+            <LanguageMenu />
+            <ThemeMenu />
             {session ? (
               <button
                 onClick={() => signOut()}
                 className="ml-1 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-muted hover:text-foreground"
               >
-                <LogOut className="size-4" /> Sign out
+                <LogOut className="size-4" /> {t("nav.signOut")}
               </button>
             ) : (
               <Link
                 to="/auth"
                 className="ml-1 inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground"
               >
-                <LogIn className="size-4" /> Sign in
+                <LogIn className="size-4" /> {t("nav.signIn")}
               </Link>
             )}
           </div>
-          <div className="flex items-center gap-2 sm:hidden">
+          <div className="flex items-center gap-1 sm:hidden">
+            <LanguageMenu compact />
+            <ThemeMenu compact />
             {session ? (
               <button
                 onClick={() => signOut()}
-                aria-label="Sign out"
+                aria-label={t("nav.signOut")}
                 className="rounded-md p-1.5 text-muted"
               >
                 <LogOut className="size-4" />
@@ -69,7 +76,7 @@ export function TopNav() {
                 to="/auth"
                 className="rounded-md bg-primary px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-primary-foreground"
               >
-                Sign in
+                {t("nav.signIn")}
               </Link>
             )}
           </div>
@@ -101,5 +108,104 @@ export function TopNav() {
         </div>
       </div>
     </>
+  );
+}
+
+function useOutsideClose(open: boolean, onClose: () => void) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    function onDoc(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open, onClose]);
+  return ref;
+}
+
+function LanguageMenu({ compact = false }: { compact?: boolean }) {
+  const { lang, setLang, t } = useI18n();
+  const [open, setOpen] = useState(false);
+  const ref = useOutsideClose(open, () => setOpen(false));
+  const langs: Lang[] = ["en", "ar", "ur"];
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-label={t("lang.label")}
+        className={`inline-flex items-center gap-1 rounded-md text-muted hover:text-foreground ${
+          compact ? "p-1.5" : "px-2 py-1.5 text-xs font-bold uppercase tracking-widest"
+        }`}
+      >
+        <Languages className="size-4" />
+        {!compact && <span className="font-mono">{lang.toUpperCase()}</span>}
+      </button>
+      {open && (
+        <div className="absolute end-0 mt-2 min-w-[10rem] overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-xl">
+          {langs.map((l) => (
+            <button
+              key={l}
+              onClick={() => {
+                setLang(l);
+                setOpen(false);
+              }}
+              className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm ${
+                lang === l ? "bg-foreground/10 font-semibold" : "hover:bg-foreground/5"
+              }`}
+            >
+              <span>{LANG_META[l].native}</span>
+              <span className="font-mono text-[10px] uppercase text-muted">{l}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ThemeMenu({ compact = false }: { compact?: boolean }) {
+  const { theme, resolved, setTheme } = useTheme();
+  const [open, setOpen] = useState(false);
+  const ref = useOutsideClose(open, () => setOpen(false));
+  const Icon = theme === "system" ? Monitor : resolved === "dark" ? Moon : Sun;
+  const options: { id: ThemeChoice; label: string; icon: typeof Sun }[] = [
+    { id: "light", label: "Light", icon: Sun },
+    { id: "dark", label: "Dark", icon: Moon },
+    { id: "system", label: "System", icon: Monitor },
+  ];
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Theme"
+        className={`inline-flex items-center gap-1 rounded-md text-muted hover:text-foreground ${
+          compact ? "p-1.5" : "px-2 py-1.5"
+        }`}
+      >
+        <Icon className="size-4" />
+      </button>
+      {open && (
+        <div className="absolute end-0 mt-2 min-w-[9rem] overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-xl">
+          {options.map((o) => {
+            const OIcon = o.icon;
+            return (
+              <button
+                key={o.id}
+                onClick={() => {
+                  setTheme(o.id);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm ${
+                  theme === o.id ? "bg-foreground/10 font-semibold" : "hover:bg-foreground/5"
+                }`}
+              >
+                <OIcon className="size-4" /> {o.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
