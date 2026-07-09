@@ -99,7 +99,6 @@
   --sidebar-ring: hsl(22 95% 55%);
 }
 
-.dark {
 .light {
   /* Warm ember daylight — cream with molten orange */
   --background: hsl(38 60% 97%);
