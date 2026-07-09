@@ -459,7 +459,7 @@ export type Database = {
       revoke_admin_invite: { Args: { _email: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "super_admin"
       order_status: "pending" | "approved" | "rejected"
       payment_method_kind:
         | "jazzcash"
@@ -605,7 +605,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "super_admin"],
       order_status: ["pending", "approved", "rejected"],
       payment_method_kind: [
         "jazzcash",
