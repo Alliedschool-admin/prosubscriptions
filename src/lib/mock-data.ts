@@ -17,6 +17,7 @@ export type Product = {
   category: Category;
   image: string;
   features: string[];
+  available_stock?: number;
 };
 
 export const products: Product[] = [

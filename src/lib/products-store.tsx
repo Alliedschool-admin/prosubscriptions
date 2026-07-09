@@ -27,6 +27,7 @@ type ProductRow = {
   category: string;
   image: string;
   features: string[] | null;
+  available_stock?: number | null;
 };
 
 function rowToProduct(r: ProductRow): Product {
@@ -44,6 +45,7 @@ function rowToProduct(r: ProductRow): Product {
     category: r.category as Category,
     image: SEED_IMAGES[r.id] ?? r.image,
     features: Array.isArray(r.features) ? r.features : [],
+    available_stock: r.available_stock == null ? 0 : Number(r.available_stock),
   };
 }
 
@@ -52,7 +54,7 @@ export const PRODUCTS_QUERY_KEY = ["products"] as const;
 async function fetchProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features")
+    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data as ProductRow[]).map(rowToProduct);
@@ -109,7 +111,7 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
       features: input.features,
       created_by: userData.user?.id ?? null,
     })
-    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features")
+    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock")
     .single();
   if (error) throw error;
   return rowToProduct(data as ProductRow);

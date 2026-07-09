@@ -21,6 +21,7 @@ export type Database = {
           buyer_id: string
           created_at: string
           currency: string
+          delivered_content: string | null
           id: string
           item_id: string
           item_kind: string
@@ -33,6 +34,7 @@ export type Database = {
           sender_contact: string
           sender_name: string
           status: Database["public"]["Enums"]["order_status"]
+          stock_item_id: string | null
           transaction_ref: string | null
           updated_at: string
         }
@@ -42,6 +44,7 @@ export type Database = {
           buyer_id: string
           created_at?: string
           currency?: string
+          delivered_content?: string | null
           id?: string
           item_id: string
           item_kind: string
@@ -54,6 +57,7 @@ export type Database = {
           sender_contact: string
           sender_name: string
           status?: Database["public"]["Enums"]["order_status"]
+          stock_item_id?: string | null
           transaction_ref?: string | null
           updated_at?: string
         }
@@ -63,6 +67,7 @@ export type Database = {
           buyer_id?: string
           created_at?: string
           currency?: string
+          delivered_content?: string | null
           id?: string
           item_id?: string
           item_kind?: string
@@ -75,6 +80,7 @@ export type Database = {
           sender_contact?: string
           sender_name?: string
           status?: Database["public"]["Enums"]["order_status"]
+          stock_item_id?: string | null
           transaction_ref?: string | null
           updated_at?: string
         }
@@ -84,6 +90,13 @@ export type Database = {
             columns: ["payment_method_id"]
             isOneToOne: false
             referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_stock_item_id_fkey"
+            columns: ["stock_item_id"]
+            isOneToOne: false
+            referencedRelation: "product_stock_items"
             referencedColumns: ["id"]
           },
         ]
@@ -130,8 +143,57 @@ export type Database = {
         }
         Relationships: []
       }
+      product_stock_items: {
+        Row: {
+          assigned_order_id: string | null
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          product_id: string
+          sold_at: string | null
+          status: Database["public"]["Enums"]["stock_status"]
+        }
+        Insert: {
+          assigned_order_id?: string | null
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          product_id: string
+          sold_at?: string | null
+          status?: Database["public"]["Enums"]["stock_status"]
+        }
+        Update: {
+          assigned_order_id?: string | null
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          product_id?: string
+          sold_at?: string | null
+          status?: Database["public"]["Enums"]["stock_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_stock_items_assigned_order_id_fkey"
+            columns: ["assigned_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_stock_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
+          available_stock: number
           category: string
           code: string
           created_at: string
@@ -148,6 +210,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          available_stock?: number
           category: string
           code: string
           created_at?: string
@@ -164,6 +227,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          available_stock?: number
           category?: string
           code?: string
           created_at?: string
@@ -207,6 +271,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_order: {
+        Args: { _note?: string; _order_id: string }
+        Returns: {
+          delivered: boolean
+          order_id: string
+          out_of_stock: boolean
+        }[]
+      }
       claim_first_admin: { Args: never; Returns: boolean }
       has_role: {
         Args: {
@@ -214,6 +286,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      refresh_product_stock_count: {
+        Args: { _product_id: string }
+        Returns: undefined
       }
     }
     Enums: {
@@ -228,6 +304,7 @@ export type Database = {
         | "binance_pay"
         | "crypto"
         | "other"
+      stock_status: "available" | "sold"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -367,6 +444,7 @@ export const Constants = {
         "crypto",
         "other",
       ],
+      stock_status: ["available", "sold"],
     },
   },
 } as const

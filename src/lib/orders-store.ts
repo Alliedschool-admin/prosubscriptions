@@ -146,6 +146,16 @@ export async function reviewOrder(
   if (error) throw error;
 }
 
+export async function approveOrder(id: string, note?: string) {
+  const { data, error } = await supabase.rpc("approve_order", {
+    _order_id: id,
+    ...(note ? { _note: note } : {}),
+  });
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : data;
+  return row as { order_id: string; delivered: boolean; out_of_stock: boolean };
+}
+
 export function useOrdersInvalidator() {
   const qc = useQueryClient();
   return () => {

@@ -30,12 +30,19 @@ import {
   deletePaymentMethod,
   useAllOrders,
   reviewOrder,
+  approveOrder,
   getProofSignedUrl,
   PAYMENT_KIND_LABEL,
   useOrdersInvalidator,
   PAYMENT_METHODS_QUERY_KEY,
   type PaymentMethodKind,
 } from "../../lib/orders-store";
+import {
+  useProductStock,
+  addStockItems,
+  deleteStockItem,
+  useStockInvalidator,
+} from "../../lib/stock-store";
 import { useAuth } from "../../hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -319,28 +326,175 @@ function ProductsPanel() {
         ) : (
           <ul className="space-y-3">
             {products.map((p) => (
-              <li key={p.id} className="flex items-center gap-3 rounded-xl border border-border bg-background p-3">
-                <img src={p.image} alt={p.name} loading="lazy" className="size-12 shrink-0 rounded-lg object-cover" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold">{p.name}</p>
-                  <p className="truncate font-mono text-[10px] uppercase tracking-widest text-muted">
-                    {p.code} · {p.category}
-                    {p.price_usd != null ? ` · $${Number(p.price_usd)}` : ""}
-                    {p.price_pkr != null ? ` · Rs ${Number(p.price_pkr).toLocaleString("en-PK")}` : ""}
-                  </p>
-                </div>
-                <Link to="/products/$id" params={{ id: p.id }} className="rounded-lg bg-foreground/5 p-2 text-muted hover:text-foreground" aria-label="View">
-                  <ExternalLink className="size-4" />
-                </Link>
-                <button onClick={() => onDelete(p.id, p.name)} className="rounded-lg bg-destructive/10 p-2 text-destructive hover:bg-destructive/15" aria-label="Delete">
-                  <Trash2 className="size-4" />
-                </button>
-              </li>
+              <ProductRow key={p.id} product={p} onDelete={onDelete} />
             ))}
           </ul>
         )}
       </section>
     </>
+  );
+}
+
+function ProductRow({
+  product,
+  onDelete,
+}: {
+  product: import("../../lib/mock-data").Product;
+  onDelete: (id: string, label: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const stock = product.available_stock ?? 0;
+  return (
+    <li className="rounded-xl border border-border bg-background p-3">
+      <div className="flex items-center gap-3">
+        <img src={product.image} alt={product.name} loading="lazy" className="size-12 shrink-0 rounded-lg object-cover" />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-bold">{product.name}</p>
+          <p className="truncate font-mono text-[10px] uppercase tracking-widest text-muted">
+            {product.code} · {product.category}
+            {product.price_usd != null ? ` · $${Number(product.price_usd)}` : ""}
+            {product.price_pkr != null ? ` · Rs ${Number(product.price_pkr).toLocaleString("en-PK")}` : ""}
+          </p>
+        </div>
+        <span
+          className={`shrink-0 rounded-full px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest ${
+            stock === 0
+              ? "bg-destructive/15 text-destructive"
+              : stock <= 3
+                ? "bg-primary/15 text-primary"
+                : "bg-foreground/5 text-foreground"
+          }`}
+          title="Available stock links"
+        >
+          {stock} stock
+        </span>
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="rounded-lg bg-foreground/5 p-2 text-muted hover:text-foreground"
+          aria-label="Manage stock"
+        >
+          <Package className="size-4" />
+        </button>
+        <Link to="/products/$id" params={{ id: product.id }} className="rounded-lg bg-foreground/5 p-2 text-muted hover:text-foreground" aria-label="View">
+          <ExternalLink className="size-4" />
+        </Link>
+        <button onClick={() => onDelete(product.id, product.name)} className="rounded-lg bg-destructive/10 p-2 text-destructive hover:bg-destructive/15" aria-label="Delete">
+          <Trash2 className="size-4" />
+        </button>
+      </div>
+      {open && <StockManager productId={product.id} />}
+    </li>
+  );
+}
+
+function StockManager({ productId }: { productId: string }) {
+  const { data: items = [], isLoading } = useProductStock(productId);
+  const invalidate = useStockInvalidator();
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function add() {
+    const lines = text.split("\n");
+    if (!lines.some((l) => l.trim())) {
+      toast.error("Paste one link or code per line.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const n = await addStockItems(productId, lines);
+      toast.success(`Added ${n} stock item${n === 1 ? "" : "s"}.`);
+      setText("");
+      invalidate(productId);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to add stock");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Delete this stock item?")) return;
+    try {
+      await deleteStockItem(id);
+      invalidate(productId);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    }
+  }
+
+  const available = items.filter((i) => i.status === "available");
+  const sold = items.filter((i) => i.status === "sold");
+
+  return (
+    <div className="mt-3 space-y-3 rounded-lg border border-border bg-foreground/[0.02] p-3">
+      <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+        Stock pool · one link/code per line
+      </p>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={3}
+        placeholder={"https://drive.google.com/…\nhttps://mega.nz/…"}
+        className="input font-mono"
+      />
+      <div className="flex justify-end">
+        <button
+          onClick={add}
+          disabled={busy}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground disabled:opacity-60"
+        >
+          <Plus className="size-3.5" /> {busy ? "Adding…" : "Add to stock"}
+        </button>
+      </div>
+      {isLoading ? (
+        <p className="text-xs text-muted">Loading stock…</p>
+      ) : (
+        <>
+          <div>
+            <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-muted">
+              Available ({available.length})
+            </p>
+            {available.length === 0 ? (
+              <p className="text-xs text-muted">No links in stock. Buyers see “Restocking soon”.</p>
+            ) : (
+              <ul className="space-y-1">
+                {available.map((it) => (
+                  <li key={it.id} className="flex items-center gap-2 rounded-md bg-background px-2 py-1">
+                    <span className="min-w-0 flex-1 truncate font-mono text-[11px]">{it.content}</span>
+                    <button
+                      onClick={() => remove(it.id)}
+                      className="shrink-0 rounded p-1 text-muted hover:text-destructive"
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {sold.length > 0 && (
+            <div>
+              <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-muted">
+                Sold ({sold.length})
+              </p>
+              <ul className="space-y-1">
+                {sold.map((it) => (
+                  <li key={it.id} className="flex items-center gap-2 rounded-md bg-foreground/[0.03] px-2 py-1 opacity-70">
+                    <span className="min-w-0 flex-1 truncate font-mono text-[11px] line-through">
+                      {it.content}
+                    </span>
+                    <span className="shrink-0 font-mono text-[9px] uppercase tracking-widest text-muted">
+                      {it.sold_at ? new Date(it.sold_at).toLocaleDateString() : "sold"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 
@@ -511,8 +665,17 @@ function OrdersPanel() {
   async function decide(id: string, status: "approved" | "rejected") {
     setBusyId(id);
     try {
-      await reviewOrder(id, status);
-      toast.success(`Order ${status}.`);
+      if (status === "approved") {
+        const res = await approveOrder(id);
+        if (res?.out_of_stock) {
+          toast.error("Out of stock — add more stock links before approving.");
+        } else {
+          toast.success("Order approved · stock item delivered.");
+        }
+      } else {
+        await reviewOrder(id, status);
+        toast.success("Order rejected.");
+      }
       invalidate();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed");
@@ -574,6 +737,15 @@ function OrdersPanel() {
                 <Info label="Contact" value={o.sender_contact} />
                 {o.transaction_ref && <Info label="Tx ref" value={o.transaction_ref} mono />}
               </div>
+
+              {o.status === "approved" && o.delivered_content && (
+                <div className="mt-3 rounded-lg bg-primary/5 p-3">
+                  <p className="font-mono text-[9px] uppercase tracking-widest text-primary">
+                    Delivered link
+                  </p>
+                  <p className="mt-1 truncate font-mono text-xs">{o.delivered_content}</p>
+                </div>
+              )}
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {o.proof_path && (

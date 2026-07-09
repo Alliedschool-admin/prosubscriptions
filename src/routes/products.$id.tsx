@@ -34,6 +34,8 @@ function ProductDetail() {
   const currencies = product ? availableCurrencies(product) : [];
   const usd = product ? productPrice(product, "USD") : null;
   const pkr = product ? productPrice(product, "PKR") : null;
+  const stock = product?.available_stock ?? 0;
+  const outOfStock = stock === 0;
 
   if (loading && !product) {
     return (
@@ -87,6 +89,9 @@ function ProductDetail() {
           </p>
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{product.name}</h1>
           <p className="mt-1 text-sm text-muted">{product.tagline}</p>
+          <div className="mt-2">
+            <StockBadge stock={stock} />
+          </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
           {currencies.map((c) => (
@@ -180,6 +185,7 @@ function ProductDetail() {
             </div>
           </div>
           <button
+            disabled={outOfStock}
             onClick={() =>
               openWith({
                 kind: "product",
@@ -190,12 +196,35 @@ function ProductDetail() {
                 price_pkr: pkr,
               })
             }
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
           >
-            <Download className="size-4" /> Buy Now
+            <Download className="size-4" /> {outOfStock ? "Sold out — restocking" : "Buy Now"}
           </button>
         </div>
       </div>
     </main>
+  );
+}
+
+function StockBadge({ stock }: { stock: number }) {
+  if (stock === 0) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-background">
+        <span className="size-1.5 animate-pulse rounded-full bg-primary" />
+        Restocking soon — check back in a few hours
+      </span>
+    );
+  }
+  if (stock <= 3) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-primary">
+        Only {stock} left in stock
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/5 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">
+      {stock} in stock · instant delivery
+    </span>
   );
 }
