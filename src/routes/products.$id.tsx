@@ -1,9 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronLeft, Check, Download } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ChevronLeft, Check, Download, Gift } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { getProduct as getSeedProduct } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
 import { useCart } from "../lib/cart-context";
 import { availableCurrencies, formatMoney, productPrice } from "../lib/price";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "../hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { MY_ORDERS_QUERY_KEY } from "../lib/orders-store";
 
 export const Route = createFileRoute("/products/$id")({
   head: ({ params }) => {
@@ -30,12 +36,43 @@ function ProductDetail() {
   const { id } = Route.useParams();
   const { getProduct, products, loading } = useProducts();
   const { openWith } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [claiming, setClaiming] = useState(false);
   const product = getProduct(id);
   const currencies = product ? availableCurrencies(product) : [];
   const usd = product ? productPrice(product, "USD") : null;
   const pkr = product ? productPrice(product, "PKR") : null;
+  const isFree = !!product?.is_free;
   const stock = product?.available_stock ?? 0;
-  const outOfStock = stock === 0;
+  const outOfStock = !isFree && stock === 0;
+
+  async function claimFree() {
+    if (!product) return;
+    if (!user) {
+      navigate({ to: "/auth" });
+      return;
+    }
+    setClaiming(true);
+    try {
+      const { data, error } = await (
+        supabase.rpc as unknown as (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: { order_id: string; already_owned: boolean }[] | null; error: { message: string } | null }>
+      )("claim_free_product", { _product_id: product.id });
+      if (error) throw new Error(error.message);
+      const row = Array.isArray(data) ? data[0] : data;
+      toast.success(row?.already_owned ? "Already in your purchases" : "Added to your purchases");
+      qc.invalidateQueries({ queryKey: MY_ORDERS_QUERY_KEY });
+      navigate({ to: "/dashboard" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to claim");
+    } finally {
+      setClaiming(false);
+    }
+  }
 
   if (loading && !product) {
     return (
@@ -94,7 +131,9 @@ function ProductDetail() {
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
-          {currencies.map((c) => (
+          {isFree ? (
+            <span className="rounded-md bg-emerald-500 px-3 py-1.5 font-mono text-sm font-bold text-white">FREE</span>
+          ) : currencies.map((c) => (
             <span key={c} className="rounded-md bg-foreground px-3 py-1.5 font-mono text-sm font-bold text-background">
               {formatMoney(c, productPrice(product, c) ?? Number(product.price))}
             </span>
@@ -177,13 +216,22 @@ function ProductDetail() {
       <div className="fixed inset-x-0 bottom-[68px] z-30 border-t border-border bg-background/90 p-4 backdrop-blur-xl sm:bottom-0">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
           <div className="leading-none">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">From</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">{isFree ? "Price" : "From"}</span>
             <div className="text-xl font-extrabold">
-              {currencies
+              {isFree ? "FREE" : currencies
                 .map((c) => formatMoney(c, productPrice(product, c) ?? Number(product.price)))
                 .join(" · ") || "—"}
             </div>
           </div>
+          {isFree ? (
+            <button
+              disabled={claiming}
+              onClick={claimFree}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 disabled:opacity-60"
+            >
+              <Gift className="size-4" /> {claiming ? "Claiming…" : "Get it free"}
+            </button>
+          ) : (
           <button
             disabled={outOfStock}
             onClick={() =>
@@ -201,6 +249,7 @@ function ProductDetail() {
           >
             <Download className="size-4" /> {outOfStock ? "Sold out — restocking" : "Buy Now"}
           </button>
+          )}
         </div>
       </div>
     </main>
