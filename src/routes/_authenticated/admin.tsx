@@ -151,30 +151,7 @@ function Admin() {
 
       <VisitorStats />
 
-      <nav className="mb-6 flex gap-1 rounded-xl border border-border bg-background p-1">
-        {(
-          [
-            { id: "products", label: "Products", icon: Package },
-            { id: "methods", label: "Payment", icon: Wallet },
-            { id: "orders", label: "Orders", icon: Inbox },
-            { id: "accounts", label: "Accounts", icon: BarChart3 },
-            { id: "requests", label: "Requests", icon: MessageSquare },
-            { id: "admins", label: "Admins", icon: Users },
-            { id: "users", label: "Users", icon: Contact },
-            { id: "posts", label: "Posts", icon: Megaphone },
-          ] as const
-        ).map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-widest transition ${
-              tab === id ? "bg-foreground text-background" : "text-muted hover:text-foreground"
-            }`}
-          >
-            <Icon className="size-3.5" /> {label}
-          </button>
-        ))}
-      </nav>
+      <AdminTabs tab={tab} setTab={setTab} />
 
       {tab === "products" && <ProductsPanel />}
       {tab === "methods" && <MethodsPanel />}
