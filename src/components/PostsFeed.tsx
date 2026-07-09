@@ -10,6 +10,7 @@ export type Post = {
   body: string;
   category: PostCategory;
   link: string | null;
+  image: string | null;
   pinned: boolean;
   published: boolean;
   created_at: string;
@@ -70,6 +71,14 @@ export function PostsFeed() {
               key={p.id}
               className="relative overflow-hidden rounded-xl border border-border bg-card p-4"
             >
+              {p.image && (
+                <img
+                  src={p.image}
+                  alt=""
+                  loading="lazy"
+                  className="mb-3 aspect-[16/9] w-full rounded-lg object-cover"
+                />
+              )}
               {p.pinned && (
                 <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-foreground/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-foreground">
                   <Pin className="size-3" /> Pinned
