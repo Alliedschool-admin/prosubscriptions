@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useAuth } from "../hooks/use-auth";
 import { useMyOrders, type Order } from "../lib/orders-store";
 import { formatMoney, type Currency } from "../lib/price";
+import { useProducts } from "../lib/products-store";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/dashboard")({
 function Dashboard() {
   const { user } = useAuth();
   const { data: orders = [], isLoading } = useMyOrders();
+  const { getProduct } = useProducts();
 
   if (!user) {
     return (
@@ -85,7 +87,13 @@ function Dashboard() {
         ) : (
           <ul className="space-y-3">
             {orders.map((o) => (
-              <OrderCard key={o.id} order={o} />
+              <OrderCard
+                key={o.id}
+                order={o}
+                instructions={
+                  o.item_kind === "product" ? getProduct(o.item_id)?.delivery_instructions ?? null : null
+                }
+              />
             ))}
           </ul>
         )}
@@ -94,7 +102,7 @@ function Dashboard() {
   );
 }
 
-function OrderCard({ order: o }: { order: Order }) {
+function OrderCard({ order: o, instructions }: { order: Order; instructions: string | null }) {
   function copy(text: string) {
     navigator.clipboard.writeText(text).then(
       () => toast.success("Copied"),
@@ -145,6 +153,16 @@ function OrderCard({ order: o }: { order: Order }) {
               )}
             </div>
           </div>
+          {instructions && (
+            <div className="mt-2 rounded-md border border-primary/20 bg-background/60 p-3">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                How to activate
+              </p>
+              <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-foreground/90">
+                {instructions}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

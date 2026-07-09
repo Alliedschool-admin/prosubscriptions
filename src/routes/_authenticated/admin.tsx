@@ -189,6 +189,7 @@ function ProductsPanel() {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
   const [features, setFeatures] = useState("");
+  const [deliveryInstructions, setDeliveryInstructions] = useState("");
   const [busy, setBusy] = useState(false);
 
   function reset() {
@@ -201,6 +202,7 @@ function ProductsPanel() {
     setDescription("");
     setImage("");
     setFeatures("");
+    setDeliveryInstructions("");
   }
 
   async function onSubmit(e: FormEvent) {
@@ -240,6 +242,7 @@ function ProductsPanel() {
         description: description.trim(),
         image: image.trim() || DEFAULT_IMG,
         features: featureList.length ? featureList : ["Instant delivery", "Commercial license"],
+        delivery_instructions: deliveryInstructions.trim() || null,
       });
       toast.success(`${created.name} posted.`);
       reset();
@@ -297,6 +300,15 @@ function ProductsPanel() {
         </Field>
         <Field label="Features" hint="One per line.">
           <textarea rows={4} value={features} onChange={(e) => setFeatures(e.target.value)} className="input resize-none" />
+        </Field>
+        <Field label="Delivery / activation instructions" hint="Shown to the buyer next to their delivered link after approval. Explain how to redeem, install, or activate.">
+          <textarea
+            rows={5}
+            value={deliveryInstructions}
+            onChange={(e) => setDeliveryInstructions(e.target.value)}
+            placeholder={"1. Open the link\n2. Sign in with the email you used at checkout\n3. Paste the license key into Settings → Activate"}
+            className="input resize-none"
+          />
         </Field>
         <div className="flex items-center justify-between pt-2">
           <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
