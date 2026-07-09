@@ -27,9 +27,17 @@ export const Route = createFileRoute("/products/$id")({
 
 function ProductDetail() {
   const { id } = Route.useParams();
-  const { getProduct, products } = useProducts();
+  const { getProduct, products, loading } = useProducts();
   const { openWith } = useCart();
   const product = getProduct(id);
+
+  if (loading && !product) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-24 text-center text-sm text-muted">
+        Loading…
+      </main>
+    );
+  }
 
   if (!product) {
     return (

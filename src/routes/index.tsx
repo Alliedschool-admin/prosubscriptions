@@ -15,7 +15,7 @@ function Discovery() {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<(typeof categories)[number]>("All");
   const { openWith } = useCart();
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -91,7 +91,9 @@ function Discovery() {
 
       {mode === "single" ? (
         <section className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-          {filtered.length === 0 ? (
+          {loading ? (
+            <p className="col-span-full py-16 text-center text-sm text-muted">Loading vault…</p>
+          ) : filtered.length === 0 ? (
             <p className="col-span-full py-16 text-center text-sm text-muted">
               No assets match that filter yet.
             </p>
