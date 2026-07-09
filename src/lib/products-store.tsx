@@ -22,12 +22,16 @@ type ProductRow = {
   tagline: string;
   description: string;
   price: number | string;
+  price_usd: number | string | null;
+  price_pkr: number | string | null;
   category: string;
   image: string;
   features: string[] | null;
 };
 
 function rowToProduct(r: ProductRow): Product {
+  const usd = r.price_usd == null ? null : Number(r.price_usd);
+  const pkr = r.price_pkr == null ? null : Number(r.price_pkr);
   return {
     id: r.id,
     code: r.code,
@@ -35,6 +39,8 @@ function rowToProduct(r: ProductRow): Product {
     tagline: r.tagline,
     description: r.description,
     price: Number(r.price),
+    price_usd: usd,
+    price_pkr: pkr,
     category: r.category as Category,
     image: SEED_IMAGES[r.id] ?? r.image,
     features: Array.isArray(r.features) ? r.features : [],
@@ -46,7 +52,7 @@ export const PRODUCTS_QUERY_KEY = ["products"] as const;
 async function fetchProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, code, name, tagline, description, price, category, image, features")
+    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data as ProductRow[]).map(rowToProduct);
@@ -69,9 +75,10 @@ export function useProducts() {
   };
 }
 
-export type NewProductInput = Omit<Product, "id" | "image"> & {
+export type NewProductInput = Omit<Product, "id" | "image" | "price"> & {
   id?: string;
   image?: string;
+  price?: number;
 };
 
 function slugify(s: string) {
@@ -85,6 +92,7 @@ function slugify(s: string) {
 export async function createProduct(input: NewProductInput): Promise<Product> {
   const id = (input.id?.trim() || slugify(input.name) || `vlt-${Date.now()}`).slice(0, 60);
   const { data: userData } = await supabase.auth.getUser();
+  const priceLegacy = input.price ?? input.price_usd ?? input.price_pkr ?? 0;
   const { data, error } = await supabase
     .from("products")
     .insert({
@@ -93,13 +101,15 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
       name: input.name,
       tagline: input.tagline,
       description: input.description,
-      price: input.price,
+      price: priceLegacy,
+      price_usd: input.price_usd ?? null,
+      price_pkr: input.price_pkr ?? null,
       category: input.category,
       image: input.image || "",
       features: input.features,
       created_by: userData.user?.id ?? null,
     })
-    .select("id, code, name, tagline, description, price, category, image, features")
+    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features")
     .single();
   if (error) throw error;
   return rowToProduct(data as ProductRow);

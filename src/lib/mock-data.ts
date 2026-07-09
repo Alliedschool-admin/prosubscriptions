@@ -12,6 +12,8 @@ export type Product = {
   tagline: string;
   description: string;
   price: number;
+  price_usd?: number | null;
+  price_pkr?: number | null;
   category: Category;
   image: string;
   features: string[];

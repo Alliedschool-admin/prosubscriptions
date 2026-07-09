@@ -5,7 +5,8 @@ export type CartItem = {
   id: string;
   name: string;
   subtitle: string;
-  price: number;
+  price_usd?: number | null;
+  price_pkr?: number | null;
   cadence?: string;
 };
 

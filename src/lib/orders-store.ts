@@ -39,6 +39,7 @@ export function usePaymentMethods(opts?: { activeOnly?: boolean }) {
 export async function createPaymentMethod(input: {
   kind: PaymentMethodKind;
   label: string;
+  currency: "USD" | "PKR";
   account_name?: string | null;
   account_number: string;
   instructions?: string | null;
