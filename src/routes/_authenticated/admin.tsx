@@ -65,7 +65,7 @@ import {
 } from "../../lib/stock-store";
 import { useAuth } from "../../hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
