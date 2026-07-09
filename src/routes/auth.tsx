@@ -8,7 +8,7 @@ import { useAuth } from "../hooks/use-auth";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
-  mode: z.enum(["signin", "signup"]).optional(),
+  mode: z.enum(["signin", "signup", "reset"]).optional(),
 });
 
 export const Route = createFileRoute("/auth")({
@@ -24,25 +24,32 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const { redirect } = useSearch({ from: "/auth" });
+  const { redirect, mode: modeParam } = useSearch({ from: "/auth" });
   const navigate = useNavigate();
   const { session, loading } = useAuth();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "reset">(modeParam ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && session) {
+    if (!loading && session && mode !== "reset") {
       navigate({ to: (redirect as any) || "/dashboard", replace: true });
     }
-  }, [loading, session, redirect, navigate]);
+  }, [loading, session, redirect, navigate, mode]);
 
   async function onEmailSubmit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signup") {
+      if (mode === "reset") {
+        if (!email) throw new Error("Enter your email first");
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("Reset link sent. Check your inbox (and spam).");
+      } else if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -76,34 +83,44 @@ function AuthPage() {
     }
   }
 
+  const isReset = mode === "reset";
+
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-md items-center px-4 py-10">
+    <main className="mx-auto flex min-h-[calc(100svh-3.5rem)] max-w-md items-center px-4 py-8 sm:py-12">
       <div className="w-full">
-        <div className="mb-8 text-center">
+        <div className="mb-6 text-center sm:mb-8">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
             Secure · Pro Subscriptions
           </p>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight">
-            {mode === "signin" ? "Sign in" : "Create account"}
+          <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
+            {isReset ? "Reset password" : mode === "signin" ? "Sign in" : "Create account"}
           </h1>
           <p className="mt-2 text-sm text-muted">
-            {mode === "signin" ? "Access your library and admin tools." : "Join the vault in seconds."}
+            {isReset
+              ? "Enter the email tied to your account and we'll send a recovery link."
+              : mode === "signin"
+                ? "Access your library and admin tools."
+                : "Join the vault in seconds."}
           </p>
         </div>
 
-        <button
-          onClick={onGoogle}
-          disabled={busy}
-          className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-sm font-bold hover:bg-foreground/5 disabled:opacity-50"
-        >
-          <GoogleGlyph /> Continue with Google
-        </button>
+        {!isReset && (
+          <>
+            <button
+              onClick={onGoogle}
+              disabled={busy}
+              className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-sm font-bold hover:bg-foreground/5 disabled:opacity-50"
+            >
+              <GoogleGlyph /> Continue with Google
+            </button>
 
-        <div className="my-4 flex items-center gap-3">
-          <div className="h-px flex-1 bg-border" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted">or</span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
+            <div className="my-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted">or</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          </>
+        )}
 
         <form onSubmit={onEmailSubmit} className="space-y-3">
           <input
@@ -115,33 +132,76 @@ function AuthPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary"
           />
-          <input
-            type="password"
-            required
-            minLength={6}
-            autoComplete={mode === "signup" ? "new-password" : "current-password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary"
-          />
+          {!isReset && (
+            <input
+              type="password"
+              required
+              minLength={6}
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary"
+            />
+          )}
+          {mode === "signin" && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setMode("reset")}
+                className="text-xs font-bold text-primary hover:underline"
+              >
+                Forgot password?
+              </button>
+            </div>
+          )}
           <button
             type="submit"
             disabled={busy}
             className="w-full rounded-xl bg-primary py-3 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
           >
-            {busy ? "Working…" : mode === "signin" ? "Sign in" : "Create account"}
+            {busy
+              ? "Working…"
+              : isReset
+                ? "Send reset link"
+                : mode === "signin"
+                  ? "Sign in"
+                  : "Create account"}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">
-          {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
-          <button
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            className="font-bold text-foreground underline underline-offset-4"
-          >
-            {mode === "signin" ? "Create an account" : "Sign in instead"}
-          </button>
+          {isReset ? (
+            <>
+              Remembered it?{" "}
+              <button
+                onClick={() => setMode("signin")}
+                className="font-bold text-foreground underline underline-offset-4"
+              >
+                Back to sign in
+              </button>
+            </>
+          ) : mode === "signin" ? (
+            <>
+              New here?{" "}
+              <button
+                onClick={() => setMode("signup")}
+                className="font-bold text-foreground underline underline-offset-4"
+              >
+                Create an account
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <button
+                onClick={() => setMode("signin")}
+                className="font-bold text-foreground underline underline-offset-4"
+              >
+                Sign in instead
+              </button>
+            </>
+          )}
         </p>
 
         <p className="mt-8 text-center">
