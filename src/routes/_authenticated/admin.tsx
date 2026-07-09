@@ -216,6 +216,7 @@ function ProductsPanel() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [category, setCategory] = useState<Category>(CAT_OPTIONS[0]);
+  const [isFree, setIsFree] = useState(false);
   const [priceUsd, setPriceUsd] = useState("");
   const [pricePkr, setPricePkr] = useState("");
   const [costUsd, setCostUsd] = useState("");
@@ -231,6 +232,7 @@ function ProductsPanel() {
     setName("");
     setCode("");
     setCategory(CAT_OPTIONS[0]);
+    setIsFree(false);
     setPriceUsd("");
     setPricePkr("");
     setCostUsd("");
@@ -248,21 +250,23 @@ function ProductsPanel() {
       toast.error("Name, tagline and description are required.");
       return;
     }
-    const usdNum = priceUsd.trim() === "" ? null : Number(priceUsd);
-    const pkrNum = pricePkr.trim() === "" ? null : Number(pricePkr);
+    const usdNum = isFree ? 0 : (priceUsd.trim() === "" ? null : Number(priceUsd));
+    const pkrNum = isFree ? 0 : (pricePkr.trim() === "" ? null : Number(pricePkr));
     const costUsdNum = costUsd.trim() === "" ? null : Number(costUsd);
     const costPkrNum = costPkr.trim() === "" ? null : Number(costPkr);
-    if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
-      toast.error("Enter a valid USD price.");
-      return;
-    }
-    if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
-      toast.error("Enter a valid PKR price.");
-      return;
-    }
-    if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
-      toast.error("Set at least one price (USD or PKR).");
-      return;
+    if (!isFree) {
+      if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
+        toast.error("Enter a valid USD price.");
+        return;
+      }
+      if (pkrNum != null && (!Number.isFinite(pkrNum) || pkrNum < 0)) {
+        toast.error("Enter a valid PKR price.");
+        return;
+      }
+      if ((usdNum == null || usdNum === 0) && (pkrNum == null || pkrNum === 0)) {
+        toast.error("Set at least one price (USD or PKR), or mark it Free.");
+        return;
+      }
     }
     const featureList = features
       .split("\n")
@@ -275,6 +279,7 @@ function ProductsPanel() {
         name: name.trim(),
         code: code.trim() || `VLT-${String(Math.floor(Math.random() * 900) + 100)}`,
         category,
+        is_free: isFree,
         price_usd: usdNum,
         price_pkr: pkrNum,
         cost_usd: costUsdNum,
