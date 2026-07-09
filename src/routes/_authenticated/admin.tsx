@@ -189,6 +189,7 @@ function ProductsPanel() {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
   const [features, setFeatures] = useState("");
+  const [deliveryInstructions, setDeliveryInstructions] = useState("");
   const [busy, setBusy] = useState(false);
 
   function reset() {
@@ -201,6 +202,7 @@ function ProductsPanel() {
     setDescription("");
     setImage("");
     setFeatures("");
+    setDeliveryInstructions("");
   }
 
   async function onSubmit(e: FormEvent) {
@@ -240,6 +242,7 @@ function ProductsPanel() {
         description: description.trim(),
         image: image.trim() || DEFAULT_IMG,
         features: featureList.length ? featureList : ["Instant delivery", "Commercial license"],
+        delivery_instructions: deliveryInstructions.trim() || null,
       });
       toast.success(`${created.name} posted.`);
       reset();

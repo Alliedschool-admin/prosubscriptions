@@ -18,6 +18,7 @@ export type Product = {
   image: string;
   features: string[];
   available_stock?: number;
+  delivery_instructions?: string | null;
 };
 
 export const products: Product[] = [
