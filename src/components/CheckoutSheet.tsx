@@ -13,12 +13,22 @@ import {
   type PaymentMethod,
 } from "../lib/orders-store";
 import { toast } from "sonner";
+import { formatMoney, type Currency } from "../lib/price";
 
 export function CheckoutSheet() {
   const { item, isOpen, close } = useCart();
   const { user } = useAuth();
   const { data: methods = [], isLoading: methodsLoading } = usePaymentMethods({ activeOnly: true });
   const invalidateOrders = useOrdersInvalidator();
+
+  const availableCurrencies = useMemo<Currency[]>(() => {
+    if (!item) return [];
+    const cs: Currency[] = [];
+    if (item.price_usd != null && Number(item.price_usd) > 0) cs.push("USD");
+    if (item.price_pkr != null && Number(item.price_pkr) > 0) cs.push("PKR");
+    return cs;
+  }, [item]);
+  const [currency, setCurrency] = useState<Currency>("USD");
 
   const [code, setCode] = useState("");
   const [applied, setApplied] = useState<{ code: string; discount: number } | null>(null);
@@ -46,17 +56,35 @@ export function CheckoutSheet() {
       setProofFile(null);
       setConfirmed(false);
       setOrderRef("");
+      if (availableCurrencies.length) setCurrency(availableCurrencies[0]);
+      setSelectedMethodId("");
     }
-  }, [isOpen, item?.id]);
+  }, [isOpen, item?.id, availableCurrencies]);
+
+  const filteredMethods = useMemo(
+    () => methods.filter((m) => (m.currency ?? "PKR") === currency),
+    [methods, currency],
+  );
 
   useEffect(() => {
-    if (!selectedMethodId && methods.length) setSelectedMethodId(methods[0].id);
-  }, [methods, selectedMethodId]);
+    if (filteredMethods.length === 0) {
+      setSelectedMethodId("");
+      return;
+    }
+    if (!filteredMethods.find((m) => m.id === selectedMethodId)) {
+      setSelectedMethodId(filteredMethods[0].id);
+    }
+  }, [filteredMethods, selectedMethodId]);
 
-  const subtotal = item?.price ?? 0;
+  const subtotal = useMemo(() => {
+    if (!item) return 0;
+    const raw = currency === "USD" ? item.price_usd : item.price_pkr;
+    return raw == null ? 0 : Number(raw);
+  }, [item, currency]);
   const discount = useMemo(() => applied?.discount ?? 0, [applied]);
   const total = Math.max(0, subtotal - discount);
-  const selectedMethod: PaymentMethod | undefined = methods.find((m) => m.id === selectedMethodId);
+  const selectedMethod: PaymentMethod | undefined = filteredMethods.find((m) => m.id === selectedMethodId);
+  const money = (n: number) => formatMoney(currency, n);
 
   function applyPromo() {
     const key = code.trim().toUpperCase();
@@ -93,7 +121,7 @@ export function CheckoutSheet() {
         item_id: item.id,
         item_name: item.name,
         amount: total,
-        currency: "USD",
+        currency,
         payment_method_id: selectedMethod.id,
         payment_method_label: `${PAYMENT_KIND_LABEL[selectedMethod.kind]} · ${selectedMethod.label}`,
         sender_name: senderName.trim(),
@@ -188,6 +216,11 @@ export function CheckoutSheet() {
             <div className="flex flex-1 items-center justify-center px-8 text-sm text-muted">
               Loading payment options…
             </div>
+          ) : availableCurrencies.length === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
+              <h3 className="text-lg font-extrabold tracking-tight">No price set</h3>
+              <p className="max-w-xs text-sm text-muted">This item has no active price. Please try later.</p>
+            </div>
           ) : methods.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
               <h3 className="text-lg font-extrabold tracking-tight">Checkout unavailable</h3>
@@ -204,45 +237,74 @@ export function CheckoutSheet() {
                     <p className="text-xs text-muted">{item.subtitle}</p>
                   </div>
                   <p className="font-mono text-sm font-bold">
-                    ${item.price.toFixed(2)}
+                    {money(subtotal)}
                     {item.cadence ? <span className="text-muted"> {item.cadence}</span> : null}
                   </p>
                 </div>
+
+                {availableCurrencies.length > 1 && (
+                  <div className="space-y-3">
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                      Pay in
+                    </p>
+                    <div className="inline-flex w-full rounded-xl bg-foreground/5 p-1">
+                      {availableCurrencies.map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => setCurrency(c)}
+                          className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${
+                            currency === c ? "bg-background shadow-sm" : "text-muted"
+                          }`}
+                        >
+                          {c === "USD" ? "USD ($)" : "PKR (Rs)"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-3">
                   <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
                     1 · Choose payment method
                   </p>
-                  <div className="grid gap-2">
-                    {methods.map((m) => {
-                      const active = m.id === selectedMethodId;
-                      return (
-                        <button
-                          key={m.id}
-                          type="button"
-                          onClick={() => setSelectedMethodId(m.id)}
-                          className={`rounded-xl border p-3 text-left transition ${
-                            active
-                              ? "border-primary bg-primary/5"
-                              : "border-border bg-background hover:border-foreground/20"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-sm">{m.label}</span>
-                            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
-                              {PAYMENT_KIND_LABEL[m.kind]}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {filteredMethods.length === 0 ? (
+                    <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted">
+                      No {currency} payment methods available yet.
+                      {availableCurrencies.length > 1 ? " Try the other currency." : ""}
+                    </p>
+                  ) : (
+                    <div className="grid gap-2">
+                      {filteredMethods.map((m) => {
+                        const active = m.id === selectedMethodId;
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => setSelectedMethodId(m.id)}
+                            className={`rounded-xl border p-3 text-left transition ${
+                              active
+                                ? "border-primary bg-primary/5"
+                                : "border-border bg-background hover:border-foreground/20"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-sm">{m.label}</span>
+                              <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                                {PAYMENT_KIND_LABEL[m.kind]}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 {selectedMethod && (
                   <div className="space-y-2 rounded-2xl bg-foreground/[0.03] p-4">
                     <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
-                      2 · Send ${total.toFixed(2)} to
+                      2 · Send {money(total)} to
                     </p>
                     {selectedMethod.account_name && (
                       <p className="text-sm">
@@ -357,16 +419,16 @@ export function CheckoutSheet() {
                 <div className="rounded-2xl bg-primary/5 p-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>{money(subtotal)}</span>
                   </div>
                   <div className="mt-1 flex justify-between text-sm font-bold text-primary">
                     <span>Discount</span>
-                    <span>-${discount.toFixed(2)}</span>
+                    <span>-{money(discount)}</span>
                   </div>
                   <div className="mt-4 flex justify-between border-t border-primary/20 pt-4 text-lg font-extrabold">
                     <span>Total Due</span>
                     <span>
-                      ${total.toFixed(2)}
+                      {money(total)}
                       {item.cadence ? <span className="text-sm font-normal text-muted"> {item.cadence}</span> : null}
                     </span>
                   </div>
@@ -376,10 +438,10 @@ export function CheckoutSheet() {
               <div className="border-t border-border p-6">
                 <button
                   onClick={submitOrder}
-                  disabled={submitting}
+                  disabled={submitting || !selectedMethod}
                   className="w-full rounded-xl bg-primary py-4 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-transform active:scale-[0.98] disabled:opacity-60"
                 >
-                  {submitting ? "Submitting…" : `Submit for verification · $${total.toFixed(2)}`}
+                  {submitting ? "Submitting…" : `Submit for verification · ${money(total)}`}
                 </button>
                 <p className="mt-3 flex items-center justify-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted">
                   <Lock className="size-3" /> Manually verified · No card data stored
