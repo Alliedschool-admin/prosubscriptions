@@ -147,46 +147,6 @@ function useOutsideClose(open: boolean, onClose: () => void) {
   return ref;
 }
 
-function LanguageMenu({ compact = false }: { compact?: boolean }) {
-  const { lang, setLang, t } = useI18n();
-  const [open, setOpen] = useState(false);
-  const ref = useOutsideClose(open, () => setOpen(false));
-  const langs: Lang[] = ["en", "ar", "ur"];
-  return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        aria-label={t("lang.label")}
-        className={`inline-flex items-center gap-1 rounded-md text-muted hover:text-foreground ${
-          compact ? "p-1.5" : "px-2 py-1.5 text-xs font-bold uppercase tracking-widest"
-        }`}
-      >
-        <Languages className="size-4" />
-        {!compact && <span className="font-mono">{lang.toUpperCase()}</span>}
-      </button>
-      {open && (
-        <div className="absolute end-0 mt-2 min-w-[10rem] overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-xl">
-          {langs.map((l) => (
-            <button
-              key={l}
-              onClick={() => {
-                setLang(l);
-                setOpen(false);
-              }}
-              className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm ${
-                lang === l ? "bg-foreground/10 font-semibold" : "hover:bg-foreground/5"
-              }`}
-            >
-              <span>{LANG_META[l].native}</span>
-              <span className="font-mono text-[10px] uppercase text-muted">{l}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function ThemeMenu({ compact = false }: { compact?: boolean }) {
   const { theme, resolved, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
