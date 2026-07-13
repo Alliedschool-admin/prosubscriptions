@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut, Sun, Moon, Monitor, Languages } from "lucide-react";
+import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut, Sun, Moon, Monitor } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
-import { useI18n, LANG_META, type Lang } from "../lib/i18n";
+import { useI18n } from "../lib/i18n";
 import { useTheme, type ThemeChoice } from "../lib/theme";
 import { useEffect, useRef, useState } from "react";
 
@@ -51,7 +51,6 @@ export function TopNav() {
                 </Link>
               );
             })}
-            <LanguageMenu />
             <ThemeMenu />
             {session ? (
               <button
@@ -71,7 +70,6 @@ export function TopNav() {
             )}
           </div>
           <div className="flex items-center gap-1 sm:hidden">
-            <LanguageMenu compact />
             <ThemeMenu compact />
             {session ? (
               <button
