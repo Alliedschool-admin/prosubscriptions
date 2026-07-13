@@ -348,3 +348,8 @@ body,
   100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 0%, transparent); }
 }
 .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-2px) rotate(-3deg); }
+}
