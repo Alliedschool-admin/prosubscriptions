@@ -13,7 +13,7 @@ type Dict = Record<string, string>;
 
 const en: Dict = {
   "nav.discover": "Discover",
-  "nav.library": "Library",
+  "nav.library": "My Purchases",
   "nav.admin": "Admin",
   "nav.signIn": "Sign in",
   "nav.signOut": "Sign out",
@@ -39,7 +39,7 @@ const en: Dict = {
 
 const ar: Dict = {
   "nav.discover": "استكشف",
-  "nav.library": "المكتبة",
+  "nav.library": "مشترياتي",
   "nav.admin": "الإدارة",
   "nav.signIn": "تسجيل الدخول",
   "nav.signOut": "تسجيل الخروج",
@@ -65,7 +65,7 @@ const ar: Dict = {
 
 const ur: Dict = {
   "nav.discover": "دریافت",
-  "nav.library": "لائبریری",
+  "nav.library": "میری خریداریاں",
   "nav.admin": "ایڈمن",
   "nav.signIn": "سائن ان",
   "nav.signOut": "سائن آؤٹ",
