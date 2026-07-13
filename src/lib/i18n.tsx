@@ -106,9 +106,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("en");
 
   useEffect(() => {
+    // Language switching disabled — force English and clear any prior selection.
     try {
-      const saved = localStorage.getItem(STORAGE_KEY) as Lang | null;
-      if (saved && saved in DICTS) setLangState(saved);
+      localStorage.removeItem(STORAGE_KEY);
     } catch {
       /* ignore */
     }

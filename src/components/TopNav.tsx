@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut, Sun, Moon, Monitor, Languages } from "lucide-react";
+import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut, Sun, Moon, Monitor } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
-import { useI18n, LANG_META, type Lang } from "../lib/i18n";
+import { useI18n } from "../lib/i18n";
 import { useTheme, type ThemeChoice } from "../lib/theme";
 import { useEffect, useRef, useState } from "react";
 
@@ -51,7 +51,6 @@ export function TopNav() {
                 </Link>
               );
             })}
-            <LanguageMenu />
             <ThemeMenu />
             {session ? (
               <button
@@ -71,7 +70,6 @@ export function TopNav() {
             )}
           </div>
           <div className="flex items-center gap-1 sm:hidden">
-            <LanguageMenu compact />
             <ThemeMenu compact />
             {session ? (
               <button
@@ -147,46 +145,6 @@ function useOutsideClose(open: boolean, onClose: () => void) {
     return () => document.removeEventListener("mousedown", onDoc);
   }, [open, onClose]);
   return ref;
-}
-
-function LanguageMenu({ compact = false }: { compact?: boolean }) {
-  const { lang, setLang, t } = useI18n();
-  const [open, setOpen] = useState(false);
-  const ref = useOutsideClose(open, () => setOpen(false));
-  const langs: Lang[] = ["en", "ar", "ur"];
-  return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        aria-label={t("lang.label")}
-        className={`inline-flex items-center gap-1 rounded-md text-muted hover:text-foreground ${
-          compact ? "p-1.5" : "px-2 py-1.5 text-xs font-bold uppercase tracking-widest"
-        }`}
-      >
-        <Languages className="size-4" />
-        {!compact && <span className="font-mono">{lang.toUpperCase()}</span>}
-      </button>
-      {open && (
-        <div className="absolute end-0 mt-2 min-w-[10rem] overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-xl">
-          {langs.map((l) => (
-            <button
-              key={l}
-              onClick={() => {
-                setLang(l);
-                setOpen(false);
-              }}
-              className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm ${
-                lang === l ? "bg-foreground/10 font-semibold" : "hover:bg-foreground/5"
-              }`}
-            >
-              <span>{LANG_META[l].native}</span>
-              <span className="font-mono text-[10px] uppercase text-muted">{l}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 }
 
 function ThemeMenu({ compact = false }: { compact?: boolean }) {
