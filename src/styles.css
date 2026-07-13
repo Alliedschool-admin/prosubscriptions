@@ -348,3 +348,89 @@ body,
   100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 0%, transparent); }
 }
 .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+
+/* Holographic shard card — faceted clip-path, dynamic border, energy pulse */
+@utility shard-card {
+  position: relative;
+  clip-path: polygon(
+    0 22px, 22px 0,
+    calc(100% - 8px) 0, 100% 8px,
+    100% calc(100% - 22px), calc(100% - 22px) 100%,
+    8px 100%, 0 calc(100% - 8px)
+  );
+  background:
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--primary) 10%, transparent) 0%,
+      color-mix(in oklab, var(--accent) 6%, transparent) 50%,
+      hsl(240 20% 6% / 0.55) 100%);
+  backdrop-filter: blur(22px) saturate(160%);
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 500ms ease;
+  will-change: transform;
+}
+
+@utility shard-border {
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  clip-path: polygon(
+    0 22px, 22px 0,
+    calc(100% - 8px) 0, 100% 8px,
+    100% calc(100% - 22px), calc(100% - 22px) 100%,
+    8px 100%, 0 calc(100% - 8px)
+  );
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--foreground) 14%, transparent) 0%,
+    color-mix(in oklab, var(--foreground) 4%, transparent) 50%,
+    color-mix(in oklab, var(--foreground) 14%, transparent) 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  transition: background 500ms ease, opacity 500ms ease;
+  pointer-events: none;
+}
+
+.group:hover .shard-border,
+.group:focus-visible .shard-border {
+  background: conic-gradient(from 140deg at 50% 50%,
+    var(--primary) 0%,
+    var(--primary-glow) 30%,
+    var(--accent-amber) 55%,
+    var(--primary) 80%,
+    var(--primary-glow) 100%);
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--primary) 55%, transparent));
+}
+
+@keyframes shard-shimmer {
+  0%   { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
+  40%  { opacity: 0.9; }
+  100% { transform: translateX(220%) skewX(-20deg); opacity: 0; }
+}
+
+.shard-shimmer {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  clip-path: inherit;
+}
+.shard-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; height: 100%; width: 45%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--primary-glow) 55%, transparent) 40%,
+    color-mix(in oklab, var(--accent-amber) 40%, transparent) 55%,
+    transparent 100%);
+  filter: blur(8px);
+  transform: translateX(-120%) skewX(-20deg);
+}
+.group:hover .shard-shimmer::after {
+  animation: shard-shimmer 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes hud-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.hud-orbit { animation: hud-orbit 18s linear infinite; }
