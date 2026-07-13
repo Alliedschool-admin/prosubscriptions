@@ -33,7 +33,7 @@ function Discovery() {
   }, [debouncedQuery, cat, products]);
 
   return (
-    <main className="relative mx-auto w-full max-w-7xl px-4 pb-40 pt-10 sm:px-6 lg:px-8">
+    <main className="relative mx-auto max-w-2xl px-4 pb-40 pt-10">
       {/* Aurora orbs — floating cosmic light sources */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[520px] overflow-hidden">
         <div className="aurora-orb" style={{ top: "-60px", left: "-40px", width: 260, height: 260, background: "radial-gradient(circle, hsl(268 85% 68% / 0.55), transparent 70%)" }} />
@@ -125,8 +125,8 @@ function Discovery() {
         })}
       </div>
 
-      {/* Asymmetric staggered product grid — architectural wave flow */}
-      <section className="grid grid-cols-1 items-start gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {/* Asymmetric offset product grid */}
+      <section className="grid grid-cols-1 gap-8 sm:grid-cols-2">
         {loading ? (
           <p className="col-span-full py-16 text-center text-sm text-muted">Uplinking vault…</p>
         ) : filtered.length === 0 ? (
@@ -135,12 +135,7 @@ function Discovery() {
           </p>
         ) : (
           filtered.map((p, i) => (
-            <div
-              key={p.id}
-              className={i % 2 === 1 ? "lg:translate-y-6" : ""}
-            >
-              <ProductCard product={p} index={i} />
-            </div>
+            <ProductCard key={p.id} product={p} index={i} />
           ))
         )}
       </section>
