@@ -19,13 +19,20 @@ export function TopNav() {
   const cols = links.length;
   return (
     <>
-      <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
+      <nav className="sticky top-0 z-40 border-b border-border/60 bg-background/50 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="grid size-7 place-items-center rounded-full bg-foreground">
-              <span className="size-2 animate-pulse rounded-full bg-primary" />
+          <Link to="/" className="flex items-center gap-2.5">
+            <span
+              className="relative grid size-7 place-items-center rounded-full"
+              style={{ background: "linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
+            >
+              <span className="absolute inset-0 rounded-full pulse-ring" />
+              <span className="relative size-2 rounded-full bg-background" />
             </span>
-            <span className="text-base font-extrabold tracking-tighter sm:text-lg">PRO SUBSCRIPTIONS</span>
+            <span className="font-display text-base tracking-tight sm:text-lg">
+              <span className="text-chrome">PRO</span>
+              <span className="text-foreground/80"> · SUBSCRIPTIONS</span>
+            </span>
           </Link>
           <div className="hidden items-center gap-1 sm:flex">
             {links.map((l) => {
@@ -34,8 +41,10 @@ export function TopNav() {
                 <Link
                   key={l.to}
                   to={l.to}
-                  className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
-                    active ? "bg-foreground text-background" : "text-muted hover:text-foreground"
+                  className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all ${
+                    active
+                      ? "bg-foreground/10 text-foreground shadow-inner"
+                      : "text-muted hover:text-foreground"
                   }`}
                 >
                   {l.label}
@@ -54,7 +63,8 @@ export function TopNav() {
             ) : (
               <Link
                 to="/auth"
-                className="ml-1 inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground"
+                className="ml-1 inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/30"
+                style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
               >
                 <LogIn className="size-4" /> {t("nav.signIn")}
               </Link>
@@ -74,7 +84,8 @@ export function TopNav() {
             ) : (
               <Link
                 to="/auth"
-                className="rounded-md bg-primary px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-primary-foreground"
+                className="rounded-full px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-primary-foreground shadow-md shadow-primary/30"
+                style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
               >
                 {t("nav.signIn")}
               </Link>
@@ -83,11 +94,13 @@ export function TopNav() {
         </div>
       </nav>
 
-      {/* Mobile bottom nav */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/90 backdrop-blur-xl sm:hidden">
+      {/* Floating circular HUD dock — spatial navigator */}
+      <div className="fixed inset-x-0 bottom-5 z-30 flex justify-center px-4 sm:hidden">
         <div
-          className="mx-auto grid max-w-2xl"
+          className="aurora-glass flex items-center gap-1 rounded-full px-2 py-2"
           style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+          role="tablist"
+          aria-label="Primary"
         >
           {links.map((l) => {
             const Icon = l.icon;
@@ -96,12 +109,24 @@ export function TopNav() {
               <Link
                 key={l.to}
                 to={l.to}
-                className={`flex flex-col items-center gap-1 py-3 text-[10px] font-mono uppercase tracking-widest ${
-                  active ? "text-primary" : "text-muted"
+                role="tab"
+                aria-selected={active}
+                aria-label={l.label}
+                className={`group relative flex size-12 flex-col items-center justify-center rounded-full transition-all ${
+                  active ? "text-primary-foreground" : "text-muted hover:text-foreground"
                 }`}
+                style={
+                  active
+                    ? {
+                        background:
+                          "linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%)",
+                        boxShadow:
+                          "0 10px 30px -8px color-mix(in oklab, var(--primary) 60%, transparent)",
+                      }
+                    : undefined
+                }
               >
-                <Icon className="size-4" strokeWidth={active ? 2.5 : 1.75} />
-                {l.label}
+                <Icon className="size-5" strokeWidth={active ? 2.4 : 1.75} />
               </Link>
             );
           })}
