@@ -26,10 +26,19 @@ export function TopNav() {
             <span className="relative grid size-9 place-items-center">
               <span
                 aria-hidden
-                className="absolute inset-0 rounded-full opacity-70 blur-md transition-opacity duration-500 group-hover:opacity-100"
+                className="absolute inset-0 rounded-full pulse-ring"
                 style={{
                   background:
-                    "conic-gradient(from 140deg, color-mix(in oklab, var(--primary) 60%, transparent), color-mix(in oklab, var(--primary-glow) 60%, transparent), color-mix(in oklab, var(--accent-amber) 40%, transparent), color-mix(in oklab, var(--primary) 60%, transparent))",
+                    "conic-gradient(from 140deg, color-mix(in oklab, var(--primary) 70%, transparent), color-mix(in oklab, var(--primary-glow) 70%, transparent), color-mix(in oklab, var(--accent-amber) 50%, transparent), color-mix(in oklab, var(--primary) 70%, transparent))",
+                }}
+              />
+              <span
+                aria-hidden
+                className="absolute -inset-1 rounded-full opacity-70 blur-lg transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                  background:
+                    "radial-gradient(circle, color-mix(in oklab, var(--primary-glow) 60%, transparent), transparent 70%)",
+                  animation: "aurora-orb 8s ease-in-out infinite",
                 }}
               />
               <img
@@ -37,7 +46,7 @@ export function TopNav() {
                 alt="Pro Subscriptions"
                 width={36}
                 height={36}
-                className="relative size-9 object-contain drop-shadow-[0_2px_8px_color-mix(in_oklab,var(--primary)_50%,transparent)] transition-transform duration-500 group-hover:rotate-[8deg] group-hover:scale-105"
+                className="relative size-9 animate-[float_6s_ease-in-out_infinite] object-contain drop-shadow-[0_2px_10px_color-mix(in_oklab,var(--primary)_60%,transparent)] transition-transform duration-500 group-hover:rotate-[10deg] group-hover:scale-110"
               />
             </span>
             <span className="font-display text-base tracking-tight sm:text-lg">
