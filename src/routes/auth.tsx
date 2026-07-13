@@ -17,7 +17,7 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Pro Subscriptions" },
-      { name: "description", content: "Sign in to Pro Subscriptions to manage your library and admin console." },
+      { name: "description", content: "Sign in to Pro Subscriptions to manage your purchases and admin console." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -103,7 +103,7 @@ function AuthPage() {
             {isReset
               ? "Enter the email tied to your account and we'll send a recovery link."
               : mode === "signin"
-                ? "Access your library and admin tools."
+                ? "Access your purchases and admin tools."
                 : "Join the vault in seconds."}
           </p>
         </div>
