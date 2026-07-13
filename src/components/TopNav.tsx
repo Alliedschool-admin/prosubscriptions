@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/use-auth";
 import { useI18n } from "../lib/i18n";
 import { useTheme, type ThemeChoice } from "../lib/theme";
 import { useEffect, useRef, useState } from "react";
+import logoMark from "../assets/logo-mark.png";
 
 export function TopNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -21,13 +22,23 @@ export function TopNav() {
     <>
       <nav className="sticky top-0 z-40 border-b border-border/60 bg-background/50 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2.5">
-            <span
-              className="relative grid size-7 place-items-center rounded-full"
-              style={{ background: "linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
-            >
-              <span className="absolute inset-0 rounded-full pulse-ring" />
-              <span className="relative size-2 rounded-full bg-background" />
+          <Link to="/" className="group flex items-center gap-2.5">
+            <span className="relative grid size-9 place-items-center">
+              <span
+                aria-hidden
+                className="absolute inset-0 rounded-full opacity-70 blur-md transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                  background:
+                    "conic-gradient(from 140deg, color-mix(in oklab, var(--primary) 60%, transparent), color-mix(in oklab, var(--primary-glow) 60%, transparent), color-mix(in oklab, var(--accent-amber) 40%, transparent), color-mix(in oklab, var(--primary) 60%, transparent))",
+                }}
+              />
+              <img
+                src={logoMark}
+                alt="Pro Subscriptions"
+                width={36}
+                height={36}
+                className="relative size-9 object-contain drop-shadow-[0_2px_8px_color-mix(in_oklab,var(--primary)_50%,transparent)] transition-transform duration-500 group-hover:rotate-[8deg] group-hover:scale-105"
+              />
             </span>
             <span className="font-display text-base tracking-tight sm:text-lg">
               <span className="text-chrome">PRO</span>
