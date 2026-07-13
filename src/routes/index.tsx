@@ -49,26 +49,26 @@ function Discovery() {
             <span className="relative inline-flex size-2 rounded-full bg-primary" />
           </span>
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-muted">
-            Node · 001 · Vault Uplink
+            Premium Subscriptions · Fair Prices
           </span>
         </div>
 
         <h1 className="font-display text-balance text-5xl leading-[0.95] tracking-tight sm:text-6xl">
-          <span className="text-chrome">Professional</span>
+          <span className="text-chrome">Premium tools,</span>
           <br />
-          <span className="ml-[0.9em] text-aurora">grade digital</span>
+          <span className="ml-[0.9em] text-aurora">unreal prices.</span>
           <br />
-          <span className="text-foreground/90">/ assets.</span>
+          <span className="text-foreground/90">/ no compromise.</span>
         </h1>
 
         <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6">
           <p className="max-w-md text-sm leading-relaxed text-muted">
-            A curated vault of presets, UI kits, AI tooling and dev templates —
-            engineered for builders who ship.
+            Top-shelf subscriptions — AI, design, and dev tools — bundled at a
+            fraction of retail. Same features, smarter price, zero fluff.
           </p>
           <div className="hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-widest text-muted sm:block">
             <div className="text-foreground/80">{products.length.toString().padStart(3, "0")}</div>
-            <div>assets online</div>
+            <div>plans live</div>
           </div>
         </div>
       </header>
