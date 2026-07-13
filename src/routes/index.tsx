@@ -33,65 +33,116 @@ function Discovery() {
   }, [debouncedQuery, cat, products]);
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-32 pt-8">
-      <header className="mb-8">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-          System Status · Active
-        </p>
-        <h1 className="mt-2 text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl">
-          Professional grade
+    <main className="relative mx-auto max-w-2xl px-4 pb-40 pt-10">
+      {/* Aurora orbs — floating cosmic light sources */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[520px] overflow-hidden">
+        <div className="aurora-orb" style={{ top: "-60px", left: "-40px", width: 260, height: 260, background: "radial-gradient(circle, hsl(268 85% 68% / 0.55), transparent 70%)" }} />
+        <div className="aurora-orb" style={{ top: "40px", right: "-60px", width: 320, height: 320, background: "radial-gradient(circle, hsl(190 90% 62% / 0.45), transparent 70%)", animationDelay: "-6s" }} />
+        <div className="aurora-orb" style={{ top: "220px", left: "35%", width: 220, height: 220, background: "radial-gradient(circle, hsl(38 95% 62% / 0.35), transparent 70%)", animationDelay: "-11s" }} />
+      </div>
+
+      {/* Asymmetric hero */}
+      <header className="relative mb-10">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1 backdrop-blur-md">
+          <span className="relative grid size-2 place-items-center">
+            <span className="absolute inline-flex size-full rounded-full bg-primary pulse-ring" />
+            <span className="relative inline-flex size-2 rounded-full bg-primary" />
+          </span>
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-muted">
+            Node · 001 · Vault Uplink
+          </span>
+        </div>
+
+        <h1 className="font-display text-balance text-5xl leading-[0.95] tracking-tight sm:text-6xl">
+          <span className="text-chrome">Professional</span>
           <br />
-          digital assets.
+          <span className="ml-[0.9em] text-aurora">grade digital</span>
+          <br />
+          <span className="text-foreground/90">/ assets.</span>
         </h1>
-        <p className="mt-3 max-w-md text-sm text-muted">
-          A curated vault of presets, UI kits, AI tooling and dev templates — engineered for
-          builders who ship.
-        </p>
+
+        <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6">
+          <p className="max-w-md text-sm leading-relaxed text-muted">
+            A curated vault of presets, UI kits, AI tooling and dev templates —
+            engineered for builders who ship.
+          </p>
+          <div className="hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-widest text-muted sm:block">
+            <div className="text-foreground/80">{products.length.toString().padStart(3, "0")}</div>
+            <div>assets online</div>
+          </div>
+        </div>
       </header>
 
-      <div className="mb-8">
+      <div className="relative mb-10">
         <CommunityBanner />
       </div>
 
       <PostsFeed />
 
-      <div className="mb-6 flex items-center rounded-xl border border-border bg-background px-3 py-2">
+      {/* Search — glass capsule */}
+      <div className="relative mb-6 flex items-center gap-2 aurora-glass rounded-2xl px-4 py-2.5">
         <Search className="size-4 text-muted" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search the vault…"
+          placeholder="Query the vault…"
           aria-label="Search the vault"
-          className="flex-1 border-none bg-transparent px-3 text-sm outline-none placeholder:text-muted"
+          className="flex-1 border-none bg-transparent px-1 text-sm outline-none placeholder:text-muted"
         />
+        <span className="hidden font-mono text-[9px] uppercase tracking-widest text-muted sm:inline">
+          ⌘K
+        </span>
       </div>
 
-      <div className="no-scrollbar mb-8 flex gap-2 overflow-x-auto pb-2">
-          {categories.map((c) => (
+      {/* Category dock — floating nodes */}
+      <div className="no-scrollbar mb-10 flex gap-2 overflow-x-auto pb-2">
+        {categories.map((c) => {
+          const active = cat === c;
+          return (
             <button
               key={c}
               onClick={() => setCat(c)}
-              className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition ${
-                cat === c
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-background text-foreground"
+              className={`group relative shrink-0 overflow-hidden rounded-full px-4 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-all ${
+                active
+                  ? "text-primary-foreground shadow-lg shadow-primary/30"
+                  : "text-muted hover:text-foreground"
               }`}
+              style={
+                active
+                  ? { background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }
+                  : undefined
+              }
             >
-              {c === "All" ? "All Assets" : c}
+              {!active && (
+                <span
+                  aria-hidden
+                  className="absolute inset-0 rounded-full border border-border bg-background/40 backdrop-blur-md transition group-hover:border-foreground/30"
+                />
+              )}
+              <span className="relative">{c === "All" ? "◉ All" : c}</span>
             </button>
-          ))}
+          );
+        })}
       </div>
 
-      <section className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-          {loading ? (
-            <p className="col-span-full py-16 text-center text-sm text-muted">Loading vault…</p>
-          ) : filtered.length === 0 ? (
-            <p className="col-span-full py-16 text-center text-sm text-muted">
-              No assets match that filter yet.
-            </p>
-          ) : (
-            filtered.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)
-          )}
+      {/* Asymmetric offset product grid */}
+      <section className="grid grid-cols-1 gap-10 sm:grid-cols-2">
+        {loading ? (
+          <p className="col-span-full py-16 text-center text-sm text-muted">Uplinking vault…</p>
+        ) : filtered.length === 0 ? (
+          <p className="col-span-full py-16 text-center text-sm text-muted">
+            No assets match that filter yet.
+          </p>
+        ) : (
+          filtered.map((p, i) => (
+            <div
+              key={p.id}
+              className={i % 2 === 1 ? "sm:translate-y-10" : ""}
+            >
+              <ProductCard product={p} index={i} />
+            </div>
+          ))
+        )}
       </section>
     </main>
   );

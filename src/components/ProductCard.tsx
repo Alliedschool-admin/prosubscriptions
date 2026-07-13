@@ -51,31 +51,45 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
     <Link
       to="/products/$id"
       params={{ id: product.id }}
-      className="group animate-vault-up block"
+      className="group animate-vault-up relative block"
       style={{ animationDelay: `${index * 60}ms` }}
     >
-      <div className="relative mb-3 aspect-square w-full overflow-hidden rounded-2xl border border-border bg-neutral-200">
+      <div className="relative mb-3 aspect-square w-full overflow-hidden rounded-[28px] aurora-glass transition-transform duration-500 group-hover:-translate-y-1">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -inset-px rounded-[28px] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          style={{
+            background:
+              "conic-gradient(from 140deg at 50% 50%, color-mix(in oklab, var(--primary) 40%, transparent), color-mix(in oklab, var(--primary-glow) 40%, transparent), color-mix(in oklab, var(--accent-amber) 30%, transparent), color-mix(in oklab, var(--primary) 40%, transparent))",
+            filter: "blur(18px)",
+            zIndex: -1,
+          }}
+        />
         <img
           src={product.image}
           alt={product.name}
           width={800}
           height={800}
           loading="lazy"
-          className={`size-full object-cover transition-transform duration-500 group-hover:scale-[1.03] ${
+          className={`size-full object-cover transition-all duration-700 group-hover:scale-[1.06] ${
             outOfStock ? "opacity-60" : ""
           }`}
         />
         <span
-          className={`absolute left-2 top-2 rounded-full px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest ${
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent opacity-90"
+        />
+        <span
+          className={`absolute left-3 top-3 rounded-full px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-widest backdrop-blur-md ${
             isFree
               ? outOfStock
                 ? "bg-foreground text-background"
-                : "bg-emerald-500 text-white"
+                : "bg-emerald-500/90 text-white"
               : outOfStock
               ? "bg-foreground text-background"
               : stock <= 3
                 ? "bg-primary text-primary-foreground"
-                : "bg-background/90 text-foreground"
+                : "bg-background/60 text-foreground border border-border"
           }`}
         >
           {isFree
@@ -89,17 +103,21 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
               : `${stock} in stock`}
         </span>
       </div>
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 px-1">
         <div className="min-w-0">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
             {product.code} · {product.category}
           </p>
-          <h3 className="mt-1 truncate text-base font-extrabold tracking-tight">{product.name}</h3>
+          <h3 className="font-display mt-1 truncate text-lg tracking-tight">{product.name}</h3>
           <p className="mt-0.5 truncate text-sm text-muted">{product.tagline}</p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
           {tags.map((t) => (
-            <span key={t} className="rounded-md bg-foreground px-2 py-1 font-mono text-xs font-bold text-background">
+            <span
+              key={t}
+              className="rounded-md px-2 py-1 font-mono text-xs font-bold text-primary-foreground"
+              style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
+            >
               {t}
             </span>
           ))}
@@ -110,7 +128,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           type="button"
           onClick={handleFreeClaim}
           disabled={claiming || outOfStock}
-          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-xs font-extrabold uppercase tracking-widest text-white shadow-sm shadow-emerald-500/20 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-white shadow-lg shadow-emerald-500/30 transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
         >
           <Gift className="size-3.5" /> {outOfStock ? "Sold out" : claiming ? "Claiming…" : "Get it free"}
         </button>
