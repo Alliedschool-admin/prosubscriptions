@@ -126,7 +126,7 @@ function Discovery() {
       </div>
 
       {/* Asymmetric offset product grid */}
-      <section className="grid grid-cols-1 gap-10 sm:grid-cols-2">
+      <section className="grid grid-cols-1 gap-8 sm:grid-cols-2">
         {loading ? (
           <p className="col-span-full py-16 text-center text-sm text-muted">Uplinking vault…</p>
         ) : filtered.length === 0 ? (
@@ -135,12 +135,7 @@ function Discovery() {
           </p>
         ) : (
           filtered.map((p, i) => (
-            <div
-              key={p.id}
-              className={i % 2 === 1 ? "sm:translate-y-10" : ""}
-            >
-              <ProductCard product={p} index={i} />
-            </div>
+            <ProductCard key={p.id} product={p} index={i} />
           ))
         )}
       </section>
