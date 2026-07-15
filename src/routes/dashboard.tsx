@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Copy, Clock, CheckCircle2, XCircle, MessageSquarePlus } from "lucide-react";
+import { Copy, Clock, CheckCircle2, XCircle, MessageSquarePlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/use-auth";
-import { useMyOrders, type Order } from "../lib/orders-store";
+import { useMyOrders, type Order, deleteOrder, useOrdersInvalidator } from "../lib/orders-store";
 import { formatMoney, type Currency } from "../lib/price";
 import { useProducts } from "../lib/products-store";
 import { CommunityBanner } from "../components/CommunityBanner";
@@ -24,6 +24,18 @@ function Dashboard() {
   const { user } = useAuth();
   const { data: orders = [], isLoading } = useMyOrders();
   const { getProduct } = useProducts();
+  const invalidateOrders = useOrdersInvalidator();
+
+  async function handleDelete(id: string) {
+    if (!confirm("Remove this order from your purchases? This cannot be undone.")) return;
+    try {
+      await deleteOrder(id);
+      invalidateOrders();
+      toast.success("Order removed");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to remove order");
+    }
+  }
 
   if (!user) {
     return (
@@ -94,6 +106,7 @@ function Dashboard() {
                 instructions={
                   o.item_kind === "product" ? getProduct(o.item_id)?.delivery_instructions ?? null : null
                 }
+                onDelete={() => handleDelete(o.id)}
               />
             ))}
           </ul>
@@ -126,7 +139,15 @@ function Dashboard() {
 }
 
 
-function OrderCard({ order: o, instructions }: { order: Order; instructions: string | null }) {
+function OrderCard({
+  order: o,
+  instructions,
+  onDelete,
+}: {
+  order: Order;
+  instructions: string | null;
+  onDelete: () => void;
+}) {
   function copy(text: string) {
     navigator.clipboard.writeText(text).then(
       () => toast.success("Copied"),
@@ -169,6 +190,15 @@ function OrderCard({ order: o, instructions }: { order: Order; instructions: str
       {o.status === "rejected" && o.admin_note && (
         <p className="mt-3 text-xs text-destructive">Reason: {o.admin_note}</p>
       )}
+      <div className="mt-3 flex justify-end">
+        <button
+          onClick={onDelete}
+          className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-destructive/5 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10"
+          aria-label="Remove order"
+        >
+          <Trash2 className="size-3" /> Remove
+        </button>
+      </div>
     </li>
   );
 }
