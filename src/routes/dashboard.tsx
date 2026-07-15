@@ -1,25 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Copy, Clock, CheckCircle2, XCircle, Plus, MessageSquare, Trash2, Sparkles } from "lucide-react";
+import { Copy, Clock, CheckCircle2, XCircle, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useMyOrders, type Order } from "../lib/orders-store";
 import { formatMoney, type Currency } from "../lib/price";
 import { useProducts } from "../lib/products-store";
 import { CommunityBanner } from "../components/CommunityBanner";
-import {
-  useMyRequests,
-  createRequest,
-  deleteRequest,
-  useRequestsInvalidator,
-  REQUEST_STATUS_LABEL,
-  type ProductRequest,
-} from "../lib/requests-store";
 
 export const Route = createFileRoute("/dashboard")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    request: typeof s.request === "string" ? s.request : undefined,
-  }),
   head: () => ({
     meta: [
       { title: "My Purchases — Pro Subscriptions" },
