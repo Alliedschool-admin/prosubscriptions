@@ -25,6 +25,7 @@ import {
   Users,
   Contact,
   Megaphone,
+  Ticket,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
@@ -82,7 +83,16 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: Admin,
 });
 
-type Tab = "products" | "methods" | "orders" | "accounts" | "requests" | "admins" | "users" | "posts";
+type Tab =
+  | "products"
+  | "methods"
+  | "orders"
+  | "accounts"
+  | "requests"
+  | "admins"
+  | "users"
+  | "posts"
+  | "coupons";
 
 function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { t } = useI18n();
@@ -95,10 +105,11 @@ function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
     { id: "admins" as const, label: t("tab.admins"), icon: Users },
     { id: "users" as const, label: t("tab.users"), icon: Contact },
     { id: "posts" as const, label: t("tab.posts"), icon: Megaphone },
+    { id: "coupons" as const, label: t("tab.coupons"), icon: Ticket },
   ];
   return (
     <nav
-      className="no-scrollbar mb-6 -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto scroll-smooth rounded-xl border border-border bg-background/70 p-1 backdrop-blur [mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)] sm:grid sm:snap-none sm:grid-cols-4 sm:overflow-visible sm:[mask-image:none] lg:grid-cols-8"
+      className="no-scrollbar mb-6 -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto scroll-smooth rounded-xl border border-border bg-background/70 p-1 backdrop-blur [mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)] sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:[mask-image:none] lg:grid-cols-9"
       aria-label="Admin sections"
       role="tablist"
     >
@@ -204,6 +215,7 @@ function Admin() {
       {tab === "admins" && <AdminsPanel />}
       {tab === "users" && <UsersPanel />}
       {tab === "posts" && <PostsAdminPanel />}
+      {tab === "coupons" && <CouponsPanel />}
 
       <style>{`
         .input {
