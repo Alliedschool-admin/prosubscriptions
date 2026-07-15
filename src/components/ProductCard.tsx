@@ -140,7 +140,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             e.preventDefault();
             e.stopPropagation();
             navigate({
-              to: "/dashboard",
+              to: "/requests",
               search: { request: product.name } as never,
             });
           }}
