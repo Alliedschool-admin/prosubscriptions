@@ -25,6 +25,7 @@ import {
   Users,
   Contact,
   Megaphone,
+  Ticket,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
@@ -82,7 +83,16 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: Admin,
 });
 
-type Tab = "products" | "methods" | "orders" | "accounts" | "requests" | "admins" | "users" | "posts";
+type Tab =
+  | "products"
+  | "methods"
+  | "orders"
+  | "accounts"
+  | "requests"
+  | "admins"
+  | "users"
+  | "posts"
+  | "coupons";
 
 function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { t } = useI18n();
@@ -95,10 +105,11 @@ function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
     { id: "admins" as const, label: t("tab.admins"), icon: Users },
     { id: "users" as const, label: t("tab.users"), icon: Contact },
     { id: "posts" as const, label: t("tab.posts"), icon: Megaphone },
+    { id: "coupons" as const, label: t("tab.coupons"), icon: Ticket },
   ];
   return (
     <nav
-      className="no-scrollbar mb-6 -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto scroll-smooth rounded-xl border border-border bg-background/70 p-1 backdrop-blur [mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)] sm:grid sm:snap-none sm:grid-cols-4 sm:overflow-visible sm:[mask-image:none] lg:grid-cols-8"
+      className="no-scrollbar mb-6 -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto scroll-smooth rounded-xl border border-border bg-background/70 p-1 backdrop-blur [mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)] sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:[mask-image:none] lg:grid-cols-9"
       aria-label="Admin sections"
       role="tablist"
     >
@@ -204,6 +215,7 @@ function Admin() {
       {tab === "admins" && <AdminsPanel />}
       {tab === "users" && <UsersPanel />}
       {tab === "posts" && <PostsAdminPanel />}
+      {tab === "coupons" && <CouponsPanel />}
 
       <style>{`
         .input {
@@ -435,6 +447,301 @@ function ProductsPanel() {
             {products.map((p) => (
               <ProductRow key={p.id} product={p} onDelete={onDelete} purchaseCount={countByProduct.get(p.id) ?? 0} />
             ))}
+          </ul>
+        )}
+      </section>
+    </>
+  );
+}
+
+/* ---------------- Coupons ---------------- */
+
+type CouponRow = {
+  id: string;
+  code: string;
+  kind: "percent" | "fixed";
+  value: number;
+  currency: string | null;
+  min_amount: number;
+  max_uses: number | null;
+  uses_count: number;
+  expires_at: string | null;
+  active: boolean;
+  note: string | null;
+  created_at: string;
+};
+
+const COUPONS_QUERY_KEY = ["admin", "coupons"] as const;
+
+function CouponsPanel() {
+  const qc = useQueryClient();
+  const { data: coupons = [], isLoading } = useQuery({
+    queryKey: COUPONS_QUERY_KEY,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("coupons")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      return (data ?? []) as CouponRow[];
+    },
+  });
+
+  const [code, setCode] = useState("");
+  const [kind, setKind] = useState<"percent" | "fixed">("percent");
+  const [value, setValue] = useState("");
+  const [currency, setCurrency] = useState<"" | "USD" | "PKR">("");
+  const [minAmount, setMinAmount] = useState("");
+  const [maxUses, setMaxUses] = useState("");
+  const [expiresAt, setExpiresAt] = useState("");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  function reset() {
+    setCode("");
+    setKind("percent");
+    setValue("");
+    setCurrency("");
+    setMinAmount("");
+    setMaxUses("");
+    setExpiresAt("");
+    setNote("");
+  }
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    const trimmed = code.trim().toUpperCase();
+    const num = Number(value);
+    if (!trimmed) return toast.error("Code is required.");
+    if (!Number.isFinite(num) || num <= 0) return toast.error("Value must be > 0.");
+    if (kind === "percent" && num > 100) return toast.error("Percent must be ≤ 100.");
+    if (kind === "fixed" && !currency) return toast.error("Pick a currency for a fixed discount.");
+
+    setBusy(true);
+    try {
+      const { error } = await supabase.from("coupons").insert({
+        code: trimmed,
+        kind,
+        value: num,
+        currency: currency || null,
+        min_amount: minAmount.trim() === "" ? 0 : Number(minAmount),
+        max_uses: maxUses.trim() === "" ? null : Number(maxUses),
+        expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
+        note: note.trim() || null,
+        active: true,
+      });
+      if (error) throw error;
+      toast.success(`Coupon ${trimmed} created.`);
+      reset();
+      qc.invalidateQueries({ queryKey: COUPONS_QUERY_KEY });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to create coupon");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function toggleActive(row: CouponRow) {
+    try {
+      const { error } = await supabase
+        .from("coupons")
+        .update({ active: !row.active })
+        .eq("id", row.id);
+      if (error) throw error;
+      qc.invalidateQueries({ queryKey: COUPONS_QUERY_KEY });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update");
+    }
+  }
+
+  async function remove(row: CouponRow) {
+    if (!confirm(`Delete coupon ${row.code}?`)) return;
+    try {
+      const { error } = await supabase.from("coupons").delete().eq("id", row.id);
+      if (error) throw error;
+      toast(`${row.code} deleted.`);
+      qc.invalidateQueries({ queryKey: COUPONS_QUERY_KEY });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
+    }
+  }
+
+  function formatValue(row: CouponRow) {
+    return row.kind === "percent"
+      ? `${row.value}% off`
+      : `${row.currency ?? ""} ${row.value} off`.trim();
+  }
+
+  return (
+    <>
+      <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-background p-5">
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Code">
+            <input
+              required
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              placeholder="LAUNCH20"
+              className="input font-mono uppercase"
+            />
+          </Field>
+          <Field label="Type">
+            <select value={kind} onChange={(e) => setKind(e.target.value as "percent" | "fixed")} className="input">
+              <option value="percent">Percent (%)</option>
+              <option value="fixed">Fixed amount</option>
+            </select>
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={kind === "percent" ? "Percent" : "Amount off"}>
+            <input
+              required
+              type="number"
+              min="0"
+              step={kind === "percent" ? "1" : "0.01"}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder={kind === "percent" ? "20" : "5"}
+              className="input font-mono"
+            />
+          </Field>
+          <Field label="Currency" hint={kind === "fixed" ? "Required for fixed." : "Restrict to one currency (optional)."}>
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value as "" | "USD" | "PKR")}
+              className="input"
+            >
+              <option value="">Any</option>
+              <option value="USD">USD</option>
+              <option value="PKR">PKR</option>
+            </select>
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Minimum spend" hint="0 for none.">
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={minAmount}
+              onChange={(e) => setMinAmount(e.target.value)}
+              placeholder="0"
+              className="input font-mono"
+            />
+          </Field>
+          <Field label="Max uses" hint="Blank = unlimited.">
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value={maxUses}
+              onChange={(e) => setMaxUses(e.target.value)}
+              placeholder="100"
+              className="input font-mono"
+            />
+          </Field>
+        </div>
+        <Field label="Expires at" hint="Optional. Local time.">
+          <input
+            type="datetime-local"
+            value={expiresAt}
+            onChange={(e) => setExpiresAt(e.target.value)}
+            className="input font-mono"
+          />
+        </Field>
+        <Field label="Internal note" hint="Not shown to buyers.">
+          <input value={note} onChange={(e) => setNote(e.target.value)} className="input" />
+        </Field>
+        <div className="flex items-center justify-between pt-1">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            {coupons.length} codes total
+          </span>
+          <button
+            type="submit"
+            disabled={busy}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
+          >
+            <Plus className="size-4" /> {busy ? "Creating…" : "Create coupon"}
+          </button>
+        </div>
+      </form>
+
+      <section className="mt-8">
+        <div className="mb-3">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Existing codes</p>
+          <h2 className="text-2xl font-extrabold tracking-tight">MANAGE</h2>
+        </div>
+        {isLoading ? (
+          <p className="text-sm text-muted">Loading…</p>
+        ) : coupons.length === 0 ? (
+          <div className="grid place-items-center rounded-2xl border border-dashed border-border p-10 text-center">
+            <Ticket className="size-6 text-muted" />
+            <p className="mt-3 text-sm text-muted">No coupons yet.</p>
+          </div>
+        ) : (
+          <ul className="space-y-3">
+            {coupons.map((c) => {
+              const expired = c.expires_at ? new Date(c.expires_at) <= new Date() : false;
+              const exhausted = c.max_uses != null && c.uses_count >= c.max_uses;
+              return (
+                <li key={c.id} className="rounded-2xl border border-border bg-background p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className="font-mono text-sm font-extrabold uppercase tracking-widest">{c.code}</p>
+                      <p className="text-xs text-muted">
+                        {formatValue(c)}
+                        {c.min_amount > 0 && ` · min ${c.min_amount}`}
+                        {c.currency && ` · ${c.currency}`}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {!c.active && (
+                        <span className="rounded bg-muted/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-muted">
+                          Off
+                        </span>
+                      )}
+                      {expired && (
+                        <span className="rounded bg-destructive/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-destructive">
+                          Expired
+                        </span>
+                      )}
+                      {exhausted && (
+                        <span className="rounded bg-destructive/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-destructive">
+                          Used up
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-2 grid grid-cols-3 gap-2 text-[11px] text-muted">
+                    <span>
+                      Uses: <span className="font-mono text-foreground">{c.uses_count}{c.max_uses != null ? `/${c.max_uses}` : ""}</span>
+                    </span>
+                    <span>
+                      Expires:{" "}
+                      <span className="font-mono text-foreground">
+                        {c.expires_at ? new Date(c.expires_at).toLocaleDateString() : "Never"}
+                      </span>
+                    </span>
+                    <span className="truncate">{c.note ?? ""}</span>
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      onClick={() => toggleActive(c)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-muted/10"
+                    >
+                      {c.active ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+                      {c.active ? "Deactivate" : "Activate"}
+                    </button>
+                    <button
+                      onClick={() => remove(c)}
+                      className="ml-auto inline-flex items-center gap-1 rounded-lg bg-destructive/10 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-destructive"
+                    >
+                      <Trash2 className="size-3" /> Delete
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
