@@ -48,6 +48,19 @@ export function TopNav() {
                 height={36}
                 className="relative size-9 animate-[float_6s_ease-in-out_infinite] object-contain drop-shadow-[0_2px_10px_color-mix(in_oklab,var(--primary)_60%,transparent)] transition-transform duration-500 group-hover:rotate-[10deg] group-hover:scale-110"
               />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 overflow-hidden rounded-full"
+              >
+                <span
+                  className="absolute inset-y-0 -left-1/2 w-1/2 animate-[logo-shimmer_4.5s_ease-in-out_infinite]"
+                  style={{
+                    background:
+                      "linear-gradient(115deg, transparent 0%, color-mix(in oklab, white 55%, transparent) 45%, color-mix(in oklab, white 80%, transparent) 50%, color-mix(in oklab, white 55%, transparent) 55%, transparent 100%)",
+                    mixBlendMode: "overlay",
+                  }}
+                />
+              </span>
             </span>
             <span className="font-display text-base tracking-tight sm:text-lg">
               <span className="text-chrome">PRO</span>
