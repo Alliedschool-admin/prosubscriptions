@@ -23,44 +23,16 @@ export function TopNav() {
       <nav className="sticky top-0 z-40 border-b border-border/60 bg-background/50 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
           <Link to="/" className="group flex items-center gap-2.5">
-            <span className="relative grid size-9 place-items-center">
-              <span
-                aria-hidden
-                className="absolute inset-0 rounded-full pulse-ring"
-                style={{
-                  background:
-                    "conic-gradient(from 140deg, color-mix(in oklab, var(--primary) 70%, transparent), color-mix(in oklab, var(--primary-glow) 70%, transparent), color-mix(in oklab, var(--accent-amber) 50%, transparent), color-mix(in oklab, var(--primary) 70%, transparent))",
-                }}
-              />
-              <span
-                aria-hidden
-                className="absolute -inset-1 rounded-full opacity-70 blur-lg transition-opacity duration-500 group-hover:opacity-100"
-                style={{
-                  background:
-                    "radial-gradient(circle, color-mix(in oklab, var(--primary-glow) 60%, transparent), transparent 70%)",
-                  animation: "aurora-orb 8s ease-in-out infinite",
-                }}
-              />
+            <span
+              className="relative grid size-9 place-items-center rounded-full bg-white ring-1 ring-black/10 shadow-[0_4px_16px_-4px_color-mix(in_oklab,var(--primary)_45%,transparent)] transition-transform duration-500 group-hover:scale-[1.06]"
+            >
               <img
                 src={logoMark}
                 alt="Pro Subscriptions"
-                width={36}
-                height={36}
-                className="relative size-9 animate-[float_6s_ease-in-out_infinite] object-contain drop-shadow-[0_2px_10px_color-mix(in_oklab,var(--primary)_60%,transparent)] transition-transform duration-500 group-hover:rotate-[10deg] group-hover:scale-110"
+                width={28}
+                height={28}
+                className="size-7 object-contain"
               />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-0 overflow-hidden rounded-full"
-              >
-                <span
-                  className="absolute inset-y-0 -left-1/2 w-1/2 animate-[logo-shimmer_4.5s_ease-in-out_infinite]"
-                  style={{
-                    background:
-                      "linear-gradient(115deg, transparent 0%, color-mix(in oklab, white 55%, transparent) 45%, color-mix(in oklab, white 80%, transparent) 50%, color-mix(in oklab, white 55%, transparent) 55%, transparent 100%)",
-                    mixBlendMode: "overlay",
-                  }}
-                />
-              </span>
             </span>
             <span className="font-display text-base tracking-tight sm:text-lg">
               <span className="text-chrome">PRO</span>

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Copy, Clock, CheckCircle2, XCircle, Plus, MessageSquare, Trash2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useMyOrders, type Order } from "../lib/orders-store";
 import { formatMoney, type Currency } from "../lib/price";
@@ -17,6 +17,9 @@ import {
 } from "../lib/requests-store";
 
 export const Route = createFileRoute("/dashboard")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    request: typeof s.request === "string" ? s.request : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "My Purchases — Pro Subscriptions" },
@@ -122,8 +125,22 @@ function RequestsSection() {
   const { user } = useAuth();
   const { data: requests = [], isLoading } = useMyRequests();
   const invalidate = useRequestsInvalidator();
+  const search = Route.useSearch();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+
+  useEffect(() => {
+    if (search.request && search.request.trim()) {
+      setName(search.request);
+      setOpen(true);
+      // Scroll into view so user sees the prefilled form
+      setTimeout(() => {
+        document.getElementById("request-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.request]);
+
   const [details, setDetails] = useState("");
   const [link, setLink] = useState("");
   const [contact, setContact] = useState("");
@@ -189,6 +206,7 @@ function RequestsSection() {
       {open && (
         <form
           onSubmit={submit}
+          id="request-form"
           className="mb-4 space-y-3 rounded-2xl border border-primary/30 bg-primary/[0.03] p-4"
         >
           <label className="block">

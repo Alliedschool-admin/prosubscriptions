@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState, type MouseEvent } from "react";
-import { Gift } from "lucide-react";
+import { Gift, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Product } from "../lib/mock-data";
@@ -131,6 +131,22 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-white shadow-lg shadow-emerald-500/30 transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
         >
           <Gift className="size-3.5" /> {outOfStock ? "Sold out" : claiming ? "Claiming…" : "Get it free"}
+        </button>
+      )}
+      {outOfStock && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigate({
+              to: "/dashboard",
+              search: { request: product.name } as never,
+            });
+          }}
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-primary transition-transform hover:-translate-y-0.5"
+        >
+          <MessageSquarePlus className="size-3.5" /> Request this
         </button>
       )}
     </Link>

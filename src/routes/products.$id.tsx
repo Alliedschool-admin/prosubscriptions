@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronLeft, Check, Download, Gift } from "lucide-react";
+import { ChevronLeft, Check, Download, Gift, MessageSquarePlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { getProduct as getSeedProduct } from "../lib/mock-data";
@@ -258,6 +258,18 @@ function ProductDetail() {
               className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
             >
               <Gift className="size-4" /> {outOfStock ? "Sold out — restocking" : claiming ? "Claiming…" : "Get it free"}
+            </button>
+          ) : outOfStock ? (
+            <button
+              onClick={() =>
+                navigate({
+                  to: "/dashboard",
+                  search: { request: product.name } as never,
+                })
+              }
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-primary"
+            >
+              <MessageSquarePlus className="size-4" /> Request this
             </button>
           ) : (
           <button
