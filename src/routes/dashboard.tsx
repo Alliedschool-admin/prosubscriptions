@@ -206,6 +206,7 @@ function RequestsSection() {
       {open && (
         <form
           onSubmit={submit}
+          id="request-form"
           className="mb-4 space-y-3 rounded-2xl border border-primary/30 bg-primary/[0.03] p-4"
         >
           <label className="block">
