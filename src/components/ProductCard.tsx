@@ -7,6 +7,7 @@ import type { Product } from "../lib/mock-data";
 import { formatPriceTags } from "../lib/price";
 import { useAuth } from "../hooks/use-auth";
 import { claimFreeProduct, MY_ORDERS_QUERY_KEY } from "../lib/orders-store";
+import { WishlistButton } from "./WishlistButton";
 
 const PENDING_CLAIM_KEY = "pending-free-claim";
 
@@ -79,6 +80,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent opacity-90"
         />
+        <WishlistButton productId={product.id} />
         <span
           className={`absolute left-3 top-3 rounded-full px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-widest backdrop-blur-md ${
             isFree
