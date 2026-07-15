@@ -9,6 +9,8 @@ import { availableCurrencies, formatMoney, productPrice } from "../lib/price";
 import { useAuth } from "../hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { MY_ORDERS_QUERY_KEY, claimFreeProduct } from "../lib/orders-store";
+import { recordProductView } from "../lib/recently-viewed";
+import { WishlistButton } from "../components/WishlistButton";
 
 const PENDING_CLAIM_KEY = "pending-free-claim";
 
@@ -49,6 +51,10 @@ function ProductDetail() {
   const isFree = !!product?.is_free;
   const stock = product?.available_stock ?? 0;
   const outOfStock = stock === 0;
+
+  useEffect(() => {
+    if (product?.id) recordProductView(product.id);
+  }, [product?.id]);
 
   async function claimFree() {
     if (!product) return;
@@ -119,7 +125,11 @@ function ProductDetail() {
     );
   }
 
-  const related = products.filter((p) => p.id !== product.id).slice(0, 2);
+  const sameCat = products.filter((p) => p.id !== product.id && p.category === product.category);
+  const others = products.filter(
+    (p) => p.id !== product.id && p.category !== product.category,
+  );
+  const related = [...sameCat, ...others].slice(0, 4);
 
   return (
     <main className="mx-auto max-w-2xl px-4 pb-40 pt-6">
@@ -156,6 +166,9 @@ function ProductDetail() {
             ) : (
               <StockBadge stock={stock} />
             )}
+          </div>
+          <div className="mt-3">
+            <WishlistButton productId={product.id} variant="inline" />
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
@@ -216,9 +229,9 @@ function ProductDetail() {
 
       <section className="mt-10">
         <h2 className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
-          Also in the vault
+          You may also like
         </h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {related.map((r) => (
             <Link
               key={r.id}
