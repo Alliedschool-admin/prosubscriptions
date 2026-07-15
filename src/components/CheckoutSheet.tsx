@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, Copy, Lock, Upload, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useCart } from "../lib/cart-context";
-import { promoCodes } from "../lib/mock-data";
 import { useAuth } from "../hooks/use-auth";
+import { applyCouponRpc, redeemCouponRpc, type AppliedCoupon } from "../lib/coupons-store";
 import {
   usePaymentMethods,
   createOrder,
@@ -34,8 +34,9 @@ export function CheckoutSheet() {
   const maxQty = Math.min(item?.available_stock ?? 100, 100) || 1;
 
   const [code, setCode] = useState("");
-  const [applied, setApplied] = useState<{ code: string; discount: number } | null>(null);
+  const [applied, setApplied] = useState<AppliedCoupon | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
+  const [applyingCode, setApplyingCode] = useState(false);
 
   const [selectedMethodId, setSelectedMethodId] = useState<string>("");
   const [senderName, setSenderName] = useState("");
@@ -91,17 +92,20 @@ export function CheckoutSheet() {
   const selectedMethod: PaymentMethod | undefined = filteredMethods.find((m) => m.id === selectedMethodId);
   const money = (n: number) => formatMoney(currency, n);
 
-  function applyPromo() {
-    const key = code.trim().toUpperCase();
-    const promo = promoCodes[key];
-    if (!promo) {
-      setPromoError("Invalid or expired code.");
+  async function applyPromo() {
+    const key = code.trim();
+    if (!key) return;
+    setApplyingCode(true);
+    try {
+      const result = await applyCouponRpc(key, subtotal, currency);
+      setApplied(result);
+      setPromoError(null);
+    } catch (err) {
       setApplied(null);
-      return;
+      setPromoError(err instanceof Error ? err.message : "Invalid code");
+    } finally {
+      setApplyingCode(false);
     }
-    const off = promo.kind === "percent" ? (subtotal * promo.value) / 100 : promo.value;
-    setApplied({ code: key, discount: Math.round(off * 100) / 100 });
-    setPromoError(null);
   }
 
   async function submitOrder() {
@@ -134,7 +138,12 @@ export function CheckoutSheet() {
         sender_contact: senderContact.trim(),
         transaction_ref: txRef.trim() || null,
         proof_path: proofPath,
+        coupon_code: applied?.code ?? null,
+        discount_amount: applied?.discount ?? 0,
       });
+      if (applied?.code) {
+        await redeemCouponRpc(applied.code);
+      }
       invalidateOrders();
       setOrderRef(`VLT-${order.id.slice(0, 6).toUpperCase()}`);
       setConfirmed(true);
