@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState, type MouseEvent } from "react";
-import { Gift } from "lucide-react";
+import { Gift, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Product } from "../lib/mock-data";
@@ -132,6 +132,16 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         >
           <Gift className="size-3.5" /> {outOfStock ? "Sold out" : claiming ? "Claiming…" : "Get it free"}
         </button>
+      )}
+      {outOfStock && (
+        <Link
+          to="/dashboard"
+          search={{ request: product.name }}
+          onClick={(e) => e.stopPropagation()}
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-primary transition-transform hover:-translate-y-0.5"
+        >
+          <MessageSquarePlus className="size-3.5" /> Request this
+        </Link>
       )}
     </Link>
   );
