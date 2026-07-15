@@ -32,14 +32,64 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          currency: string | null
+          expires_at: string | null
+          id: string
+          kind: Database["public"]["Enums"]["coupon_kind"]
+          max_uses: number | null
+          min_amount: number
+          note: string | null
+          updated_at: string
+          uses_count: number
+          value: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["coupon_kind"]
+          max_uses?: number | null
+          min_amount?: number
+          note?: string | null
+          updated_at?: string
+          uses_count?: number
+          value: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["coupon_kind"]
+          max_uses?: number | null
+          min_amount?: number
+          note?: string | null
+          updated_at?: string
+          uses_count?: number
+          value?: number
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           admin_note: string | null
           amount: number
           buyer_id: string
+          coupon_code: string | null
           created_at: string
           currency: string
           delivered_content: string | null
+          discount_amount: number
           id: string
           item_id: string
           item_kind: string
@@ -61,9 +111,11 @@ export type Database = {
           admin_note?: string | null
           amount: number
           buyer_id: string
+          coupon_code?: string | null
           created_at?: string
           currency?: string
           delivered_content?: string | null
+          discount_amount?: number
           id?: string
           item_id: string
           item_kind: string
@@ -85,9 +137,11 @@ export type Database = {
           admin_note?: string | null
           amount?: number
           buyer_id?: string
+          coupon_code?: string | null
           created_at?: string
           currency?: string
           delivered_content?: string | null
+          discount_amount?: number
           id?: string
           item_id?: string
           item_kind?: string
@@ -410,11 +464,46 @@ export type Database = {
         }
         Relationships: []
       }
+      wishlists: {
+        Row: {
+          created_at: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlists_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      apply_coupon: {
+        Args: { _code: string; _currency: string; _subtotal: number }
+        Returns: {
+          code: string
+          discount: number
+          kind: Database["public"]["Enums"]["coupon_kind"]
+          value: number
+        }[]
+      }
       approve_order: {
         Args: { _note?: string; _order_id: string }
         Returns: {
@@ -498,6 +587,7 @@ export type Database = {
         Args: { _path: string; _user_agent: string; _visitor_key: string }
         Returns: undefined
       }
+      redeem_coupon: { Args: { _code: string }; Returns: undefined }
       refresh_product_stock_count: {
         Args: { _product_id: string }
         Returns: undefined
@@ -517,6 +607,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "super_admin"
+      coupon_kind: "percent" | "fixed"
       order_status: "pending" | "approved" | "rejected"
       payment_method_kind:
         | "jazzcash"
@@ -663,6 +754,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "super_admin"],
+      coupon_kind: ["percent", "fixed"],
       order_status: ["pending", "approved", "rejected"],
       payment_method_kind: [
         "jazzcash",

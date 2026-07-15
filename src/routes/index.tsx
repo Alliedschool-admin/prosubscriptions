@@ -1,11 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Clock } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { categories } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
 import { CommunityBanner } from "../components/CommunityBanner";
 import { PostsFeed } from "../components/PostsFeed";
+import { getRecentlyViewed } from "../lib/recently-viewed";
 
 export const Route = createFileRoute("/")({
   component: Discovery,
@@ -16,6 +17,20 @@ function Discovery() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [cat, setCat] = useState<(typeof categories)[number]>("All");
   const { products, loading } = useProducts();
+  const [recentIds, setRecentIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    setRecentIds(getRecentlyViewed());
+  }, []);
+
+  const recent = useMemo(
+    () =>
+      recentIds
+        .map((id) => products.find((p) => p.id === id))
+        .filter((p): p is NonNullable<typeof p> => !!p)
+        .slice(0, 6),
+    [recentIds, products],
+  );
 
   // Debounce search input so filtering doesn't run on every keystroke.
   useEffect(() => {
@@ -78,6 +93,37 @@ function Discovery() {
       </div>
 
       <PostsFeed />
+
+      {recent.length > 0 && (
+        <section className="mb-10">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+              <Clock className="mr-1 inline size-3" /> Recently viewed
+            </p>
+          </div>
+          <div className="no-scrollbar flex gap-3 overflow-x-auto pb-2">
+            {recent.map((p) => (
+              <Link
+                key={p.id}
+                to="/products/$id"
+                params={{ id: p.id }}
+                className="group w-36 shrink-0"
+              >
+                <div className="aspect-square overflow-hidden rounded-xl border border-border">
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    loading="lazy"
+                    className="size-full object-cover transition-transform group-hover:scale-105"
+                  />
+                </div>
+                <p className="mt-2 truncate text-xs font-bold">{p.name}</p>
+                <p className="font-mono text-[10px] text-muted">{p.code}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Search — glass capsule */}
       <div className="relative mb-6 flex items-center gap-2 aurora-glass rounded-2xl px-4 py-2.5">
