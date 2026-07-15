@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut, Sun, Moon, Monitor } from "lucide-react";
+import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut, Sun, Moon, Monitor, MessageSquarePlus } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
 import { useI18n } from "../lib/i18n";
 import { useTheme, type ThemeChoice } from "../lib/theme";
@@ -13,6 +13,7 @@ export function TopNav() {
   const baseLinks = [
     { to: "/", label: t("nav.discover"), icon: Compass },
     { to: "/dashboard", label: t("nav.library"), icon: LayoutDashboard },
+    { to: "/requests", label: "Requests", icon: MessageSquarePlus },
   ] as const;
   const links = isAdmin
     ? [...baseLinks, { to: "/admin", label: t("nav.admin"), icon: ShieldCheck } as const]

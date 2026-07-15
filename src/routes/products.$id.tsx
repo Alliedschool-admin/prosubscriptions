@@ -263,7 +263,7 @@ function ProductDetail() {
             <button
               onClick={() =>
                 navigate({
-                  to: "/dashboard",
+                  to: "/requests",
                   search: { request: product.name } as never,
                 })
               }
