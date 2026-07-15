@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Copy, Clock, CheckCircle2, XCircle, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/use-auth";
-import { useMyOrders, type Order } from "../lib/orders-store";
+import { useMyOrders, type Order, deleteOrder, useOrdersInvalidator } from "../lib/orders-store";
 import { formatMoney, type Currency } from "../lib/price";
 import { useProducts } from "../lib/products-store";
 import { CommunityBanner } from "../components/CommunityBanner";
@@ -24,6 +24,18 @@ function Dashboard() {
   const { user } = useAuth();
   const { data: orders = [], isLoading } = useMyOrders();
   const { getProduct } = useProducts();
+  const invalidateOrders = useOrdersInvalidator();
+
+  async function handleDelete(id: string) {
+    if (!confirm("Remove this order from your purchases? This cannot be undone.")) return;
+    try {
+      await deleteOrder(id);
+      invalidateOrders();
+      toast.success("Order removed");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to remove order");
+    }
+  }
 
   if (!user) {
     return (
@@ -94,6 +106,7 @@ function Dashboard() {
                 instructions={
                   o.item_kind === "product" ? getProduct(o.item_id)?.delivery_instructions ?? null : null
                 }
+                onDelete={() => handleDelete(o.id)}
               />
             ))}
           </ul>
