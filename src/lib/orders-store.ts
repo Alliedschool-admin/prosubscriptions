@@ -123,6 +123,8 @@ export async function createOrder(input: {
   sender_contact: string;
   transaction_ref?: string | null;
   proof_path?: string | null;
+  coupon_code?: string | null;
+  discount_amount?: number;
 }) {
   const { data, error } = await supabase.from("orders").insert(input).select().single();
   if (error) throw error;
