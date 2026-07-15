@@ -116,6 +116,7 @@ function Dashboard() {
       <section className="mt-10 px-4">
         <Link
           to="/requests"
+          search={{ request: undefined }}
           className="flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/[0.04] p-4 transition-colors hover:bg-primary/[0.08]"
         >
           <div>
