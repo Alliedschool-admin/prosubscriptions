@@ -100,7 +100,23 @@ function Dashboard() {
         )}
       </section>
 
-      <RequestsSection />
+      <section className="mt-10 px-4">
+        <Link
+          to="/requests"
+          className="flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/[0.04] p-4 transition-colors hover:bg-primary/[0.08]"
+        >
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+              <MessageSquarePlus className="mr-1 inline size-3" /> Wishlist
+            </p>
+            <p className="mt-1 text-sm font-bold">Request a product we don't stock</p>
+            <p className="text-xs text-muted">Track your requests and admin replies in one place.</p>
+          </div>
+          <span className="shrink-0 rounded-lg bg-primary px-3 py-2 text-[11px] font-extrabold uppercase tracking-widest text-primary-foreground">
+            Open
+          </span>
+        </Link>
+      </section>
 
       <section className="mt-10 px-4">
         <CommunityBanner compact />
@@ -109,7 +125,7 @@ function Dashboard() {
   );
 }
 
-function RequestsSection() {
+function _RemovedRequestsSection() {
   const { user } = useAuth();
   const { data: requests = [], isLoading } = useMyRequests();
   const invalidate = useRequestsInvalidator();
