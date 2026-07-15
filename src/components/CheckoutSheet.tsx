@@ -452,9 +452,10 @@ export function CheckoutSheet() {
                     />
                     <button
                       onClick={applyPromo}
+                      disabled={applyingCode}
                       className="rounded-lg bg-foreground px-4 py-3 text-xs font-bold uppercase tracking-widest text-background"
                     >
-                      Apply
+                      {applyingCode ? "…" : "Apply"}
                     </button>
                   </div>
                   {applied && (
