@@ -134,14 +134,20 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         </button>
       )}
       {outOfStock && (
-        <Link
-          to="/dashboard"
-          search={{ request: product.name }}
-          onClick={(e) => e.stopPropagation()}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigate({
+              to: "/dashboard",
+              search: { request: product.name } as never,
+            });
+          }}
           className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-primary transition-transform hover:-translate-y-0.5"
         >
           <MessageSquarePlus className="size-3.5" /> Request this
-        </Link>
+        </button>
       )}
     </Link>
   );
