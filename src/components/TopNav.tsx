@@ -36,7 +36,7 @@ export function TopNav() {
                 className="size-7 object-contain"
               />
             </span>
-            <span className="font-display text-base tracking-tight sm:text-lg">
+            <span className="font-display whitespace-nowrap text-base tracking-tight sm:text-lg">
               <span className="text-chrome">PRO</span>
               <span className="text-foreground/80"> · SUBSCRIPTIONS</span>
             </span>
@@ -48,7 +48,7 @@ export function TopNav() {
                 <Link
                   key={l.to}
                   to={l.to}
-                  className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all ${
+                  className={`whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm font-semibold transition-all lg:px-3.5 ${
                     active
                       ? "bg-foreground/10 text-foreground shadow-inner"
                       : "text-muted hover:text-foreground"
