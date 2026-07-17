@@ -132,7 +132,7 @@ function ProductDetail() {
   const related = [...sameCat, ...others].slice(0, 4);
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-40 pt-6">
+    <main className="mx-auto max-w-2xl px-4 pb-40 pt-6 lg:max-w-6xl lg:px-8 lg:pt-10">
       <Link
         to="/"
         className="mb-4 inline-flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-muted"
@@ -140,7 +140,8 @@ function ProductDetail() {
         <ChevronLeft className="size-3" /> Back to store
       </Link>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-neutral-200">
+      <div className="lg:grid lg:grid-cols-[1.05fr_1fr] lg:items-start lg:gap-12">
+        <div className="lg:sticky lg:top-24 overflow-hidden rounded-2xl border border-border bg-neutral-200">
         <img
           src={product.image}
           alt={product.name}
@@ -149,17 +150,18 @@ function ProductDetail() {
           loading="eager"
           fetchPriority="high"
           decoding="async"
-          className="aspect-square w-full object-cover"
+          className="aspect-square w-full object-cover lg:aspect-[4/5]"
         />
-      </div>
+        </div>
 
-      <div className="mt-6 flex items-start justify-between gap-3">
+        <div className="lg:pt-2">
+        <div className="mt-6 flex items-start justify-between gap-3 lg:mt-0">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
             {product.code} · {product.category}
           </p>
-          <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{product.name}</h1>
-          <p className="mt-1 text-sm text-muted">{product.tagline}</p>
+          <h1 className="mt-1 text-3xl font-extrabold tracking-tight lg:text-5xl lg:leading-[1.02]">{product.name}</h1>
+          <p className="mt-1 text-sm text-muted lg:mt-2 lg:text-base">{product.tagline}</p>
           <div className="mt-2">
             {isFree ? (
               <StockBadge stock={stock} free />
@@ -182,7 +184,7 @@ function ProductDetail() {
         </div>
       </div>
 
-      <p className="mt-6 text-pretty text-[15px] leading-relaxed text-foreground/80">
+      <p className="mt-6 text-pretty text-[15px] leading-relaxed text-foreground/80 lg:text-base">
         {product.description}
       </p>
 
@@ -201,16 +203,18 @@ function ProductDetail() {
           ))}
         </ul>
       </section>
+        </div>
+      </div>
 
       <section className="mt-8">
         <h2 className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
           Screenshots
         </h2>
-        <div className="no-scrollbar flex gap-3 overflow-x-auto">
+        <div className="no-scrollbar flex gap-3 overflow-x-auto lg:gap-5">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="relative aspect-[4/3] w-64 shrink-0 overflow-hidden rounded-xl border border-border bg-neutral-200"
+              className="relative aspect-[4/3] w-64 shrink-0 overflow-hidden rounded-xl border border-border bg-neutral-200 lg:w-96"
             >
               <img
                 src={product.image}
@@ -231,15 +235,15 @@ function ProductDetail() {
         <h2 className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
           You may also like
         </h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:gap-6">
           {related.map((r) => (
             <Link
               key={r.id}
               to="/products/$id"
               params={{ id: r.id }}
-              className="block overflow-hidden rounded-xl border border-border"
+              className="group block overflow-hidden rounded-xl border border-border transition-transform hover:-translate-y-1"
             >
-              <img src={r.image} alt={r.name} loading="lazy" className="aspect-square w-full object-cover" />
+              <img src={r.image} alt={r.name} loading="lazy" className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div className="p-3">
                 <p className="truncate text-xs font-bold">{r.name}</p>
                 <p className="font-mono text-[10px] text-muted">
@@ -255,7 +259,7 @@ function ProductDetail() {
 
       {/* Sticky Buy Bar */}
       <div className="fixed inset-x-0 bottom-[68px] z-30 border-t border-border bg-background/90 p-4 backdrop-blur-xl sm:bottom-0">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 lg:max-w-6xl lg:px-4">
           <div className="leading-none">
             <span className="font-mono text-[10px] uppercase tracking-widest text-muted">{isFree ? "Price" : "From"}</span>
             <div className="text-xl font-extrabold">
