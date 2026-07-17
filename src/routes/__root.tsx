@@ -17,6 +17,7 @@ import { AuthProvider } from "../hooks/use-auth";
 import { CheckoutSheet } from "../components/CheckoutSheet";
 import { Toaster } from "../components/ui/sonner";
 import { VisitorTracker } from "../components/VisitorTracker";
+import { WelcomePopup } from "../components/WelcomePopup";
 import { I18nProvider } from "../lib/i18n";
 import { ThemeProvider } from "../lib/theme";
 
@@ -145,6 +146,7 @@ function RootComponent() {
               <CheckoutSheet />
               <Toaster />
               <VisitorTracker />
+              <WelcomePopup />
             </CartProvider>
           </AuthProvider>
         </I18nProvider>
