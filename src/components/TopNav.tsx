@@ -41,7 +41,7 @@ export function TopNav() {
               <span className="text-foreground/80"> · SUBSCRIPTIONS</span>
             </span>
           </Link>
-          <div className="hidden items-center gap-1 sm:flex">
+          <div className="hidden items-center gap-1 lg:flex">
             {links.map((l) => {
               const active = l.to === "/" ? pathname === "/" : pathname.startsWith(l.to);
               return (
@@ -76,7 +76,7 @@ export function TopNav() {
               </Link>
             )}
           </div>
-          <div className="flex items-center gap-1 sm:hidden">
+          <div className="flex items-center gap-1 lg:hidden">
             <ThemeMenu compact />
             {session ? (
               <button
@@ -100,7 +100,7 @@ export function TopNav() {
       </nav>
 
       {/* Floating circular HUD dock — spatial navigator */}
-      <div className="fixed inset-x-0 bottom-5 z-30 flex justify-center px-4 sm:hidden">
+      <div className="fixed inset-x-0 bottom-5 z-30 flex justify-center px-4 lg:hidden">
         <div
           className="aurora-glass flex items-center gap-1 rounded-full px-2 py-2"
           style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
