@@ -69,7 +69,7 @@ function Discovery() {
           </span>
         </div>
 
-        <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(2rem,10vw,4rem)] sm:text-6xl lg:text-[clamp(3.5rem,7vw,6.5rem)]">
+        <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(2rem,10vw,4rem)] sm:text-6xl lg:text-[clamp(3rem,4.5vw,4.75rem)]">
           <span className="text-chrome">Premium tools,</span>
           <br />
           <span className="ml-[0.9em] text-aurora">unreal prices.</span>
