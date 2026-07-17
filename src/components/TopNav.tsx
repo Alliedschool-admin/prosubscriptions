@@ -23,7 +23,7 @@ export function TopNav() {
   return (
     <>
       <nav className="sticky top-0 z-40 border-b border-border/60 bg-background/50 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
+        <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4 lg:max-w-6xl lg:px-8">
           <Link to="/" className="group flex items-center gap-2.5">
             <span
               className="relative grid size-9 place-items-center rounded-full bg-white ring-1 ring-black/10 shadow-[0_4px_16px_-4px_color-mix(in_oklab,var(--primary)_45%,transparent)] transition-transform duration-500 group-hover:scale-[1.06]"

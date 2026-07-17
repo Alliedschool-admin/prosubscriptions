@@ -42,7 +42,7 @@ function WishlistPage() {
     .filter((p): p is NonNullable<typeof p> => !!p);
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-32 pt-8">
+    <main className="mx-auto max-w-2xl px-4 pb-32 pt-8 lg:max-w-6xl lg:px-8 lg:pt-14">
       <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
         <Heart className="mr-1 inline size-3" /> Favorites
       </p>
@@ -62,7 +62,7 @@ function WishlistPage() {
           </Link>
         </div>
       ) : (
-        <section className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2">
+        <section className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-10">
           {items.map((p, i) => (
             <ProductCard key={p.id} product={p} index={i} />
           ))}
