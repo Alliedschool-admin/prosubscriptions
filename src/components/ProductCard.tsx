@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState, type MouseEvent } from "react";
-import { Gift, MessageSquarePlus } from "lucide-react";
+import { Gift, MessageSquarePlus, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Product } from "../lib/mock-data";
@@ -8,6 +8,7 @@ import { formatPriceTags } from "../lib/price";
 import { useAuth } from "../hooks/use-auth";
 import { claimFreeProduct, MY_ORDERS_QUERY_KEY } from "../lib/orders-store";
 import { WishlistButton } from "./WishlistButton";
+import { useCart } from "../lib/cart-context";
 
 const PENDING_CLAIM_KEY = "pending-free-claim";
 
@@ -20,6 +21,22 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [claiming, setClaiming] = useState(false);
+  const { openWith } = useCart();
+
+  function handleBuyNow(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (outOfStock) return;
+    openWith({
+      kind: "product",
+      id: product.id,
+      name: product.name,
+      subtitle: `${product.category} · ${product.code}`,
+      price_usd: product.price_usd ?? null,
+      price_pkr: product.price_pkr ?? null,
+      available_stock: stock,
+    });
+  }
 
   async function handleFreeClaim(e: MouseEvent) {
     e.preventDefault();
@@ -133,6 +150,15 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-white shadow-lg shadow-emerald-500/30 transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
         >
           <Gift className="size-3.5" /> {outOfStock ? "Sold out" : claiming ? "Claiming…" : "Get it free"}
+        </button>
+      )}
+      {!isFree && !outOfStock && (
+        <button
+          type="button"
+          onClick={handleBuyNow}
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:-translate-y-0.5"
+        >
+          <Zap className="size-3.5" /> Buy now
         </button>
       )}
       {outOfStock && (
