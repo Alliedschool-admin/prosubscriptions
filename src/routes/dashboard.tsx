@@ -61,7 +61,7 @@ function Dashboard() {
       .join("") || "U";
 
   return (
-    <main className="mx-auto max-w-2xl pb-32">
+    <main className="mx-auto max-w-2xl pb-32 lg:max-w-5xl">
       <section className="px-4 pt-8">
         <div className="flex items-center gap-4">
           <div className="grid size-14 place-items-center rounded-2xl bg-foreground font-mono text-sm font-bold text-background">
@@ -74,7 +74,7 @@ function Dashboard() {
         </div>
       </section>
 
-      <section className="mt-8 px-4">
+      <section className="mt-8 px-4 lg:px-0">
         <div className="mb-4 flex items-end justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Your orders</p>
@@ -98,7 +98,7 @@ function Dashboard() {
             </Link>
           </div>
         ) : (
-          <ul className="space-y-3">
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {orders.map((o) => (
               <OrderCard
                 key={o.id}

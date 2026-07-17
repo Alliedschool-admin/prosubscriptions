@@ -106,7 +106,7 @@ function RequestsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl pb-32">
+    <main className="mx-auto max-w-2xl pb-32 lg:max-w-4xl">
       <section className="px-4 pt-8">
         <div className="flex items-start justify-between gap-3">
           <div>

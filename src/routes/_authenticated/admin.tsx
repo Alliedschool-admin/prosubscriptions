@@ -192,7 +192,7 @@ function Admin() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-32 pt-8">
+    <main className="mx-auto max-w-2xl px-4 pb-32 pt-8 lg:max-w-6xl lg:px-8">
       <header className="mb-6">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
           Admin Console · Restricted

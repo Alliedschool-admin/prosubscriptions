@@ -48,16 +48,17 @@ function Discovery() {
   }, [debouncedQuery, cat, products]);
 
   return (
-    <main className="relative mx-auto max-w-2xl px-4 pb-40 pt-10">
+    <main className="relative mx-auto max-w-2xl px-4 pb-40 pt-10 lg:max-w-6xl lg:px-8 lg:pt-16">
       {/* Aurora orbs — floating cosmic light sources */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[520px] overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[520px] overflow-hidden lg:h-[680px]">
         <div className="aurora-orb" style={{ top: "-60px", left: "-40px", width: 260, height: 260, background: "radial-gradient(circle, hsl(268 85% 68% / 0.55), transparent 70%)" }} />
         <div className="aurora-orb" style={{ top: "40px", right: "-60px", width: 320, height: 320, background: "radial-gradient(circle, hsl(190 90% 62% / 0.45), transparent 70%)", animationDelay: "-6s" }} />
         <div className="aurora-orb" style={{ top: "220px", left: "35%", width: 220, height: 220, background: "radial-gradient(circle, hsl(38 95% 62% / 0.35), transparent 70%)", animationDelay: "-11s" }} />
       </div>
 
       {/* Asymmetric hero */}
-      <header className="relative mb-10">
+      <header className="relative mb-10 lg:mb-16 lg:grid lg:grid-cols-12 lg:items-end lg:gap-8">
+        <div className="lg:col-span-8">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1 backdrop-blur-md">
           <span className="relative grid size-2 place-items-center">
             <span className="absolute inline-flex size-full rounded-full bg-primary pulse-ring" />
@@ -68,7 +69,7 @@ function Discovery() {
           </span>
         </div>
 
-        <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(2rem,10vw,4rem)] sm:text-6xl">
+        <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(2rem,10vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
           <span className="text-chrome">Premium tools,</span>
           <br />
           <span className="ml-[0.9em] text-aurora">unreal prices.</span>
@@ -76,8 +77,8 @@ function Discovery() {
           <span className="text-foreground/90">/ no compromise.</span>
         </h1>
 
-        <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6">
-          <p className="max-w-md text-sm leading-relaxed text-muted">
+        <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6 lg:mt-8">
+          <p className="max-w-md text-sm leading-relaxed text-muted lg:text-base">
             Top-shelf subscriptions — AI, design, and dev tools — bundled at a
             fraction of retail. Same features, smarter price, zero fluff.
           </p>
@@ -86,6 +87,22 @@ function Discovery() {
             <div>plans live</div>
           </div>
         </div>
+        </div>
+        {/* Desktop stat panel — creative flourish */}
+        <aside className="mt-8 hidden lg:col-span-4 lg:mt-0 lg:block">
+          <div className="aurora-glass relative overflow-hidden rounded-3xl p-6">
+            <div className="flex items-baseline gap-3">
+              <span className="font-display text-6xl tracking-tight text-aurora">{products.length}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted">live plans</span>
+            </div>
+            <div className="mt-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+            <ul className="mt-4 space-y-2 font-mono text-[11px] uppercase tracking-widest text-muted">
+              <li className="flex justify-between"><span>· Instant delivery</span><span className="text-foreground/80">24/7</span></li>
+              <li className="flex justify-between"><span>· Verified stock</span><span className="text-foreground/80">Live</span></li>
+              <li className="flex justify-between"><span>· Fair pricing</span><span className="text-foreground/80">Always</span></li>
+            </ul>
+          </div>
+        </aside>
       </header>
 
       <div className="relative mb-10">
@@ -101,13 +118,13 @@ function Discovery() {
               <Clock className="mr-1 inline size-3" /> Recently viewed
             </p>
           </div>
-          <div className="no-scrollbar flex gap-3 overflow-x-auto pb-2">
+          <div className="no-scrollbar flex gap-3 overflow-x-auto pb-2 lg:gap-4">
             {recent.map((p) => (
               <Link
                 key={p.id}
                 to="/products/$id"
                 params={{ id: p.id }}
-                className="group w-36 shrink-0"
+                className="group w-36 shrink-0 lg:w-44"
               >
                 <div className="aspect-square overflow-hidden rounded-xl border border-border">
                   <img
@@ -126,14 +143,14 @@ function Discovery() {
       )}
 
       {/* Search — glass capsule */}
-      <div className="relative mb-6 flex items-center gap-2 aurora-glass rounded-2xl px-4 py-2.5">
+      <div className="relative mb-6 flex items-center gap-2 aurora-glass rounded-2xl px-4 py-2.5 lg:py-3.5">
         <Search className="size-4 text-muted" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Query the vault…"
           aria-label="Search the vault"
-          className="flex-1 border-none bg-transparent px-1 text-sm outline-none placeholder:text-muted"
+          className="flex-1 border-none bg-transparent px-1 text-sm outline-none placeholder:text-muted lg:text-base"
         />
         <span className="hidden font-mono text-[9px] uppercase tracking-widest text-muted sm:inline">
           ⌘K
@@ -172,7 +189,7 @@ function Discovery() {
       </div>
 
       {/* Asymmetric offset product grid */}
-      <section className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+      <section className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-10">
         {loading ? (
           <p className="col-span-full py-16 text-center text-sm text-muted">Uplinking vault…</p>
         ) : filtered.length === 0 ? (
