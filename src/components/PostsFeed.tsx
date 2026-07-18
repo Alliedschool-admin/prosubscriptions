@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Sparkles, Megaphone, Gift, Pin, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { Sparkles, Megaphone, Gift, Pin, ExternalLink, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type PostCategory = "free_method" | "update" | "announcement";
@@ -47,12 +48,16 @@ export function usePublishedPosts() {
   return useQuery({ queryKey: POSTS_QUERY_KEY, queryFn: fetchPosts });
 }
 
-export function PostsFeed() {
+export function PostsFeed({ mobilePreview = false }: { mobilePreview?: boolean } = {}) {
   const { data: posts = [], isLoading, error } = usePublishedPosts();
+  const [expanded, setExpanded] = useState(false);
 
   if (isLoading) return null;
   if (error) return null;
   if (posts.length === 0) return null;
+
+  const showAll = expanded || !mobilePreview;
+  const visible = showAll ? posts : posts.slice(0, 1);
 
   return (
     <section className="mb-10">
@@ -63,7 +68,7 @@ export function PostsFeed() {
         </span>
       </div>
       <ul className="space-y-3">
-        {posts.map((p) => {
+        {visible.map((p) => {
           const meta = CATEGORY_META[p.category];
           const Icon = meta.icon;
           return (
@@ -108,6 +113,14 @@ export function PostsFeed() {
           );
         })}
       </ul>
+      {mobilePreview && !expanded && posts.length > 1 && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-xl border border-border bg-background/40 px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted backdrop-blur-md hover:text-foreground sm:hidden"
+        >
+          See all {posts.length} updates <ChevronDown className="size-3" />
+        </button>
+      )}
     </section>
   );
 }
