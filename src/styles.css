@@ -360,3 +360,17 @@ body,
   60%  { opacity: 1; }
   100% { transform: translateX(220%) skewX(-20deg); opacity: 0; }
 }
+
+@keyframes marquee-x {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+.animate-marquee { animation: marquee-x 38s linear infinite; }
+
+@utility grid-backdrop {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 75%);
+}
