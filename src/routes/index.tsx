@@ -9,6 +9,15 @@ import { PostsFeed } from "../components/PostsFeed";
 import { getRecentlyViewed } from "../lib/recently-viewed";
 import { CountUp } from "../components/CountUp";
 import { trackSpotlight } from "../lib/spotlight";
+import { useSiteSetting } from "../lib/site-settings";
+
+type HeroSettings = {
+  image_url?: string;
+  headline?: string;
+  subtext?: string;
+  cta_label?: string;
+  cta_href?: string;
+};
 
 export const Route = createFileRoute("/")({
   component: Discovery,
@@ -20,6 +29,8 @@ function Discovery() {
   const [cat, setCat] = useState<(typeof categories)[number]>("All");
   const { products, loading } = useProducts();
   const [recentIds, setRecentIds] = useState<string[]>([]);
+  const { value: hero } = useSiteSetting<HeroSettings>("hero");
+  const heroImage = hero?.image_url;
 
   useEffect(() => {
     setRecentIds(getRecentlyViewed());
@@ -64,7 +75,25 @@ function Discovery() {
       </div>
 
       {/* Asymmetric hero */}
-      <header className="relative mb-10 lg:mb-16 lg:grid lg:grid-cols-12 lg:items-end lg:gap-8">
+      <header className={`relative mb-10 lg:mb-16 lg:grid lg:grid-cols-12 lg:items-end lg:gap-8 ${heroImage ? "overflow-hidden rounded-3xl border border-border/60" : ""}`}>
+        {heroImage && (
+          <>
+            <img
+              src={heroImage}
+              alt=""
+              aria-hidden
+              fetchPriority="high"
+              className="pointer-events-none absolute inset-0 -z-10 size-full object-cover"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-background/85 via-background/70 to-background/40"
+            />
+          </>
+        )}
+        <div className={heroImage ? "lg:col-span-8 lg:p-10 p-6" : "lg:col-span-8"}>
+        {/* placeholder wrapper opens */}
+        <div style={{ display: "contents" }}>
         <div className="lg:col-span-8">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1 backdrop-blur-md">
           <span className="relative grid size-2 place-items-center">
