@@ -4,7 +4,7 @@ import { Search, Clock } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { categories } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
-import { CommunityBanner } from "../components/CommunityBanner";
+import { CommunityBanner, CommunityPill } from "../components/CommunityBanner";
 import { PostsFeed } from "../components/PostsFeed";
 import { getRecentlyViewed } from "../lib/recently-viewed";
 
@@ -69,18 +69,17 @@ function Discovery() {
           </span>
         </div>
 
-        <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(2rem,10vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
-          <span className="text-chrome">Premium tools,</span>
+        <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(1.9rem,9vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
+          <span className="text-chrome">Premium tools.</span>
           <br />
-          <span className="ml-[0.9em] text-aurora">unreal prices.</span>
-          <br />
-          <span className="text-foreground/90">/ no compromise.</span>
+          <span className="text-aurora sm:ml-[0.9em]">Unreal prices.</span>
+          <span className="hidden sm:inline"><br /><span className="text-foreground/90">/ no compromise.</span></span>
         </h1>
 
-        <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6 lg:mt-8">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6 sm:mt-6 lg:mt-8">
           <p className="max-w-md text-sm leading-relaxed text-muted lg:text-base">
-            Top-shelf subscriptions — AI, design, and dev tools — bundled at a
-            fraction of retail. Same features, smarter price, zero fluff.
+            <span className="sm:hidden">Top-shelf subscriptions at a fraction of retail.</span>
+            <span className="hidden sm:inline">Top-shelf subscriptions — AI, design, and dev tools — bundled at a fraction of retail. Same features, smarter price, zero fluff.</span>
           </p>
           <div className="hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-widest text-muted sm:block">
             <div className="text-foreground/80">{products.length.toString().padStart(3, "0")}</div>
@@ -105,14 +104,72 @@ function Discovery() {
         </aside>
       </header>
 
-      <div className="relative mb-10">
-        <CommunityBanner />
+      {/* Mobile: slim community pill; Desktop/tablet: full banner (below products) */}
+      <CommunityPill />
+
+      {/* Search — glass capsule */}
+      <div className="relative mb-4 flex items-center gap-2 aurora-glass rounded-2xl px-4 py-2.5 lg:py-3.5">
+        <Search className="size-4 text-muted" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Query the vault…"
+          aria-label="Search the vault"
+          className="flex-1 border-none bg-transparent px-1 text-sm outline-none placeholder:text-muted lg:text-base"
+        />
+        <span className="hidden font-mono text-[9px] uppercase tracking-widest text-muted sm:inline">
+          ⌘K
+        </span>
       </div>
 
-      <PostsFeed />
+      {/* Category dock */}
+      <div className="no-scrollbar mb-8 flex gap-2 overflow-x-auto pb-2">
+        {categories.map((c) => {
+          const active = cat === c;
+          return (
+            <button
+              key={c}
+              onClick={() => setCat(c)}
+              className={`group relative shrink-0 overflow-hidden rounded-full px-4 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-all ${
+                active
+                  ? "text-primary-foreground shadow-lg shadow-primary/30"
+                  : "text-muted hover:text-foreground"
+              }`}
+              style={
+                active
+                  ? { background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }
+                  : undefined
+              }
+            >
+              {!active && (
+                <span
+                  aria-hidden
+                  className="absolute inset-0 rounded-full border border-border bg-background/40 backdrop-blur-md transition group-hover:border-foreground/30"
+                />
+              )}
+              <span className="relative">{c === "All" ? "All" : c}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Products — surfaced above secondary content on mobile */}
+      <section className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-10">
+        {loading ? (
+          <p className="col-span-full py-16 text-center text-sm text-muted">Uplinking vault…</p>
+        ) : filtered.length === 0 ? (
+          <p className="col-span-full py-16 text-center text-sm text-muted">
+            No assets match that filter yet.
+          </p>
+        ) : (
+          filtered.map((p, i) => (
+            <ProductCard key={p.id} product={p} index={i} />
+          ))
+        )}
+      </section>
 
       {recent.length > 0 && (
-        <section className="mb-10">
+        <section className="mt-12 mb-10">
           <div className="mb-3 flex items-center justify-between">
             <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
               <Clock className="mr-1 inline size-3" /> Recently viewed
@@ -142,66 +199,14 @@ function Discovery() {
         </section>
       )}
 
-      {/* Search — glass capsule */}
-      <div className="relative mb-6 flex items-center gap-2 aurora-glass rounded-2xl px-4 py-2.5 lg:py-3.5">
-        <Search className="size-4 text-muted" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Query the vault…"
-          aria-label="Search the vault"
-          className="flex-1 border-none bg-transparent px-1 text-sm outline-none placeholder:text-muted lg:text-base"
-        />
-        <span className="hidden font-mono text-[9px] uppercase tracking-widest text-muted sm:inline">
-          ⌘K
-        </span>
+      <div className="mt-12">
+        <PostsFeed mobilePreview />
       </div>
 
-      {/* Category dock — floating nodes */}
-      <div className="no-scrollbar mb-10 flex gap-2 overflow-x-auto pb-2">
-        {categories.map((c) => {
-          const active = cat === c;
-          return (
-            <button
-              key={c}
-              onClick={() => setCat(c)}
-              className={`group relative shrink-0 overflow-hidden rounded-full px-4 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-all ${
-                active
-                  ? "text-primary-foreground shadow-lg shadow-primary/30"
-                  : "text-muted hover:text-foreground"
-              }`}
-              style={
-                active
-                  ? { background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }
-                  : undefined
-              }
-            >
-              {!active && (
-                <span
-                  aria-hidden
-                  className="absolute inset-0 rounded-full border border-border bg-background/40 backdrop-blur-md transition group-hover:border-foreground/30"
-                />
-              )}
-              <span className="relative">{c === "All" ? "◉ All" : c}</span>
-            </button>
-          );
-        })}
+      {/* Full community banner on tablet+; hidden on mobile (pill above) */}
+      <div className="mt-10 hidden sm:block">
+        <CommunityBanner />
       </div>
-
-      {/* Asymmetric offset product grid */}
-      <section className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-10">
-        {loading ? (
-          <p className="col-span-full py-16 text-center text-sm text-muted">Uplinking vault…</p>
-        ) : filtered.length === 0 ? (
-          <p className="col-span-full py-16 text-center text-sm text-muted">
-            No assets match that filter yet.
-          </p>
-        ) : (
-          filtered.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
-          ))
-        )}
-      </section>
     </main>
   );
 }

@@ -38,7 +38,7 @@ export function TopNav() {
             </span>
             <span className="font-display whitespace-nowrap text-base tracking-tight sm:text-lg">
               <span className="text-chrome">PRO</span>
-              <span className="text-foreground/80"> · SUBSCRIPTIONS</span>
+            <span className="hidden text-foreground/80 sm:inline"> · SUBSCRIPTIONS</span>
             </span>
           </Link>
           <div className="hidden items-center gap-1 lg:flex">
