@@ -26,6 +26,7 @@ import {
   Contact,
   Megaphone,
   Ticket,
+  Image as ImageLucide,
 } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
@@ -71,6 +72,7 @@ import { useI18n } from "../../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImageInput } from "@/components/ImageInput";
+import { useSiteSetting, setSiteSetting } from "@/lib/site-settings";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -92,7 +94,8 @@ type Tab =
   | "admins"
   | "users"
   | "posts"
-  | "coupons";
+  | "coupons"
+  | "site";
 
 function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { t } = useI18n();
@@ -106,6 +109,7 @@ function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
     { id: "users" as const, label: t("tab.users"), icon: Contact },
     { id: "posts" as const, label: t("tab.posts"), icon: Megaphone },
     { id: "coupons" as const, label: t("tab.coupons"), icon: Ticket },
+    { id: "site" as const, label: "Site", icon: ImageLucide },
   ];
   return (
     <nav
@@ -216,6 +220,7 @@ function Admin() {
       {tab === "users" && <UsersPanel />}
       {tab === "posts" && <PostsAdminPanel />}
       {tab === "coupons" && <CouponsPanel />}
+      {tab === "site" && <SitePanel />}
 
       <style>{`
         .input {
