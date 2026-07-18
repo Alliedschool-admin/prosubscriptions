@@ -102,17 +102,29 @@ function Discovery() {
           </span>
         </div>
 
-        <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(1.9rem,9vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
-          <span className="text-chrome">Premium tools.</span>
-          <br />
-          <span className="text-aurora sm:ml-[0.9em]">Unreal prices.</span>
-          <span className="hidden sm:inline"><br /><span className="text-foreground/90">/ no compromise.</span></span>
-        </h1>
+        {hero?.headline ? (
+          <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(1.9rem,9vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
+            <span className="text-chrome">{hero.headline}</span>
+          </h1>
+        ) : (
+          <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(1.9rem,9vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
+            <span className="text-chrome">Premium tools.</span>
+            <br />
+            <span className="text-aurora sm:ml-[0.9em]">Unreal prices.</span>
+            <span className="hidden sm:inline"><br /><span className="text-foreground/90">/ no compromise.</span></span>
+          </h1>
+        )}
 
         <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6 sm:mt-6 lg:mt-8">
           <p className="max-w-md text-sm leading-relaxed text-muted lg:text-base">
-            <span className="sm:hidden">Top-shelf subscriptions at a fraction of retail.</span>
-            <span className="hidden sm:inline">Top-shelf subscriptions — AI, design, and dev tools — bundled at a fraction of retail. Same features, smarter price, zero fluff.</span>
+            {hero?.subtext ? (
+              hero.subtext
+            ) : (
+              <>
+                <span className="sm:hidden">Top-shelf subscriptions at a fraction of retail.</span>
+                <span className="hidden sm:inline">Top-shelf subscriptions — AI, design, and dev tools — bundled at a fraction of retail. Same features, smarter price, zero fluff.</span>
+              </>
+            )}
           </p>
           <div className="hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-widest text-muted sm:block">
             <div className="text-foreground/80">{products.length.toString().padStart(3, "0")}</div>
