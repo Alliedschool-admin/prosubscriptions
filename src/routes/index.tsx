@@ -135,11 +135,11 @@ function Discovery() {
         {/* Desktop-only CTA row */}
         <div className="mt-8 hidden items-center gap-3 lg:flex">
           <a
-            href="#vault"
+            href={hero?.cta_href || "#vault"}
             className="group inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-primary-foreground shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
             style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
           >
-            <Zap className="size-3.5" /> Enter the vault
+            <Zap className="size-3.5" /> {hero?.cta_label || "Enter the vault"}
           </a>
           <a
             href="#posts"
