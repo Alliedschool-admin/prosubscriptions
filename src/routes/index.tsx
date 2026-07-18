@@ -7,6 +7,8 @@ import { useProducts } from "../lib/products-store";
 import { CommunityBanner, CommunityPill } from "../components/CommunityBanner";
 import { PostsFeed } from "../components/PostsFeed";
 import { getRecentlyViewed } from "../lib/recently-viewed";
+import { CountUp } from "../components/CountUp";
+import { trackSpotlight } from "../lib/spotlight";
 
 export const Route = createFileRoute("/")({
   component: Discovery,
@@ -111,7 +113,10 @@ function Discovery() {
         </div>
         {/* Desktop stat panel — creative flourish */}
         <aside className="mt-8 hidden lg:col-span-4 lg:mt-0 lg:block">
-          <div className="aurora-glass relative overflow-hidden rounded-3xl p-6">
+          <div
+            className="spotlight aurora-glass relative overflow-hidden rounded-3xl p-6 reveal"
+            onPointerMove={trackSpotlight}
+          >
             <span
               aria-hidden
               className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full opacity-60 blur-3xl"
@@ -130,7 +135,7 @@ function Discovery() {
               </span>
             </div>
             <div className="flex items-baseline gap-3">
-              <span className="font-display text-7xl tracking-tight text-aurora">{products.length}</span>
+              <CountUp to={products.length} className="font-display text-7xl tracking-tight text-aurora" />
               <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted">live plans</span>
             </div>
             <div className="mt-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
@@ -157,7 +162,7 @@ function Discovery() {
       </header>
 
       {/* Desktop marquee — trust ticker */}
-      <div className="relative mb-10 hidden overflow-hidden rounded-2xl border border-border/60 bg-background/30 py-3 backdrop-blur-md lg:block">
+      <div className="reveal relative mb-10 hidden overflow-hidden rounded-2xl border border-border/60 bg-background/30 py-3 backdrop-blur-md lg:block">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-background to-transparent"
@@ -236,7 +241,7 @@ function Discovery() {
       </div>
 
       {/* Desktop section label */}
-      <div id="vault" className="mb-6 hidden items-end justify-between lg:flex">
+      <div id="vault" className="reveal mb-6 hidden items-end justify-between lg:flex">
         <div>
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.32em] text-primary">
             ◉ Vault · Live inventory
@@ -267,7 +272,7 @@ function Discovery() {
       </section>
 
       {recent.length > 0 && (
-        <section className="mt-12 mb-10">
+        <section className="reveal mt-12 mb-10">
           <div className="mb-3 flex items-center justify-between">
             <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
               <Clock className="mr-1 inline size-3" /> Recently viewed
@@ -297,12 +302,12 @@ function Discovery() {
         </section>
       )}
 
-      <div id="posts" className="mt-12">
+      <div id="posts" className="reveal mt-12">
         <PostsFeed mobilePreview />
       </div>
 
       {/* Full community banner on tablet+; hidden on mobile (pill above) */}
-      <div className="mt-10 hidden sm:block">
+      <div className="reveal mt-10 hidden sm:block">
         <CommunityBanner />
       </div>
     </main>
