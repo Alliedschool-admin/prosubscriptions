@@ -53,7 +53,7 @@ export function CommandPalette() {
           <CommandItem onSelect={() => go(() => navigate({ to: "/" }))}>
             <Home className="mr-2 size-4" /> Home
           </CommandItem>
-          <CommandItem onSelect={() => go(() => navigate({ to: "/vault" }))}>
+          <CommandItem onSelect={() => go(() => navigate({ to: "/dashboard" }))}>
             <Library className="mr-2 size-4" /> My Vault
           </CommandItem>
           <CommandItem onSelect={() => go(() => navigate({ to: "/wishlist" }))}>
