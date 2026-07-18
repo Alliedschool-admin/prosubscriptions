@@ -20,6 +20,8 @@ import { VisitorTracker } from "../components/VisitorTracker";
 import { WelcomePopup } from "../components/WelcomePopup";
 import { I18nProvider } from "../lib/i18n";
 import { ThemeProvider } from "../lib/theme";
+import { CommandPalette } from "../components/CommandPalette";
+import { useReveal } from "../hooks/useReveal";
 
 function NotFoundComponent() {
   return (
@@ -132,6 +134,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useReveal();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -143,10 +146,12 @@ function RootComponent() {
                 <TopNav />
                 <Outlet />
               </div>
+              <div aria-hidden className="grain-overlay" />
               <CheckoutSheet />
               <Toaster />
               <VisitorTracker />
               <WelcomePopup />
+              <CommandPalette />
             </CartProvider>
           </AuthProvider>
         </I18nProvider>
