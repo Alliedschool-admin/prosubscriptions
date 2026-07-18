@@ -459,6 +459,175 @@ function ProductsPanel() {
   );
 }
 
+type HeroSettings = {
+  image_url?: string;
+  headline?: string;
+  subtext?: string;
+  cta_label?: string;
+  cta_href?: string;
+};
+
+function SitePanel() {
+  const { value, loading, reload } = useSiteSetting<HeroSettings>("hero");
+  const [form, setForm] = useState<HeroSettings>({});
+  const [saving, setSaving] = useState(false);
+
+  // Hydrate form when settings load.
+  const loaded = !loading && value !== null;
+  const initialized = useState({ v: false })[0];
+  if (!initialized.v && loaded) {
+    Object.assign(form, value as HeroSettings);
+    initialized.v = true;
+  }
+
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await setSiteSetting("hero", form as Record<string, unknown>);
+      toast.success("Hero saved");
+      reload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function clearImage() {
+    setSaving(true);
+    try {
+      const next = { ...form, image_url: "" };
+      setForm(next);
+      await setSiteSetting("hero", next as Record<string, unknown>);
+      toast.success("Hero image removed");
+      reload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="rounded-2xl border border-border bg-background p-5">
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-primary">
+            Landing hero
+          </p>
+          <h2 className="mt-1 text-xl font-extrabold tracking-tight">Hero image & copy</h2>
+          <p className="mt-1 text-xs text-muted">
+            Replaces the text-only hero on the home page when an image is set. Text still renders
+            over the image as an overlay.
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-5 rounded-xl border border-dashed border-border bg-foreground/[0.02] p-4 text-xs text-muted">
+        <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">
+          Recommended image
+        </p>
+        <ul className="list-inside list-disc space-y-0.5">
+          <li><strong className="text-foreground">2400 × 1200 px</strong> (2:1 ratio) — sharp on retina, safe crop on mobile.</li>
+          <li>Min 1600 × 800 px, max 3200 × 1600 px.</li>
+          <li>Format: WebP or JPG. Keep file size under <strong className="text-foreground">600 KB</strong>.</li>
+          <li>Keep important content in the centre 60% — sides may crop on narrow screens.</li>
+          <li>Prefer darker imagery so the white headline stays readable.</li>
+        </ul>
+      </div>
+
+      <form onSubmit={save} className="space-y-4">
+        <div>
+          <label className="mb-1 block font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+            Hero image
+          </label>
+          <ImageInput
+            value={form.image_url || ""}
+            onChange={(url) => setForm({ ...form, image_url: url })}
+            folder="hero"
+            placeholder="https://… or upload"
+          />
+          {form.image_url && (
+            <div className="mt-3">
+              <div className="relative overflow-hidden rounded-xl border border-border">
+                <img
+                  src={form.image_url}
+                  alt="Hero preview"
+                  className="aspect-[2/1] w-full object-cover"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={clearImage}
+                disabled={saving}
+                className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-destructive hover:underline"
+              >
+                <Trash2 className="size-3" /> Remove hero image
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className="mb-1 block font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+              Headline (optional)
+            </label>
+            <input
+              className="input w-full"
+              value={form.headline || ""}
+              onChange={(e) => setForm({ ...form, headline: e.target.value })}
+              placeholder="Premium tools. Unreal prices."
+            />
+          </div>
+          <div>
+            <label className="mb-1 block font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+              Subtext (optional)
+            </label>
+            <input
+              className="input w-full"
+              value={form.subtext || ""}
+              onChange={(e) => setForm({ ...form, subtext: e.target.value })}
+              placeholder="Top-shelf subscriptions at a fraction of retail."
+            />
+          </div>
+          <div>
+            <label className="mb-1 block font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+              CTA label
+            </label>
+            <input
+              className="input w-full"
+              value={form.cta_label || ""}
+              onChange={(e) => setForm({ ...form, cta_label: e.target.value })}
+              placeholder="Enter the vault"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+              CTA link
+            </label>
+            <input
+              className="input w-full"
+              value={form.cta_href || ""}
+              onChange={(e) => setForm({ ...form, cta_href: e.target.value })}
+              placeholder="#vault"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
+        >
+          <Save className="size-4" /> {saving ? "Saving…" : "Save hero"}
+        </button>
+      </form>
+    </section>
+  );
+}
+
 /* ---------------- Coupons ---------------- */
 
 type CouponRow = {
