@@ -9,6 +9,7 @@ import { useAuth } from "../hooks/use-auth";
 import { claimFreeProduct, MY_ORDERS_QUERY_KEY } from "../lib/orders-store";
 import { WishlistButton } from "./WishlistButton";
 import { useCart } from "../lib/cart-context";
+import { ProductImage } from "./ProductImage";
 
 const PENDING_CLAIM_KEY = "pending-free-claim";
 
@@ -83,13 +84,11 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             zIndex: -1,
           }}
         />
-        <img
+        <ProductImage
           src={product.image}
           alt={product.name}
-          width={800}
-          height={800}
-          loading="lazy"
-          className={`size-full object-cover transition-all duration-700 group-hover:scale-[1.06] ${
+          priority={index < 4}
+          className={`transition-transform duration-700 group-hover:scale-[1.06] ${
             outOfStock ? "opacity-60" : ""
           }`}
         />
