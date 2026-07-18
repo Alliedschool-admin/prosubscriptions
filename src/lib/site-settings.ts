@@ -33,6 +33,7 @@ export function useSiteSetting<T extends SiteSettingValue = SiteSettingValue>(ke
 export async function setSiteSetting(key: string, value: SiteSettingValue) {
   const { error } = await supabase
     .from("site_settings")
-    .upsert({ key, value }, { onConflict: "key" });
+    // Supabase Json type doesn't index by string; cast is safe for jsonb.
+    .upsert({ key, value: value as unknown as never }, { onConflict: "key" });
   if (error) throw error;
 }
