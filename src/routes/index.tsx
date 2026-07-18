@@ -91,9 +91,6 @@ function Discovery() {
             />
           </>
         )}
-        <div className={heroImage ? "lg:col-span-8 lg:p-10 p-6" : "lg:col-span-8"}>
-        {/* placeholder wrapper opens */}
-        <div style={{ display: "contents" }}>
         <div className="lg:col-span-8">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1 backdrop-blur-md">
           <span className="relative grid size-2 place-items-center">
