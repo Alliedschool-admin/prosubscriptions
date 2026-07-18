@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Clock } from "lucide-react";
+import { Search, Clock, Sparkles, Zap, ShieldCheck, Rocket, Infinity as InfinityIcon, Diamond } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { categories } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
@@ -49,6 +49,11 @@ function Discovery() {
 
   return (
     <main className="relative mx-auto max-w-2xl px-4 pb-40 pt-10 lg:max-w-6xl lg:px-8 lg:pt-16">
+      {/* Desktop-only grid backdrop — spatial architecture */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[780px] grid-backdrop lg:block"
+      />
       {/* Aurora orbs — floating cosmic light sources */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[520px] overflow-hidden lg:h-[680px]">
         <div className="aurora-orb" style={{ top: "-60px", left: "-40px", width: 260, height: 260, background: "radial-gradient(circle, hsl(268 85% 68% / 0.55), transparent 70%)" }} />
@@ -86,23 +91,100 @@ function Discovery() {
             <div>plans live</div>
           </div>
         </div>
+
+        {/* Desktop-only CTA row */}
+        <div className="mt-8 hidden items-center gap-3 lg:flex">
+          <a
+            href="#vault"
+            className="group inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-primary-foreground shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
+            style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
+          >
+            <Zap className="size-3.5" /> Enter the vault
+          </a>
+          <a
+            href="#posts"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-foreground backdrop-blur-md transition-colors hover:border-primary/60 hover:text-primary"
+          >
+            <Sparkles className="size-3.5" /> Free methods
+          </a>
+        </div>
         </div>
         {/* Desktop stat panel — creative flourish */}
         <aside className="mt-8 hidden lg:col-span-4 lg:mt-0 lg:block">
           <div className="aurora-glass relative overflow-hidden rounded-3xl p-6">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full opacity-60 blur-3xl"
+              style={{ background: "radial-gradient(circle, color-mix(in oklab, var(--primary) 60%, transparent), transparent 70%)" }}
+            />
+            <div className="mb-4 flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-emerald-400">
+                <span className="relative grid size-1.5 place-items-center">
+                  <span className="absolute inline-flex size-full rounded-full bg-emerald-400 pulse-ring" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
+                </span>
+                Live
+              </span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
+                v.03 · Vault
+              </span>
+            </div>
             <div className="flex items-baseline gap-3">
-              <span className="font-display text-6xl tracking-tight text-aurora">{products.length}</span>
+              <span className="font-display text-7xl tracking-tight text-aurora">{products.length}</span>
               <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted">live plans</span>
             </div>
             <div className="mt-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-            <ul className="mt-4 space-y-2 font-mono text-[11px] uppercase tracking-widest text-muted">
-              <li className="flex justify-between"><span>· Instant delivery</span><span className="text-foreground/80">24/7</span></li>
-              <li className="flex justify-between"><span>· Verified stock</span><span className="text-foreground/80">Live</span></li>
-              <li className="flex justify-between"><span>· Fair pricing</span><span className="text-foreground/80">Always</span></li>
+            <ul className="mt-4 space-y-2.5 font-mono text-[11px] uppercase tracking-widest text-muted">
+              <li className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-2"><Rocket className="size-3 text-primary" /> Instant delivery</span>
+                <span className="text-foreground/80">24/7</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-2"><ShieldCheck className="size-3 text-primary" /> Verified stock</span>
+                <span className="text-foreground/80">Live</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-2"><Diamond className="size-3 text-primary" /> Fair pricing</span>
+                <span className="text-foreground/80">Always</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-2"><InfinityIcon className="size-3 text-primary" /> Support</span>
+                <span className="text-foreground/80">Human</span>
+              </li>
             </ul>
           </div>
         </aside>
       </header>
+
+      {/* Desktop marquee — trust ticker */}
+      <div className="relative mb-10 hidden overflow-hidden rounded-2xl border border-border/60 bg-background/30 py-3 backdrop-blur-md lg:block">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-background to-transparent"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-background to-transparent"
+        />
+        <div className="flex w-max animate-marquee gap-10 pr-10 font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-muted">
+          {Array.from({ length: 2 }).map((_, dup) => (
+            <div key={dup} className="flex shrink-0 items-center gap-10">
+              <span className="inline-flex items-center gap-2"><Zap className="size-3 text-primary" /> Instant activation</span>
+              <span className="text-foreground/30">◇</span>
+              <span className="inline-flex items-center gap-2"><ShieldCheck className="size-3 text-primary" /> Buyer protected</span>
+              <span className="text-foreground/30">◇</span>
+              <span className="inline-flex items-center gap-2"><Rocket className="size-3 text-primary" /> Live restocks</span>
+              <span className="text-foreground/30">◇</span>
+              <span className="inline-flex items-center gap-2"><Sparkles className="size-3 text-primary" /> Free bonus drops</span>
+              <span className="text-foreground/30">◇</span>
+              <span className="inline-flex items-center gap-2"><Diamond className="size-3 text-primary" /> Fair, honest pricing</span>
+              <span className="text-foreground/30">◇</span>
+              <span className="inline-flex items-center gap-2"><InfinityIcon className="size-3 text-primary" /> Human support</span>
+              <span className="text-foreground/30">◇</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Mobile: slim community pill; Desktop/tablet: full banner (below products) */}
       <CommunityPill />
@@ -153,6 +235,22 @@ function Discovery() {
         })}
       </div>
 
+      {/* Desktop section label */}
+      <div id="vault" className="mb-6 hidden items-end justify-between lg:flex">
+        <div>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.32em] text-primary">
+            ◉ Vault · Live inventory
+          </p>
+          <h2 className="font-display mt-1 text-2xl tracking-tight">
+            {filtered.length} {filtered.length === 1 ? "asset" : "assets"}
+            <span className="text-muted"> matching your filter</span>
+          </h2>
+        </div>
+        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted">
+          {cat === "All" ? "All categories" : `Category · ${cat}`}
+        </span>
+      </div>
+
       {/* Products — surfaced above secondary content on mobile */}
       <section className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-10">
         {loading ? (
@@ -199,7 +297,7 @@ function Discovery() {
         </section>
       )}
 
-      <div className="mt-12">
+      <div id="posts" className="mt-12">
         <PostsFeed mobilePreview />
       </div>
 
