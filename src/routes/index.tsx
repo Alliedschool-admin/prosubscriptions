@@ -9,6 +9,15 @@ import { PostsFeed } from "../components/PostsFeed";
 import { getRecentlyViewed } from "../lib/recently-viewed";
 import { CountUp } from "../components/CountUp";
 import { trackSpotlight } from "../lib/spotlight";
+import { useSiteSetting } from "../lib/site-settings";
+
+type HeroSettings = {
+  image_url?: string;
+  headline?: string;
+  subtext?: string;
+  cta_label?: string;
+  cta_href?: string;
+};
 
 export const Route = createFileRoute("/")({
   component: Discovery,
@@ -20,6 +29,8 @@ function Discovery() {
   const [cat, setCat] = useState<(typeof categories)[number]>("All");
   const { products, loading } = useProducts();
   const [recentIds, setRecentIds] = useState<string[]>([]);
+  const { value: hero } = useSiteSetting<HeroSettings>("hero");
+  const heroImage = hero?.image_url;
 
   useEffect(() => {
     setRecentIds(getRecentlyViewed());
@@ -64,7 +75,22 @@ function Discovery() {
       </div>
 
       {/* Asymmetric hero */}
-      <header className="relative mb-10 lg:mb-16 lg:grid lg:grid-cols-12 lg:items-end lg:gap-8">
+      <header className={`relative mb-10 lg:mb-16 lg:grid lg:grid-cols-12 lg:items-end lg:gap-8 ${heroImage ? "overflow-hidden rounded-3xl border border-border/60" : ""}`}>
+        {heroImage && (
+          <>
+            <img
+              src={heroImage}
+              alt=""
+              aria-hidden
+              fetchPriority="high"
+              className="pointer-events-none absolute inset-0 -z-10 size-full object-cover"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-background/85 via-background/70 to-background/40"
+            />
+          </>
+        )}
         <div className="lg:col-span-8">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1 backdrop-blur-md">
           <span className="relative grid size-2 place-items-center">
@@ -76,17 +102,29 @@ function Discovery() {
           </span>
         </div>
 
-        <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(1.9rem,9vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
-          <span className="text-chrome">Premium tools.</span>
-          <br />
-          <span className="text-aurora sm:ml-[0.9em]">Unreal prices.</span>
-          <span className="hidden sm:inline"><br /><span className="text-foreground/90">/ no compromise.</span></span>
-        </h1>
+        {hero?.headline ? (
+          <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(1.9rem,9vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
+            <span className="text-chrome">{hero.headline}</span>
+          </h1>
+        ) : (
+          <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(1.9rem,9vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
+            <span className="text-chrome">Premium tools.</span>
+            <br />
+            <span className="text-aurora sm:ml-[0.9em]">Unreal prices.</span>
+            <span className="hidden sm:inline"><br /><span className="text-foreground/90">/ no compromise.</span></span>
+          </h1>
+        )}
 
         <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6 sm:mt-6 lg:mt-8">
           <p className="max-w-md text-sm leading-relaxed text-muted lg:text-base">
-            <span className="sm:hidden">Top-shelf subscriptions at a fraction of retail.</span>
-            <span className="hidden sm:inline">Top-shelf subscriptions — AI, design, and dev tools — bundled at a fraction of retail. Same features, smarter price, zero fluff.</span>
+            {hero?.subtext ? (
+              hero.subtext
+            ) : (
+              <>
+                <span className="sm:hidden">Top-shelf subscriptions at a fraction of retail.</span>
+                <span className="hidden sm:inline">Top-shelf subscriptions — AI, design, and dev tools — bundled at a fraction of retail. Same features, smarter price, zero fluff.</span>
+              </>
+            )}
           </p>
           <div className="hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-widest text-muted sm:block">
             <div className="text-foreground/80">{products.length.toString().padStart(3, "0")}</div>
@@ -97,11 +135,11 @@ function Discovery() {
         {/* Desktop-only CTA row */}
         <div className="mt-8 hidden items-center gap-3 lg:flex">
           <a
-            href="#vault"
+            href={hero?.cta_href || "#vault"}
             className="group inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-primary-foreground shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
             style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
           >
-            <Zap className="size-3.5" /> Enter the vault
+            <Zap className="size-3.5" /> {hero?.cta_label || "Enter the vault"}
           </a>
           <a
             href="#posts"
