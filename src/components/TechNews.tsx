@@ -12,16 +12,22 @@ type Story = {
 };
 
 async function fetchTopTech(): Promise<Story[]> {
-  const ids: number[] = await fetch("https://hacker-news.firebaseio.com/v0/topstories.json")
-    .then((r) => r.json());
-  const top = ids.slice(0, 30);
-  const stories = await Promise.all(
-    top.map((id) =>
-      fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then((r) => r.json()),
-    ),
-  );
-  return (stories as Story[])
-    .filter((s) => s && s.title && s.url)
+  // Single request via Algolia HN Search — much faster than 30 firebase item calls.
+  const res = await fetch(
+    "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=12",
+  ).then((r) => r.json());
+  const hits: any[] = res?.hits ?? [];
+  return hits
+    .filter((h) => h.title && h.url)
+    .map((h) => ({
+      id: Number(h.objectID),
+      title: h.title,
+      url: h.url,
+      score: h.points ?? 0,
+      by: h.author ?? "",
+      time: h.created_at_i ?? Math.floor(Date.now() / 1000),
+      descendants: h.num_comments ?? 0,
+    }))
     .slice(0, 8);
 }
 
@@ -37,7 +43,10 @@ export function TechNews() {
     queryKey: ["tech-news"],
     queryFn: fetchTopTech,
     staleTime: 15 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     refetchInterval: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    placeholderData: (prev) => prev,
   });
 
   return (
