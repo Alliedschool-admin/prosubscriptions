@@ -32,6 +32,33 @@ export type Database = {
         }
         Relationships: []
       }
+      broadcasts: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          message: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          message: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          message?: string
+        }
+        Relationships: []
+      }
       coupons: {
         Row: {
           active: boolean
@@ -77,6 +104,24 @@ export type Database = {
           updated_at?: string
           uses_count?: number
           value?: number
+        }
+        Relationships: []
+      }
+      loyalty_points: {
+        Row: {
+          points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          points?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -305,6 +350,36 @@ export type Database = {
         }
         Relationships: []
       }
+      product_reviews: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          product_id: string
+          rating: number
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          product_id: string
+          rating: number
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string
+          rating?: number
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       product_stock_items: {
         Row: {
           assigned_order_id: string | null
@@ -516,6 +591,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_sales_stats: { Args: never; Returns: Json }
       apply_coupon: {
         Args: { _code: string; _currency: string; _subtotal: number }
         Returns: {
@@ -602,6 +678,15 @@ export type Database = {
         Returns: {
           product_id: string
           purchase_count: number
+        }[]
+      }
+      recent_purchases_public: {
+        Args: never
+        Returns: {
+          created_at: string
+          first_name: string
+          id: string
+          item_name: string
         }[]
       }
       record_site_visit: {
