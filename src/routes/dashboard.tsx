@@ -184,9 +184,22 @@ function OrderCard({
       )}
 
       {o.status === "pending" && (
-        <p className="mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted">
-          <Clock className="size-3" /> Awaiting admin verification
-        </p>
+        <>
+          <p className="mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted">
+            <Clock className="size-3" /> Awaiting admin verification
+          </p>
+          <a
+            href={`https://wa.me/923108411396?text=${encodeURIComponent(
+              `Hi! Order VLT-${o.id.slice(0, 6).toUpperCase()} for "${o.item_name}" — payment done. Please verify and approve. Thanks!`,
+            )}`}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-[#25D366] px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-widest text-white shadow-sm transition hover:brightness-110"
+          >
+            <svg viewBox="0 0 24 24" className="size-3" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.4-1.7a11.9 11.9 0 0 0 5.6 1.4h.1c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.3-6.2-3.5-8.3zM12 21.5c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.8 1 1-3.7-.2-.4a9.6 9.6 0 1 1 8.4 4.7z"/></svg>
+            Ping admin on WhatsApp
+          </a>
+        </>
       )}
       {o.status === "rejected" && o.admin_note && (
         <p className="mt-3 text-xs text-destructive">Reason: {o.admin_note}</p>
