@@ -6,6 +6,7 @@ import { categories } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
 import { CommunityBanner, CommunityPill } from "../components/CommunityBanner";
 import { PostsFeed } from "../components/PostsFeed";
+import { TechNews } from "../components/TechNews";
 import { getRecentlyViewed } from "../lib/recently-viewed";
 import { CountUp } from "../components/CountUp";
 import { trackSpotlight } from "../lib/spotlight";
@@ -304,6 +305,10 @@ function Discovery() {
 
       <div id="posts" className="reveal mt-12">
         <PostsFeed mobilePreview />
+      </div>
+
+      <div className="reveal mt-6">
+        <TechNews />
       </div>
 
       {/* Full community banner on tablet+; hidden on mobile (pill above) */}
