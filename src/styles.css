@@ -367,6 +367,71 @@ body,
 }
 .animate-marquee { animation: marquee-x 38s linear infinite; }
 
+/* Broadcast banner — aurora sweep + slide-in + shimmer */
+@keyframes broadcast-slide {
+  0%   { transform: translateY(-120%); opacity: 0; }
+  100% { transform: translateY(0);     opacity: 1; }
+}
+@keyframes broadcast-aurora {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes broadcast-sheen {
+  0%   { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(260%)  skewX(-18deg); }
+}
+@keyframes broadcast-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.broadcast-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  box-shadow:
+    0 20px 60px -20px color-mix(in oklab, var(--primary) 55%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--foreground) 6%, transparent) inset;
+  animation: broadcast-slide 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.broadcast-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(
+    120deg,
+    color-mix(in oklab, var(--primary) 85%, transparent) 0%,
+    color-mix(in oklab, var(--primary-glow, var(--primary)) 75%, transparent) 25%,
+    color-mix(in oklab, #7c3aed 65%, transparent) 50%,
+    color-mix(in oklab, var(--primary-glow, var(--primary)) 75%, transparent) 75%,
+    color-mix(in oklab, var(--primary) 85%, transparent) 100%
+  );
+  background-size: 200% 200%;
+  animation: broadcast-aurora 9s linear infinite;
+}
+.broadcast-card::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0;
+  width: 40%;
+  z-index: -1;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: broadcast-sheen 3.6s ease-in-out 700ms infinite;
+}
+.broadcast-marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: broadcast-marquee 22s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .broadcast-card,
+  .broadcast-card::before,
+  .broadcast-card::after,
+  .broadcast-marquee-track { animation: none; }
+}
+
 @utility grid-backdrop {
   background-image:
     linear-gradient(color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
