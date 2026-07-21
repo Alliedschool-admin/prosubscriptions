@@ -21,6 +21,8 @@ import { WelcomePopup } from "../components/WelcomePopup";
 import { I18nProvider } from "../lib/i18n";
 import { ThemeProvider } from "../lib/theme";
 import { CommandPalette } from "../components/CommandPalette";
+import { BroadcastListener } from "../components/BroadcastListener";
+import { PurchaseTicker } from "../components/PurchaseTicker";
 import { useReveal } from "../hooks/useReveal";
 
 function NotFoundComponent() {
@@ -104,6 +106,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.png?v=3", type: "image/png" },
       { rel: "shortcut icon", href: "/favicon.png?v=3", type: "image/png" },
       { rel: "apple-touch-icon", href: "/favicon.png?v=3" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -152,6 +155,8 @@ function RootComponent() {
               <VisitorTracker />
               <WelcomePopup />
               <CommandPalette />
+              <BroadcastListener />
+              <PurchaseTicker />
             </CartProvider>
           </AuthProvider>
         </I18nProvider>

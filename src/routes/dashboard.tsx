@@ -6,6 +6,7 @@ import { useMyOrders, type Order, deleteOrder, useOrdersInvalidator } from "../l
 import { formatMoney, type Currency } from "../lib/price";
 import { useProducts } from "../lib/products-store";
 import { CommunityBanner } from "../components/CommunityBanner";
+import { LoyaltyCard } from "../components/LoyaltyCard";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -72,6 +73,10 @@ function Dashboard() {
             <h1 className="truncate text-2xl font-extrabold tracking-tight">{user.email}</h1>
           </div>
         </div>
+      </section>
+
+      <section className="mt-6 px-4 lg:px-0">
+        <LoyaltyCard />
       </section>
 
       <section className="mt-8 px-4 lg:px-0">

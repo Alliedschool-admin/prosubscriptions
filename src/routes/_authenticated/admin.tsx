@@ -27,6 +27,7 @@ import {
   Megaphone,
   Ticket,
 } from "lucide-react";
+import { LineChart } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
 import {
@@ -71,6 +72,8 @@ import { useI18n } from "../../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImageInput } from "@/components/ImageInput";
+import { SalesAnalyticsPanel } from "@/components/admin/SalesAnalyticsPanel";
+import { BroadcastPanel } from "@/components/admin/BroadcastPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -92,7 +95,9 @@ type Tab =
   | "admins"
   | "users"
   | "posts"
-  | "coupons";
+  | "coupons"
+  | "analytics"
+  | "broadcasts";
 
 function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { t } = useI18n();
@@ -106,10 +111,12 @@ function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
     { id: "users" as const, label: t("tab.users"), icon: Contact },
     { id: "posts" as const, label: t("tab.posts"), icon: Megaphone },
     { id: "coupons" as const, label: t("tab.coupons"), icon: Ticket },
+    { id: "analytics" as const, label: "Analytics", icon: LineChart },
+    { id: "broadcasts" as const, label: "Broadcasts", icon: Send },
   ];
   return (
     <nav
-      className="no-scrollbar mb-6 -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto scroll-smooth rounded-xl border border-border bg-background/70 p-1 backdrop-blur [mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)] sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:[mask-image:none] lg:grid-cols-9"
+      className="no-scrollbar mb-6 -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto scroll-smooth rounded-xl border border-border bg-background/70 p-1 backdrop-blur [mask-image:linear-gradient(to_right,transparent,#000_24px,#000_calc(100%-24px),transparent)] sm:grid sm:snap-none sm:grid-cols-4 sm:overflow-visible sm:[mask-image:none] lg:grid-cols-11"
       aria-label="Admin sections"
       role="tablist"
     >
@@ -216,6 +223,8 @@ function Admin() {
       {tab === "users" && <UsersPanel />}
       {tab === "posts" && <PostsAdminPanel />}
       {tab === "coupons" && <CouponsPanel />}
+      {tab === "analytics" && <SalesAnalyticsPanel />}
+      {tab === "broadcasts" && <BroadcastPanel />}
 
       <style>{`
         .input {
