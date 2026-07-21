@@ -5,6 +5,7 @@ import { useI18n } from "../lib/i18n";
 import { useTheme, type ThemeChoice } from "../lib/theme";
 import { useEffect, useRef, useState } from "react";
 import logoMark from "../assets/logo-mark.png";
+import { PWAInstallButton } from "./PWAInstallButton";
 
 export function TopNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -59,6 +60,7 @@ export function TopNav() {
               );
             })}
             <ThemeMenu />
+            <PWAInstallButton />
             {session ? (
               <button
                 onClick={() => signOut()}
@@ -77,6 +79,7 @@ export function TopNav() {
             )}
           </div>
           <div className="flex items-center gap-1 lg:hidden">
+            <PWAInstallButton />
             <ThemeMenu compact />
             {session ? (
               <button
