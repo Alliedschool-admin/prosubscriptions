@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { MY_ORDERS_QUERY_KEY, claimFreeProduct } from "../lib/orders-store";
 import { recordProductView } from "../lib/recently-viewed";
 import { WishlistButton } from "../components/WishlistButton";
+import { ReviewsSection } from "../components/ReviewsSection";
 
 const PENDING_CLAIM_KEY = "pending-free-claim";
 
@@ -256,6 +257,8 @@ function ProductDetail() {
           ))}
         </div>
       </section>
+
+      <ReviewsSection productId={product.id} />
 
       {/* Sticky Buy Bar */}
       <div className="fixed inset-x-0 bottom-[68px] z-30 border-t border-border bg-background/90 p-4 backdrop-blur-xl sm:bottom-0">
