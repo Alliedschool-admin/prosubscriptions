@@ -24,15 +24,15 @@ function addDismissed(id: string) {
 }
 
 function BroadcastCard({ b, onClose }: { b: Broadcast; onClose: (id: string) => void }) {
-  const textRef = useRef<HTMLSpanElement | null>(null);
+  const measureRef = useRef<HTMLSpanElement | null>(null);
   const boxRef = useRef<HTMLDivElement | null>(null);
   const [overflow, setOverflow] = useState(false);
 
   useLayoutEffect(() => {
-    const t = textRef.current;
-    const b = boxRef.current;
-    if (!t || !b) return;
-    setOverflow(t.scrollWidth > b.clientWidth - 8);
+    const t = measureRef.current;
+    const box = boxRef.current;
+    if (!t || !box) return;
+    setOverflow(t.scrollWidth > box.clientWidth - 8);
   }, [b.message]);
 
   return (
@@ -59,23 +59,18 @@ function BroadcastCard({ b, onClose }: { b: Broadcast; onClose: (id: string) => 
               <span className="pr-12" aria-hidden>{b.message}</span>
             </div>
           ) : (
-            <span
-              ref={textRef}
-              className="block truncate text-[13px] font-semibold leading-snug sm:whitespace-normal sm:text-sm"
-            >
+            <span className="block text-[13px] font-semibold leading-snug sm:text-sm">
               {b.message}
             </span>
           )}
-          {/* hidden measurer */}
-          {!overflow && (
-            <span
-              ref={textRef}
-              aria-hidden
-              className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap text-[13px] font-semibold sm:text-sm"
-            >
-              {b.message}
-            </span>
-          )}
+          {/* hidden measurer to detect overflow */}
+          <span
+            ref={measureRef}
+            aria-hidden
+            className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap text-[13px] font-semibold sm:text-sm"
+          >
+            {b.message}
+          </span>
         </div>
       </div>
 
