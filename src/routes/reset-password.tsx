@@ -7,8 +7,8 @@ import { ShieldCheck } from "lucide-react";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Reset password — Pro Subscriptions" },
-      { name: "description", content: "Set a new password for your Pro Subscriptions account." },
+      { title: "Reset password — Digital Chacho" },
+      { name: "description", content: "Set a new password for your Digital Chacho account." },
       { name: "robots", content: "noindex" },
     ],
   }),

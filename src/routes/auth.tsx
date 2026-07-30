@@ -16,8 +16,8 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "Sign in — Pro Subscriptions" },
-      { name: "description", content: "Sign in to Pro Subscriptions to manage your purchases and admin console." },
+      { title: "Sign in — Digital Chacho" },
+      { name: "description", content: "Sign in to Digital Chacho to manage your purchases and admin console." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -94,7 +94,7 @@ function AuthPage() {
       <div className="w-full">
         <div className="mb-6 text-center sm:mb-8">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-            Secure · Pro Subscriptions
+            Secure · Digital Chacho
           </p>
           <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
             {isReset ? "Reset password" : mode === "signin" ? "Sign in" : "Create account"}

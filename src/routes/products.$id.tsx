@@ -19,9 +19,9 @@ export const Route = createFileRoute("/products/$id")({
   head: ({ params }) => {
     const product = getSeedProduct(params.id);
     if (!product) {
-      return { meta: [{ title: "Product · Pro Subscriptions" }] };
+      return { meta: [{ title: "Product · Digital Chacho" }] };
     }
-    const title = `${product.name} — Pro Subscriptions`;
+    const title = `${product.name} — Digital Chacho`;
     return {
       meta: [
         { title },

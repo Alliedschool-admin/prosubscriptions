@@ -31,7 +31,7 @@ export function TopNav() {
             >
               <img
                 src={logoMark}
-                alt="Pro Subscriptions"
+                alt="Digital Chacho"
                 width={28}
                 height={28}
                 className="size-7 object-contain"

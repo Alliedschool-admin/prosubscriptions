@@ -90,10 +90,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Pro Subscriptions — Premium digital tools & Pro subscriptions" },
+      { title: "Digital Chacho — Premium subscriptions at unreal prices" },
       { name: "description", content: "A curated vault of professional-grade presets, UI kits, AI tools and dev templates. Buy once or unlock everything with Pro." },
-      { name: "author", content: "Pro Subscriptions" },
-      { property: "og:title", content: "Pro Subscriptions — Premium digital tools" },
+      { name: "author", content: "Digital Chacho" },
+      { property: "og:title", content: "Digital Chacho — Premium digital tools" },
       { property: "og:description", content: "Curated presets, UI kits, AI tools and dev templates. Buy once or go Pro." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
