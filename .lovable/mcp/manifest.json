@@ -9,13 +9,13 @@
     "server": {
       "name": "pro-subscriptions-mcp",
       "version": "0.1.0",
-      "title": "Pro Subscriptions"
+      "title": "Digital Chacho"
     },
     "tools": [
       {
         "name": "list_products",
         "title": "List products",
-        "description": "List public products in the Pro Subscriptions catalog. Optionally filter by category and limit results.",
+        "description": "List public products in the Digital Chacho catalog. Optionally filter by category and limit results.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,

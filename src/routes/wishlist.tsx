@@ -8,7 +8,7 @@ import { ProductCard } from "../components/ProductCard";
 export const Route = createFileRoute("/wishlist")({
   head: () => ({
     meta: [
-      { title: "My Wishlist — Pro Subscriptions" },
+      { title: "My Wishlist — Digital Chacho" },
       { name: "description", content: "Products you saved for later." },
       { name: "robots", content: "noindex" },
     ],

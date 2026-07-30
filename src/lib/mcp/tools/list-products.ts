@@ -11,7 +11,7 @@ function anonClient() {
 export default defineTool({
   name: "list_products",
   title: "List products",
-  description: "List public products in the Pro Subscriptions catalog. Optionally filter by category and limit results.",
+  description: "List public products in the Digital Chacho catalog. Optionally filter by category and limit results.",
   inputSchema: {
     category: z
       .enum(["Presets", "UI Kits", "AI Tools", "Dev Templates"])

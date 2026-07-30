@@ -5,4 +5,4 @@ Disallow: /dashboard
 Disallow: /auth
 Disallow: /reset-password
 
-Sitemap: https://prosubscriptions.lovable.app/sitemap.xml
+Sitemap: https://www.digitalchacho.store/sitemap.xml

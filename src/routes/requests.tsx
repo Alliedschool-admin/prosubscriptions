@@ -18,7 +18,7 @@ export const Route = createFileRoute("/requests")({
   }),
   head: () => ({
     meta: [
-      { title: "My Requests — Pro Subscriptions" },
+      { title: "My Requests — Digital Chacho" },
       { name: "description", content: "Request products we don't stock yet and track admin replies." },
       { property: "og:title", content: "My Requests" },
       { property: "og:description", content: "Request products we don't stock yet and track admin replies." },

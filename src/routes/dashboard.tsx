@@ -11,7 +11,7 @@ import { LoyaltyCard } from "../components/LoyaltyCard";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "My Purchases — Pro Subscriptions" },
+      { title: "My Purchases — Digital Chacho" },
       { name: "description", content: "Your orders and purchased download links." },
       { property: "og:title", content: "My Purchases" },
       { property: "og:description", content: "Your orders and purchased download links." },

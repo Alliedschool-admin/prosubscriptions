@@ -27,19 +27,19 @@ export function TopNav() {
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4 lg:max-w-6xl lg:px-8">
           <Link to="/" className="group flex items-center gap-2.5">
             <span
-              className="relative grid size-9 place-items-center rounded-full bg-white ring-1 ring-black/10 shadow-[0_4px_16px_-4px_color-mix(in_oklab,var(--primary)_45%,transparent)] transition-transform duration-500 group-hover:scale-[1.06]"
+              className="relative grid size-9 place-items-center overflow-hidden rounded-full bg-[oklch(0.14_0.02_280)] ring-1 ring-border/70 shadow-[0_4px_16px_-4px_color-mix(in_oklab,var(--primary)_45%,transparent)] transition-transform duration-500 group-hover:scale-[1.06]"
             >
               <img
                 src={logoMark}
-                alt="Pro Subscriptions"
+                alt="Digital Chacho"
                 width={28}
                 height={28}
-                className="size-7 object-contain"
+                className="size-9 scale-125 object-contain"
               />
             </span>
             <span className="font-display whitespace-nowrap text-base tracking-tight sm:text-lg">
-              <span className="text-chrome">PRO</span>
-            <span className="hidden text-foreground/80 sm:inline"> · SUBSCRIPTIONS</span>
+              <span className="text-chrome">DIGITAL</span>
+            <span className="hidden text-foreground/80 sm:inline"> · CHACHO</span>
             </span>
           </Link>
           <div className="hidden items-center gap-1 lg:flex">

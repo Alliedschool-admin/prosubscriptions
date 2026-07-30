@@ -12,6 +12,23 @@ import { CountUp } from "../components/CountUp";
 import { trackSpotlight } from "../lib/spotlight";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Digital Chacho — Premium subscriptions at unreal prices" },
+      {
+        name: "description",
+        content:
+          "Digital Chacho is your vault of premium subscriptions, AI tools, presets and dev templates at prices that make sense. Instant delivery, verified stock.",
+      },
+      { property: "og:title", content: "Digital Chacho — Premium subscriptions at unreal prices" },
+      {
+        property: "og:description",
+        content: "Premium subscriptions, AI tools and digital gear at unreal prices. Instant delivery.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Discovery,
 });
 

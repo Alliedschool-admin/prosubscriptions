@@ -78,7 +78,7 @@ import { BroadcastPanel } from "@/components/admin/BroadcastPanel";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Admin · Pro Subscriptions" },
+      { title: "Admin · Digital Chacho" },
       { name: "description", content: "Manage products, payment methods and order verifications." },
       { name: "robots", content: "noindex" },
     ],
