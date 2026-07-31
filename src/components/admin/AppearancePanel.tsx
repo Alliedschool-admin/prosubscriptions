@@ -1,10 +1,12 @@
-import { Check, Loader2, Palette } from "lucide-react";
+import { Check, Layers, Loader2, Palette } from "lucide-react";
 import { toast } from "sonner";
 import { SKINS, useSkin, type Skin } from "@/lib/skin";
+import { BACKGROUNDS, useBackground, type BackgroundStyle } from "@/lib/background";
 import { useTheme } from "@/lib/theme";
 
 export function AppearancePanel() {
   const { skin, setSkin, saving } = useSkin();
+  const { background, setBackground, saving: savingBg } = useBackground();
   const { theme, setTheme } = useTheme();
 
   async function pick(next: Skin) {
@@ -13,6 +15,15 @@ export function AppearancePanel() {
       toast.success("Theme applied to the whole site.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save theme");
+    }
+  }
+
+  async function pickBg(next: BackgroundStyle) {
+    try {
+      await setBackground(next);
+      toast.success("Background applied to the whole site.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save background");
     }
   }
 
