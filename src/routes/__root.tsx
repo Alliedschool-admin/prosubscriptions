@@ -21,6 +21,8 @@ import { WelcomePopup } from "../components/WelcomePopup";
 import { I18nProvider } from "../lib/i18n";
 import { ThemeProvider } from "../lib/theme";
 import { SkinProvider } from "../lib/skin";
+import { BackgroundProvider } from "../lib/background";
+import { SiteBackground } from "../components/SiteBackground";
 import { CommandPalette } from "../components/CommandPalette";
 import { BroadcastListener } from "../components/BroadcastListener";
 import { PurchaseTicker } from "../components/PurchaseTicker";
@@ -159,12 +161,16 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <SkinProvider>
+        <BackgroundProvider>
         <I18nProvider>
           <AuthProvider>
             <CartProvider>
               <div className="min-h-screen bg-background text-foreground antialiased">
-                <TopNav />
-                <Outlet />
+                <SiteBackground />
+                <div className="relative z-10">
+                  <TopNav />
+                  <Outlet />
+                </div>
               </div>
               <div aria-hidden className="grain-overlay" />
               <CheckoutSheet />
@@ -177,6 +183,7 @@ function RootComponent() {
             </CartProvider>
           </AuthProvider>
         </I18nProvider>
+        </BackgroundProvider>
         </SkinProvider>
       </ThemeProvider>
     </QueryClientProvider>
