@@ -505,3 +505,153 @@ body,
 @media (prefers-reduced-motion: reduce) {
   .grain-overlay { display: none; }
 }
+
+/* ============================================================
+ * Site skins — selectable design themes (set by admin).
+ * Applied as data-skin on <html>. Default (no attribute) = Aurora Obsidian.
+ * ============================================================ */
+
+/* --- Ember Noir: charcoal + molten orange/gold --- */
+html[data-skin="ember"] {
+  --background: hsl(24 12% 5%);
+  --foreground: hsl(30 25% 96%);
+  --card: hsl(24 12% 9% / 0.55);
+  --card-foreground: hsl(30 25% 96%);
+  --popover: hsl(24 12% 8%);
+  --popover-foreground: hsl(30 25% 96%);
+  --primary: hsl(22 95% 58%);
+  --primary-foreground: hsl(24 12% 6%);
+  --primary-glow: hsl(42 96% 62%);
+  --accent-amber: hsl(42 96% 62%);
+  --chrome-1: hsl(35 25% 88%);
+  --chrome-2: hsl(22 45% 70%);
+  --secondary: hsl(24 10% 13%);
+  --secondary-foreground: hsl(30 25% 96%);
+  --muted: hsl(28 8% 62%);
+  --muted-foreground: hsl(28 8% 62%);
+  --accent: hsl(42 96% 62%);
+  --accent-foreground: hsl(24 12% 6%);
+  --ring: hsl(22 95% 58%);
+  --border: hsl(30 40% 100% / 0.08);
+  --input: hsl(30 40% 100% / 0.1);
+  --sidebar: hsl(24 12% 7%);
+  --sidebar-primary: hsl(22 95% 58%);
+  --sidebar-ring: hsl(22 95% 58%);
+}
+html[data-skin="ember"].light {
+  --background: hsl(36 40% 97%);
+  --foreground: hsl(24 25% 10%);
+  --card: hsl(0 0% 100% / 0.65);
+  --card-foreground: hsl(24 25% 10%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(24 25% 10%);
+  --primary: hsl(20 88% 48%);
+  --primary-foreground: hsl(0 0% 100%);
+  --primary-glow: hsl(38 92% 50%);
+  --accent: hsl(38 92% 50%);
+  --accent-foreground: hsl(0 0% 100%);
+  --muted: hsl(24 10% 40%);
+  --muted-foreground: hsl(24 10% 40%);
+  --secondary: hsl(36 30% 93%);
+  --border: hsl(24 25% 10% / 0.12);
+  --input: hsl(24 25% 10% / 0.08);
+  --ring: hsl(20 88% 48%);
+}
+
+/* --- Neon Mint: ink-black + electric mint/lime --- */
+html[data-skin="mint"] {
+  --background: hsl(200 40% 4%);
+  --foreground: hsl(160 20% 96%);
+  --card: hsl(190 35% 8% / 0.55);
+  --card-foreground: hsl(160 20% 96%);
+  --popover: hsl(190 35% 7%);
+  --popover-foreground: hsl(160 20% 96%);
+  --primary: hsl(162 90% 52%);
+  --primary-foreground: hsl(200 40% 5%);
+  --primary-glow: hsl(140 85% 62%);
+  --accent-amber: hsl(180 85% 60%);
+  --chrome-1: hsl(170 20% 90%);
+  --chrome-2: hsl(162 45% 70%);
+  --secondary: hsl(195 25% 12%);
+  --secondary-foreground: hsl(160 20% 96%);
+  --muted: hsl(180 10% 62%);
+  --muted-foreground: hsl(180 10% 62%);
+  --accent: hsl(180 85% 58%);
+  --accent-foreground: hsl(200 40% 5%);
+  --ring: hsl(162 90% 52%);
+  --border: hsl(160 60% 100% / 0.08);
+  --input: hsl(160 60% 100% / 0.1);
+  --sidebar: hsl(196 35% 6%);
+  --sidebar-primary: hsl(162 90% 52%);
+  --sidebar-ring: hsl(162 90% 52%);
+}
+html[data-skin="mint"].light {
+  --background: hsl(170 40% 97%);
+  --foreground: hsl(195 30% 10%);
+  --card: hsl(0 0% 100% / 0.65);
+  --card-foreground: hsl(195 30% 10%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(195 30% 10%);
+  --primary: hsl(166 78% 34%);
+  --primary-foreground: hsl(0 0% 100%);
+  --primary-glow: hsl(180 70% 40%);
+  --accent: hsl(184 72% 38%);
+  --accent-foreground: hsl(0 0% 100%);
+  --muted: hsl(195 12% 38%);
+  --muted-foreground: hsl(195 12% 38%);
+  --secondary: hsl(170 30% 93%);
+  --border: hsl(195 30% 10% / 0.12);
+  --input: hsl(195 30% 10% / 0.08);
+  --ring: hsl(166 78% 34%);
+}
+
+/* --- Noir Gold: pure black + editorial gold, minimal glow --- */
+html[data-skin="noir"] {
+  --background: hsl(0 0% 4%);
+  --foreground: hsl(45 20% 95%);
+  --card: hsl(0 0% 8% / 0.6);
+  --card-foreground: hsl(45 20% 95%);
+  --popover: hsl(0 0% 7%);
+  --popover-foreground: hsl(45 20% 95%);
+  --primary: hsl(43 62% 55%);
+  --primary-foreground: hsl(0 0% 6%);
+  --primary-glow: hsl(43 80% 74%);
+  --accent-amber: hsl(43 80% 74%);
+  --chrome-1: hsl(45 15% 88%);
+  --chrome-2: hsl(43 40% 68%);
+  --secondary: hsl(0 0% 12%);
+  --secondary-foreground: hsl(45 20% 95%);
+  --muted: hsl(45 6% 60%);
+  --muted-foreground: hsl(45 6% 60%);
+  --accent: hsl(43 70% 62%);
+  --accent-foreground: hsl(0 0% 6%);
+  --ring: hsl(43 62% 55%);
+  --border: hsl(45 30% 100% / 0.09);
+  --input: hsl(45 30% 100% / 0.1);
+  --sidebar: hsl(0 0% 6%);
+  --sidebar-primary: hsl(43 62% 55%);
+  --sidebar-ring: hsl(43 62% 55%);
+}
+html[data-skin="noir"].light {
+  --background: hsl(40 30% 97%);
+  --foreground: hsl(0 0% 8%);
+  --card: hsl(0 0% 100% / 0.7);
+  --card-foreground: hsl(0 0% 8%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(0 0% 8%);
+  --primary: hsl(40 60% 38%);
+  --primary-foreground: hsl(0 0% 100%);
+  --primary-glow: hsl(43 70% 52%);
+  --accent: hsl(43 65% 45%);
+  --accent-foreground: hsl(0 0% 100%);
+  --muted: hsl(40 6% 38%);
+  --muted-foreground: hsl(40 6% 38%);
+  --secondary: hsl(40 20% 93%);
+  --border: hsl(0 0% 8% / 0.14);
+  --input: hsl(0 0% 8% / 0.08);
+  --ring: hsl(40 60% 38%);
+}
+
+/* Noir keeps it calm: dial back the ambient orbs/grid. */
+html[data-skin="noir"] body::before { opacity: 0.5; }
+html[data-skin="noir"] body { background-attachment: fixed; }
