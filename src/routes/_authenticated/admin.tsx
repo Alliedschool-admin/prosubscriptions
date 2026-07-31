@@ -27,7 +27,7 @@ import {
   Megaphone,
   Ticket,
 } from "lucide-react";
-import { LineChart } from "lucide-react";
+import { LineChart, Palette } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
 import {
