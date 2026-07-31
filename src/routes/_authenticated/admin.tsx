@@ -74,6 +74,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImageInput } from "@/components/ImageInput";
 import { SalesAnalyticsPanel } from "@/components/admin/SalesAnalyticsPanel";
 import { BroadcastPanel } from "@/components/admin/BroadcastPanel";
+import { AppearancePanel } from "@/components/admin/AppearancePanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -97,7 +98,8 @@ type Tab =
   | "posts"
   | "coupons"
   | "analytics"
-  | "broadcasts";
+  | "broadcasts"
+  | "appearance";
 
 function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { t } = useI18n();
@@ -113,6 +115,7 @@ function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
     { id: "coupons" as const, label: t("tab.coupons"), icon: Ticket },
     { id: "analytics" as const, label: "Analytics", icon: LineChart },
     { id: "broadcasts" as const, label: "Broadcasts", icon: Send },
+    { id: "appearance" as const, label: "Appearance", icon: Palette },
   ];
   return (
     <nav
@@ -225,6 +228,7 @@ function Admin() {
       {tab === "coupons" && <CouponsPanel />}
       {tab === "analytics" && <SalesAnalyticsPanel />}
       {tab === "broadcasts" && <BroadcastPanel />}
+      {tab === "appearance" && <AppearancePanel />}
 
       <style>{`
         .input {
