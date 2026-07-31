@@ -90,6 +90,56 @@ export function AppearancePanel() {
         })}
       </div>
 
+      <header className="flex items-start gap-3 pt-2">
+        <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
+          <Layers className="size-5" />
+        </div>
+        <div>
+          <h2 className="text-lg font-extrabold tracking-tight">Background Style</h2>
+          <p className="text-sm text-muted">
+            Only one background is active at a time — it applies instantly for every visitor.
+          </p>
+        </div>
+      </header>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {BACKGROUNDS.map((b) => {
+          const active = background === b.id;
+          return (
+            <button
+              key={b.id}
+              type="button"
+              onClick={() => pickBg(b.id)}
+              disabled={savingBg}
+              className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition disabled:opacity-70 ${
+                active
+                  ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
+                  : "border-border bg-card hover:border-primary/50"
+              }`}
+            >
+              <div
+                className="h-24 w-full rounded-xl border border-border"
+                style={{ background: b.preview }}
+              />
+              <p className="mt-3 text-sm font-bold">{b.name}</p>
+              <p className="mt-1 text-xs text-muted">{b.blurb}</p>
+              <span
+                className={`mt-3 inline-flex items-center gap-1 rounded-full px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest ${
+                  active ? "bg-primary text-primary-foreground" : "bg-foreground/5 text-muted"
+                }`}
+              >
+                {savingBg && active ? (
+                  <Loader2 className="size-3 animate-spin" />
+                ) : active ? (
+                  <Check className="size-3" />
+                ) : null}
+                {active ? "Active" : "Apply"}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       <div className="rounded-2xl border border-border bg-card p-4">
         <p className="text-sm font-bold">Default brightness</p>
         <p className="mt-1 text-xs text-muted">
