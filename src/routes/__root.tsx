@@ -20,6 +20,7 @@ import { VisitorTracker } from "../components/VisitorTracker";
 import { WelcomePopup } from "../components/WelcomePopup";
 import { I18nProvider } from "../lib/i18n";
 import { ThemeProvider } from "../lib/theme";
+import { SkinProvider } from "../lib/skin";
 import { CommandPalette } from "../components/CommandPalette";
 import { BroadcastListener } from "../components/BroadcastListener";
 import { PurchaseTicker } from "../components/PurchaseTicker";
@@ -157,6 +158,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <SkinProvider>
         <I18nProvider>
           <AuthProvider>
             <CartProvider>
@@ -175,6 +177,7 @@ function RootComponent() {
             </CartProvider>
           </AuthProvider>
         </I18nProvider>
+        </SkinProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
