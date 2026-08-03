@@ -27,7 +27,7 @@ import {
   Megaphone,
   Ticket,
 } from "lucide-react";
-import { LineChart, Palette } from "lucide-react";
+import { LineChart, Palette, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { categories, type Category } from "../../lib/mock-data";
 import {
@@ -75,6 +75,7 @@ import { ImageInput } from "@/components/ImageInput";
 import { SalesAnalyticsPanel } from "@/components/admin/SalesAnalyticsPanel";
 import { BroadcastPanel } from "@/components/admin/BroadcastPanel";
 import { AppearancePanel } from "@/components/admin/AppearancePanel";
+import { MobileAppPanel } from "@/components/admin/MobileAppPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -99,7 +100,8 @@ type Tab =
   | "coupons"
   | "analytics"
   | "broadcasts"
-  | "appearance";
+  | "appearance"
+  | "mobile";
 
 function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { t } = useI18n();
@@ -116,6 +118,7 @@ function AdminTabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
     { id: "analytics" as const, label: "Analytics", icon: LineChart },
     { id: "broadcasts" as const, label: "Broadcasts", icon: Send },
     { id: "appearance" as const, label: "Appearance", icon: Palette },
+    { id: "mobile" as const, label: "Mobile App", icon: Smartphone },
   ];
   return (
     <nav
@@ -229,6 +232,7 @@ function Admin() {
       {tab === "analytics" && <SalesAnalyticsPanel />}
       {tab === "broadcasts" && <BroadcastPanel />}
       {tab === "appearance" && <AppearancePanel />}
+      {tab === "mobile" && <MobileAppPanel />}
 
       <style>{`
         .input {
