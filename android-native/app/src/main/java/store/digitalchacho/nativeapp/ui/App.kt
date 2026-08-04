@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -22,6 +23,7 @@ import store.digitalchacho.nativeapp.ui.components.AuroraBackground
 import store.digitalchacho.nativeapp.ui.components.BroadcastBanner
 import store.digitalchacho.nativeapp.ui.components.OfflineBanner
 import store.digitalchacho.nativeapp.ui.screens.*
+
 
 private data class Tab(val route: String, val label: String, val icon: ImageVector)
 
