@@ -1,20 +1,20 @@
-import { Download, Smartphone, Hammer, Rocket } from "lucide-react";
+import { Download, Smartphone, Hammer, Rocket, Sparkles } from "lucide-react";
 
 const STEPS = [
   {
     icon: Download,
     title: "Download the package",
-    body: "Grab the zip below — it contains the complete Android Studio project for the Digital Chacho app.",
+    body: "Grab the native v2 package below — it is a full Kotlin + Jetpack Compose app, no WebView required.",
   },
   {
     icon: Hammer,
-    title: "Build the APK",
-    body: "Open the folder in Android Studio, then Build → Build APK(s). The APK appears in app/build/outputs/apk/.",
+    title: "Build or install",
+    body: "Install the APK directly on your phone, or open the project in Android Studio to customize and sign a release build.",
   },
   {
     icon: Rocket,
-    title: "Install or publish",
-    body: "Share the APK directly with customers, or sign it and upload the .aab to Google Play.",
+    title: "Share or publish",
+    body: "Share the APK with customers, or sign the AAB and upload it to Google Play.",
   },
 ];
 
@@ -28,34 +28,34 @@ export function MobileAppPanel() {
         <div>
           <h2 className="text-lg font-extrabold tracking-tight">Mobile app (Android)</h2>
           <p className="text-sm text-muted">
-            Offline-first native shell: the full store loads from the device even with no internet, then syncs silently when a connection returns. Sign in, admin and checkout ask for a connection. Google sign-in works, pull-to-refresh syncs on demand,
-            and WhatsApp/payment links open in their own apps.
+            Fully native v2 app: built in Kotlin with Jetpack Compose, loads products offline, syncs when online,
+            and supports email sign-in, Google OAuth, cart, checkout, proof upload, coupons, My Vault, requests, and admin.
           </p>
         </div>
       </header>
 
       <div className="rounded-2xl border border-border bg-card p-5">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-          Ready to build
+          Native v2.0
         </p>
-        <h3 className="mt-2 text-xl font-extrabold tracking-tight">Digital Chacho · v1.3</h3>
+        <h3 className="mt-2 text-xl font-extrabold tracking-tight">Digital Chacho · Native v2.0</h3>
         <p className="mt-1 text-sm text-muted">
-          Android project package · package id <span className="font-mono">store.digitalchacho.app</span>
+          Kotlin + Jetpack Compose · package id <span className="font-mono">store.digitalchacho.nativeapp</span>
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a
-            href="/downloads/digital-chacho-android.zip?v=1.3"
+            href="/downloads/digital-chacho-native-v2.zip?v=2.0"
             download
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition hover:brightness-110"
           >
-            <Download className="size-4" /> Download app package
+            <Download className="size-4" /> Download project package
           </a>
           <a
-            href="/downloads/digital-chacho-app.apk?v=1.3"
+            href="/__l5e/assets-v1/6b08e508-07c9-40cf-a719-57e6be80dcc8/digital-chacho-native-v2.apk"
             download
             className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-foreground transition hover:bg-foreground/5"
           >
-            <Smartphone className="size-4" /> Download APK
+            <Sparkles className="size-4" /> Download APK
           </a>
         </div>
         <p className="mt-3 text-xs text-muted">
@@ -63,6 +63,33 @@ export function MobileAppPanel() {
           customers. For Google Play you must sign a release build (steps included in the package
           README).
         </p>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card/50 p-5">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
+          Legacy v1.3
+        </p>
+        <h3 className="mt-2 text-lg font-extrabold tracking-tight">Digital Chacho · WebView v1.3</h3>
+        <p className="mt-1 text-sm text-muted">
+          Offline-first WebView shell: the store loads from the device even with no internet, then syncs silently.
+          Google sign-in works, pull-to-refresh syncs on demand, and WhatsApp/payment links open in their own apps.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <a
+            href="/downloads/digital-chacho-android.zip?v=1.3"
+            download
+            className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-foreground transition hover:bg-foreground/5"
+          >
+            <Download className="size-4" /> Download v1.3 project
+          </a>
+          <a
+            href="/downloads/digital-chacho-app.apk?v=1.3"
+            download
+            className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-foreground transition hover:bg-foreground/5"
+          >
+            <Smartphone className="size-4" /> Download v1.3 APK
+          </a>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
