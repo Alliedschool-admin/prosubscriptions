@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "../hooks/use-auth";
 import { isDisposableEmail } from "../lib/disposable-emails";
+import { useOnline } from "../hooks/use-online";
+import { OfflineGate } from "../components/OfflineNotice";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -87,6 +89,7 @@ function AuthPage() {
     }
   }
 
+  const online = useOnline();
   const isReset = mode === "reset";
 
   return (
@@ -108,7 +111,11 @@ function AuthPage() {
           </p>
         </div>
 
-        {!isReset && (
+        {!online ? (
+          <OfflineGate action="sign in or create an account" />
+        ) : null}
+
+        {online && !isReset && (
           <>
             <button
               onClick={onGoogle}
@@ -126,6 +133,7 @@ function AuthPage() {
           </>
         )}
 
+        {online ? (
         <form onSubmit={onEmailSubmit} className="space-y-3">
           <input
             type="email"
@@ -173,7 +181,9 @@ function AuthPage() {
                   : "Create account"}
           </button>
         </form>
+        ) : null}
 
+        {online ? (
         <p className="mt-6 text-center text-sm text-muted">
           {isReset ? (
             <>
@@ -207,6 +217,7 @@ function AuthPage() {
             </>
           )}
         </p>
+        ) : null}
 
         <p className="mt-8 text-center">
           <Link to="/" className="font-mono text-[10px] uppercase tracking-widest text-muted">

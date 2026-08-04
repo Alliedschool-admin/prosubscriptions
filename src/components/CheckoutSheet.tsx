@@ -14,10 +14,12 @@ import {
 } from "../lib/orders-store";
 import { toast } from "sonner";
 import { formatMoney, type Currency } from "../lib/price";
+import { useOnline } from "../hooks/use-online";
 
 export function CheckoutSheet() {
   const { item, isOpen, close } = useCart();
   const { user } = useAuth();
+  const online = useOnline();
   const { data: methods = [], isLoading: methodsLoading } = usePaymentMethods({ activeOnly: true });
   const invalidateOrders = useOrdersInvalidator();
 
@@ -506,10 +508,14 @@ export function CheckoutSheet() {
               <div className="border-t border-border p-6">
                 <button
                   onClick={submitOrder}
-                  disabled={submitting || !selectedMethod}
+                  disabled={submitting || !selectedMethod || !online}
                   className="w-full rounded-xl bg-primary py-4 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-transform active:scale-[0.98] disabled:opacity-60"
                 >
-                  {submitting ? "Submitting…" : `Submit for verification · ${money(total)}`}
+                  {!online
+                    ? "Offline · connect to submit"
+                    : submitting
+                      ? "Submitting…"
+                      : `Submit for verification · ${money(total)}`}
                 </button>
                 <p className="mt-3 flex items-center justify-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted">
                   <Lock className="size-3" /> Manually verified · No card data stored
