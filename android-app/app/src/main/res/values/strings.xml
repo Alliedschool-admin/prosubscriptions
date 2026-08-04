@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Digital Chacho</string>
+    <string name="site_url">https://www.digitalchacho.store</string>
+    <string name="offline_message">You are offline. Check your connection and pull down to retry.</string>
+</resources>
