@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Digital Chacho</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: radial-gradient(120% 80% at 50% 0%, #16121f 0%, #0b0b0f 60%, #07070a 100%);
+    color: #f5f5f7;
+    font-family: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; text-align: center; padding: 32px;
+  }
+  .halo {
+    width: 108px; height: 108px; border-radius: 50%;
+    background: conic-gradient(from 0deg, #ff8a3d, #ffd166, #4cc9f0, #ff8a3d);
+    display: grid; place-items: center;
+    animation: spin 3.6s linear infinite;
+    box-shadow: 0 0 44px rgba(255, 138, 61, .35);
+  }
+  .halo span {
+    width: 92px; height: 92px; border-radius: 50%;
+    background: #0b0b0f; display: grid; place-items: center;
+    font-weight: 800; font-size: 30px; letter-spacing: 1px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  h1 { font-size: 20px; margin: 0; letter-spacing: .02em; }
+  p { margin: 0; font-size: 13px; color: #a1a1aa; max-width: 280px; line-height: 1.5; }
+  .bar { width: 168px; height: 3px; border-radius: 99px; background: #1d1d24; overflow: hidden; }
+  .bar i { display: block; width: 40%; height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #ff8a3d, #ffd166); animation: slide 1.15s ease-in-out infinite; }
+  @keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(320%); } }
+  #offline { display: none; }
+  body.offline #loading { display: none; }
+  body.offline #offline { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  button {
+    border: 0; border-radius: 14px; padding: 12px 22px; font-weight: 800; font-size: 13px;
+    letter-spacing: .08em; text-transform: uppercase; color: #0b0b0f;
+    background: linear-gradient(90deg, #ff8a3d, #ffd166);
+  }
+</style>
+</head>
+<body>
+  <div class="halo"><span>DC</span></div>
+  <h1>Digital Chacho</h1>
+  <div id="loading">
+    <p>Opening your store&hellip;</p>
+    <div class="bar"><i></i></div>
+  </div>
+  <div id="offline">
+    <p>You are offline. The app is running from your device &mdash; reconnect to sync the latest products and orders.</p>
+    <button onclick="window.DCApp &amp;&amp; window.DCApp.retry()">Try again</button>
+  </div>
+  <script>
+    window.dcShowOffline = function () { document.body.classList.add("offline"); };
+  </script>
+</body>
+</html>
