@@ -36,6 +36,8 @@ fun AuthScreen(nav: NavController) {
     var password by remember { mutableStateOf("") }
     var fullName by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
+    var awaitingConfirm by remember { mutableStateOf(false) }
+    val emailValid = Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}$").matches(email.trim())
 
     if (AppState.signedIn.value) {
         Column(Modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.Center) {
@@ -78,13 +80,25 @@ fun AuthScreen(nav: NavController) {
         if (mode != "reset") {
             Spacer(Modifier.height(10.dp))
             Field(password, { password = it }, "Password", password = true)
+            if (mode == "up" && password.isNotEmpty() && password.length < 6) {
+                Spacer(Modifier.height(6.dp))
+                Text("Use at least 6 characters", color = DC.Muted, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+        if (awaitingConfirm) {
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "We emailed you a confirmation link. Open it, then come back and sign in.",
+                color = DC.Gold, style = MaterialTheme.typography.bodySmall,
+            )
         }
         Spacer(Modifier.height(16.dp))
 
         GradientButton(
             when (mode) { "up" -> "Create account"; "reset" -> "Send reset link"; else -> "Sign in" },
             Modifier.fillMaxWidth(),
-            enabled = email.isNotBlank() && (mode == "reset" || password.length >= 6),
+            enabled = emailValid && (mode == "reset" || password.length >= 6) &&
+                (mode != "up" || fullName.trim().length >= 2),
             loading = busy,
         ) {
             val domain = email.substringAfterLast('@', "").lowercase().trim()
@@ -92,6 +106,7 @@ fun AuthScreen(nav: NavController) {
                 AppState.notify("Temporary email services aren't allowed"); return@GradientButton
             }
             busy = true
+            awaitingConfirm = false
             scope.launch {
                 runCatching {
                     when (mode) {
@@ -99,30 +114,32 @@ fun AuthScreen(nav: NavController) {
                         "reset" -> Api.resetPassword(email.trim())
                         else -> Api.signIn(email.trim(), password)
                     }
-                }.onSuccess {
+                }.onSuccess { result ->
                     busy = false
                     when (mode) {
                         "reset" -> AppState.notify("Reset link sent — check your inbox")
                         "up" -> {
-                            if (Session.signedIn) {
+                            if (result == true && Session.signedIn) {
                                 AppState.afterSignIn(); AppState.notify("Welcome to Digital Chacho"); nav.navigate("home")
-                            } else AppState.notify("Check your email to confirm your account")
+                            } else {
+                                awaitingConfirm = true
+                                mode = "in"
+                                password = ""
+                                AppState.notify("Check your email to confirm your account")
+                            }
                         }
                         else -> { AppState.afterSignIn(); AppState.notify("Signed in"); nav.navigate("home") }
                     }
                 }.onFailure {
                     busy = false
-                    AppState.notify(it.message ?: "Something went wrong")
+                    AppState.notify(it.message ?: "Something went wrong. Check your connection and try again.")
                 }
             }
         }
 
         Spacer(Modifier.height(12.dp))
         GhostButton("Continue with Google", Modifier.fillMaxWidth()) {
-            openUrl(
-                ctx,
-                "${Env.authUrl}/authorize?provider=google&redirect_to=${Env.REDIRECT_SCHEME}",
-            )
+            openUrl(ctx, Api.googleAuthUrl())
         }
 
         Spacer(Modifier.height(18.dp))
