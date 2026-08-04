@@ -250,10 +250,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onRenderProcessGone(WebView view, android.webkit.RenderProcessGoneDetail detail) {
+        public boolean onRenderProcessGone(WebView view, android.webkit.RenderProcessGoneDetail detail) {
             // Never leave a dead (black) WebView behind — rebuild the session.
             Log.e(TAG, "render process gone, restarting");
             recreate();
+            return true;
         }
     }
 
