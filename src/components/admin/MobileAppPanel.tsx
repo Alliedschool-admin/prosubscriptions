@@ -28,8 +28,7 @@ export function MobileAppPanel() {
         <div>
           <h2 className="text-lg font-extrabold tracking-tight">Mobile app (Android)</h2>
           <p className="text-sm text-muted">
-            Offline-first native shell: the app opens instantly from the device, then syncs the
-            live store in the background. Google sign-in works, pull-to-refresh syncs on demand,
+            Offline-first native shell: the full store loads from the device even with no internet, then syncs silently when a connection returns. Sign in, admin and checkout ask for a connection. Google sign-in works, pull-to-refresh syncs on demand,
             and WhatsApp/payment links open in their own apps.
           </p>
         </div>
