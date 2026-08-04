@@ -1,101 +1,33 @@
-# Vault.01 — Improvement Plan
+# Offline-first native store app (v1.3)
 
-A prioritized set of upgrades across performance, UX, i18n, admin, and quality. Grouped so you can approve everything or cherry-pick.
+Goal: after install, the app opens and shows the **full store** — products, prices, images, pages — with **no internet at all**. Anything that truly needs the server (sign in, admin, checkout, claiming a product) asks for a connection instead of failing silently.
 
----
+## How it will work
 
-## 1. Translation system (biggest win)
+```text
+launch
+  ├─ instant local boot screen (already shipped)
+  ├─ load bundled store snapshot from inside the app  ← works with zero internet
+  └─ if online → quietly load the live store and save a fresh snapshot for next time
+```
 
-Current: every visible text node is sent to the AI gateway on language switch — slow, expensive, and flickers.
+1. **Bundled store snapshot.** The APK ships a copy of the storefront (HTML/CSS/JS shell + a products.json + product thumbnails) inside `assets/`. Served locally through Android's asset loader on a `https://appassets.androidplatform.net` origin, so the same site code runs unchanged and browser storage/session stays valid.
+2. **Cache-then-network.** Offline or slow: the snapshot renders immediately. Online: the live site loads in the background and replaces the view once ready; the downloaded copy is written to app storage so the next cold start (even offline) shows the newest products, not the install-day ones.
+3. **Silent sync.** On resume, on pull-to-refresh, and when connectivity returns, the app refreshes the snapshot in the background — no spinner, no interruption.
+4. **Online-only actions.** Sign in / Google sign-in, admin panel, checkout, free-claim, requests and reviews are gated: with no connection the app shows a clean "You're offline — connect to sign in" sheet with a retry, instead of a dead form. Browsing, product details, My Vault (already-purchased list from the last sync) stay readable offline.
+5. **Offline badge.** A small "Offline — showing your saved store" pill at the top while there is no connection, which disappears the moment sync succeeds.
 
-Improvements:
-- Ship a **static dictionary** for all built-in UI strings (nav, buttons, tabs, product card labels, checkout, admin). Instant switch, zero API calls for the app shell.
-- Keep the AI DOM-translator **only as a fallback** for dynamic/user content (product names, descriptions, posts).
-- Precompute translations for mock product data (name, tagline, description) at build time and store alongside `mock-data.ts`.
-- Add a small **language switch spinner** + skeleton so users see progress instead of English flashing.
-- Persist cache with a version key so dictionary updates invalidate cleanly.
+## Technical notes
 
-## 2. Theming & design polish
+- `MainActivity.java`: add `WebViewAssetLoader` with an assets path handler plus an app-storage handler, so the snapshot can be updated after install. Boot order becomes boot.html → snapshot → live site.
+- Snapshot writer: on a successful live load, fetch `/` plus the product API payload and store under `filesDir/snapshot/`; serve that folder ahead of the bundled assets when present.
+- Connectivity: `ConnectivityManager.NetworkCallback` (registered in `onStart`) replaces polling, driving the offline pill and the online-only gate.
+- JS bridge gains `DCApp.isOnline()` so the web app can disable sign-in/checkout buttons offline; used by a small guard in the web app's auth/checkout entry points (no change to auth or payment logic itself).
+- `AndroidManifest.xml`: no new permissions needed.
+- Web side: a tiny `useNativeOnline()` helper reads the bridge (falls back to `navigator.onLine` in browsers) and renders the offline sheet. Nothing else in the store logic changes.
+- Version bumps to `1.3` / versionCode 4; rebuild APK + project zip and update the Admin → Mobile App download panel.
 
-- Fix any remaining light-mode contrast issues (ember accent on light bg, borders, muted text).
-- Add smooth theme-transition (200ms) on `color`, `background`, `border` — avoid jarring flash.
-- Respect `prefers-reduced-motion` for the subtle/premium motion set.
-- Ensure focus rings visible in both themes (currently faint in dark).
+## Limits worth knowing
 
-## 3. Admin panel (mobile responsiveness)
-
-- Convert the tabs bar into a **horizontal scroll-snap** row with fade edges on <640px, and a **grouped dropdown** ("More ▾") on very small screens.
-- Sticky sub-header per tab with search + primary action.
-- Tables → **card list** on mobile (already partial); finish for Orders, Requests, Users.
-- Add empty states and skeleton loaders per tab.
-
-## 4. Performance
-
-- Route-level **code splitting** for admin (heaviest bundle).
-- Lazy-load product images with `loading="lazy"` + blurred placeholder.
-- Prefetch on `<Link>` hover for product detail.
-- Debounce search input (150ms).
-- Move translation cache to IndexedDB when it exceeds ~200KB.
-
-## 5. SEO & metadata
-
-- Unique `head()` per route with real titles/descriptions (some still generic).
-- Add JSON-LD `Product` schema on product detail pages.
-- Generate an `og:image` per product (already have hero art — wire it in).
-- Add `sitemap.xml` + `robots.txt` route.
-
-## 6. Auth & account UX
-
-- Post-login redirect back to the originally requested page.
-- "Forgot password" flow polish (already exists — add success toast + resend cooldown).
-- Show provider (Google / email) on the account panel.
-- Session-expired toast + auto-redirect to `/auth`.
-
-## 7. Checkout & orders
-
-- Persist cart in `localStorage` so refresh doesn't lose it.
-- Order confirmation email (via Lovable Cloud — optional).
-- "Recent orders" widget on dashboard with re-download.
-
-## 8. Community / posts
-
-- Optimistic UI on like / comment.
-- Image upload with client-side compression before upload.
-- Report / hide post action for admins.
-
-## 9. Accessibility
-
-- Audit color contrast (WCAG AA) in both themes.
-- Add `aria-label` on icon-only buttons (lang switcher, theme toggle, nav).
-- Trap focus in `CheckoutSheet` and close on Esc.
-- Announce language change to screen readers.
-
-## 10. Developer quality
-
-- Add `eslint-plugin-jsx-a11y` rules.
-- Wire a `bunx vitest` smoke test for translate function + cart reducer.
-- Add error boundary per route with retry.
-
----
-
-## Suggested first slice (if you want a smaller scope)
-
-**Phase A (high impact, ~1 pass):**
-- #1 Static dictionary + fallback AI translator
-- #3 Admin mobile tabs (scroll-snap + More menu)
-- #2 Theme transition + focus rings
-- #5 Per-route metadata + product JSON-LD
-
-**Phase B (next):**
-- #4 Perf (code split admin, lazy images)
-- #6 Auth redirect + session toast
-- #7 Cart persistence
-- #9 A11y pass
-
-**Phase C (polish):**
-- #8 Community optimistic UI
-- #10 Tests + a11y lint
-
----
-
-Approve the whole plan, pick a phase, or tell me which numbered items to build.
+- The bundled snapshot is a point-in-time copy, so a fully offline first launch shows install-day products until the first online sync.
+- Product **delivery** (keys, links, downloads) always needs internet — it comes from the server on demand.
