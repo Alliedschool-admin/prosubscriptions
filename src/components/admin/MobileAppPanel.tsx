@@ -28,8 +28,7 @@ export function MobileAppPanel() {
         <div>
           <h2 className="text-lg font-extrabold tracking-tight">Mobile app (Android)</h2>
           <p className="text-sm text-muted">
-            Offline-first native shell: the app opens instantly from the device, then syncs the
-            live store in the background. Google sign-in works, pull-to-refresh syncs on demand,
+            Offline-first native shell: the full store loads from the device even with no internet, then syncs silently when a connection returns. Sign in, admin and checkout ask for a connection. Google sign-in works, pull-to-refresh syncs on demand,
             and WhatsApp/payment links open in their own apps.
           </p>
         </div>
@@ -39,20 +38,20 @@ export function MobileAppPanel() {
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
           Ready to build
         </p>
-        <h3 className="mt-2 text-xl font-extrabold tracking-tight">Digital Chacho · v1.2</h3>
+        <h3 className="mt-2 text-xl font-extrabold tracking-tight">Digital Chacho · v1.3</h3>
         <p className="mt-1 text-sm text-muted">
           Android project package · package id <span className="font-mono">store.digitalchacho.app</span>
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a
-            href="/downloads/digital-chacho-android.zip?v=1.2"
+            href="/downloads/digital-chacho-android.zip?v=1.3"
             download
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition hover:brightness-110"
           >
             <Download className="size-4" /> Download app package
           </a>
           <a
-            href="/downloads/digital-chacho-app.apk?v=1.2"
+            href="/downloads/digital-chacho-app.apk?v=1.3"
             download
             className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-foreground transition hover:bg-foreground/5"
           >

@@ -25,6 +25,7 @@ import { BackgroundProvider } from "../lib/background";
 import { SiteBackground } from "../components/SiteBackground";
 import { CommandPalette } from "../components/CommandPalette";
 import { BroadcastListener } from "../components/BroadcastListener";
+import { OfflineBanner } from "../components/OfflineNotice";
 import { PurchaseTicker } from "../components/PurchaseTicker";
 import { useReveal } from "../hooks/useReveal";
 
@@ -168,6 +169,7 @@ function RootComponent() {
               <div className="min-h-screen bg-background text-foreground antialiased">
                 <SiteBackground />
                 <div className="relative z-10">
+                  <OfflineBanner />
                   <TopNav />
                   <Outlet />
                 </div>

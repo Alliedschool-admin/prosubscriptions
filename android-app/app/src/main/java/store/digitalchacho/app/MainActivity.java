@@ -8,8 +8,10 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,12 +19,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -32,7 +34,6 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.JavascriptInterface;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -41,21 +42,24 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.util.Map;
+
 /**
- * Digital Chacho shell — offline-first.
+ * Digital Chacho shell — offline-first native app.
  *
  * Boot order:
- *   1. Local boot screen from assets renders instantly (no network needed).
- *   2. Store loads from the WebView's on-device cache when available, network when online.
- *   3. When connectivity returns, the shell silently syncs (reloads) the store.
+ *   1. Bundled boot screen renders instantly (no network needed).
+ *   2. The store loads from the on-device snapshot — full store, zero internet.
+ *   3. When online, every request is refetched and the snapshot is refreshed silently.
  *
- * Google / social sign-in works because popups (window.open) are supported and the
- * user agent is a plain Chrome UA — Google rejects "wv" WebView agents.
+ * Sign-in / admin / checkout need the server: the web app asks DCApp.isOnline()
+ * and shows a "connect to continue" state instead of a dead form.
  */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "DigitalChacho";
     private static final int LOAD_TIMEOUT_MS = 18000;
+    private static final String BOOT_URL = "file:///android_asset/boot.html";
 
     private WebView webView;
     private WebView popupView;
@@ -63,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout refreshLayout;
     private FrameLayout root;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private OfflineCache cache;
 
     private boolean storeLoaded = false;
     private boolean usedFallback = false;
@@ -71,15 +76,17 @@ public class MainActivity extends AppCompatActivity {
     private ValueCallback<Uri[]> filePathCallback;
     private ActivityResultLauncher<Intent> fileChooser;
     private Runnable timeoutTask;
+    private ConnectivityManager.NetworkCallback netCallback;
 
     private String primaryUrl() { return getString(R.string.site_url); }
     private String fallbackUrl() { return getString(R.string.site_url_fallback); }
-    private static final String BOOT_URL = "file:///android_asset/boot.html";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        cache = new OfflineCache(this);
 
         fileChooser = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -132,11 +139,11 @@ public class MainActivity extends AppCompatActivity {
             bootScreenVisible = false;
             webView.restoreState(savedInstanceState);
         } else {
-            // 1. Instant local screen — never a black screen, even with no network.
             webView.loadUrl(BOOT_URL);
-            // 2. Hand over to the store (cache first, then network).
-            handler.postDelayed(this::loadStore, 220);
+            handler.postDelayed(this::loadStore, 200);
         }
+
+        registerNetworkCallback();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -158,16 +165,14 @@ public class MainActivity extends AppCompatActivity {
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WebView.setWebContentsDebuggingEnabled(true);
-        }
+        WebView.setWebContentsDebuggingEnabled(true);
     }
 
     /** Google blocks embedded WebViews ("; wv"). Present a plain Chrome UA instead. */
     private String chromeUserAgent(String original) {
         String ua = original == null ? "" : original;
         ua = ua.replace("; wv)", ")").replace("; wv", "");
-        return ua + " DigitalChacho/1.2";
+        return ua + " DigitalChacho/1.3";
     }
 
     private void loadStore() {
@@ -202,6 +207,54 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void registerNetworkCallback() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return;
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm == null) return;
+            netCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    handler.post(() -> {
+                        notifyConnectivity(true);
+                        if (wasOffline || !storeLoaded) syncNow();
+                    });
+                }
+
+                @Override
+                public void onLost(Network network) {
+                    handler.post(() -> notifyConnectivity(false));
+                }
+            };
+            cm.registerNetworkCallback(new NetworkRequest.Builder()
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build(), netCallback);
+        } catch (Exception e) {
+            netCallback = null;
+        }
+    }
+
+    private void notifyConnectivity(boolean online) {
+        if (webView == null) return;
+        webView.evaluateJavascript(
+                "window.dispatchEvent(new Event('" + (online ? "online" : "offline") + "'));"
+                + "window.__dcOnline=" + online + ";", null);
+    }
+
+    private boolean isStoreHost(String host) {
+        return host.endsWith("digitalchacho.store") || host.endsWith("lovable.app");
+    }
+
+    /** Cacheable = the store shell, its assets, and read-only backend GETs. */
+    private boolean isCacheable(WebResourceRequest request) {
+        if (request == null) return false;
+        if (!"GET".equalsIgnoreCase(request.getMethod())) return false;
+        Uri url = request.getUrl();
+        String scheme = url.getScheme() == null ? "" : url.getScheme();
+        if (!scheme.startsWith("http")) return false;
+        String host = url.getHost() == null ? "" : url.getHost();
+        return isStoreHost(host) || host.endsWith("supabase.co");
+    }
+
     private class StoreWebViewClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -225,8 +278,9 @@ public class MainActivity extends AppCompatActivity {
             }
             bootScreenVisible = false;
             storeLoaded = true;
-            wasOffline = false;
             cancelTimeout();
+            notifyConnectivity(isOnline());
+            wasOffline = !isOnline();
         }
 
         @Override
@@ -245,16 +299,43 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-            return super.shouldInterceptRequest(view, request);
-        }
-
-        @Override
         public boolean onRenderProcessGone(WebView view, android.webkit.RenderProcessGoneDetail detail) {
-            // Never leave a dead (black) WebView behind — rebuild the session.
             Log.e(TAG, "render process gone, restarting");
             recreate();
             return true;
+        }
+
+        /**
+         * Offline-first request pipeline:
+         *   offline → serve the stored copy immediately
+         *   online  → fetch, refresh the stored copy, fall back to it if the network fails
+         */
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            if (!isCacheable(request)) return null;
+            String url = request.getUrl().toString();
+            Map<String, String> headers = request.getRequestHeaders();
+
+            if (!isOnline()) {
+                OfflineCache.Entry stored = cache.read(url);
+                if (stored != null) {
+                    return new WebResourceResponse(stored.mime, stored.encoding,
+                            OfflineCache.stream(stored.body));
+                }
+                return null;
+            }
+
+            OfflineCache.Entry fresh = cache.fetchAndStore(url, headers);
+            if (fresh != null) {
+                return new WebResourceResponse(fresh.mime, fresh.encoding,
+                        OfflineCache.stream(fresh.body));
+            }
+            OfflineCache.Entry stored = cache.read(url);
+            if (stored != null) {
+                return new WebResourceResponse(stored.mime, stored.encoding,
+                        OfflineCache.stream(stored.body));
+            }
+            return null;
         }
     }
 
@@ -277,16 +358,18 @@ public class MainActivity extends AppCompatActivity {
                 || host.endsWith("microsoftonline.com"));
     }
 
-    /** Fall back to the mirror, then to the on-device cache, then to the offline screen. */
+    /** Fall back to the mirror, then to the on-device snapshot, then to the offline screen. */
     private void recoverFromFailure() {
+        if (cache.has(primaryUrl())) {
+            // The snapshot can render the whole store without any network.
+            webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+            webView.loadUrl(primaryUrl());
+            wasOffline = true;
+            return;
+        }
         if (!usedFallback) {
             usedFallback = true;
             webView.loadUrl(fallbackUrl());
-            return;
-        }
-        if (webView.getSettings().getCacheMode() != WebSettings.LOAD_CACHE_ONLY && storeLoaded) {
-            webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ONLY);
-            webView.loadUrl(primaryUrl());
             return;
         }
         showOfflineScreen();
@@ -301,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
                 350);
     }
 
-    /** Called from boot.html's Try again button. */
+    /** Bridge used by boot.html and by the web app to know if the server is reachable. */
     private class BootBridge {
         @JavascriptInterface
         public void retry() {
@@ -311,6 +394,21 @@ public class MainActivity extends AppCompatActivity {
                         isOnline() ? WebSettings.LOAD_DEFAULT : WebSettings.LOAD_CACHE_ELSE_NETWORK);
                 loadStore();
             });
+        }
+
+        @JavascriptInterface
+        public boolean isOnline() {
+            return MainActivity.this.isOnline();
+        }
+
+        @JavascriptInterface
+        public boolean isNativeApp() {
+            return true;
+        }
+
+        @JavascriptInterface
+        public void sync() {
+            handler.post(MainActivity.this::syncNow);
         }
     }
 
@@ -363,7 +461,6 @@ public class MainActivity extends AppCompatActivity {
             popupDialog.setOnDismissListener(d -> {
                 popupDialog = null;
                 popupView = null;
-                // Sign-in finished (or was cancelled) — pick up the new session.
                 if (storeLoaded) webView.reload();
             });
             popupDialog.show();
@@ -423,7 +520,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Connection came back while the app was open → sync quietly.
         if (isOnline() && (wasOffline || !storeLoaded)) syncNow();
     }
 
@@ -444,6 +540,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         cancelTimeout();
         closePopup();
+        if (netCallback != null) {
+            try {
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (cm != null) cm.unregisterNetworkCallback(netCallback);
+            } catch (Exception ignored) { }
+        }
         super.onDestroy();
     }
 }
