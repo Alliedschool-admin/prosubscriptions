@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Digital Chacho</string>
+    <string name="site_url">https://www.digitalchacho.store</string>
+    <string name="site_url_fallback">https://prosubscriptions.lovable.app</string>
+    <string name="offline_message">Couldn\'t load the store. Check your connection and try again.</string>
+    <string name="retry">Try again</string>
+</resources>
