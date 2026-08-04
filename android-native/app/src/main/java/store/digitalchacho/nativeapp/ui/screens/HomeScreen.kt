@@ -6,9 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -171,17 +168,9 @@ fun HomeScreen(nav: NavController) {
         } else if (visible.isEmpty()) {
             item { EmptyState("Nothing here yet", "Try another search or pull sync to refresh the store.") }
         } else {
-            item {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 4000.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    userScrollEnabled = false,
-                ) {
-                    items(visible, key = { it.id }) { p ->
+            items(visible.chunked(2)) { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    row.forEach { p ->
                         ProductCardView(
                             product = p,
                             currency = currency,
@@ -192,8 +181,10 @@ fun HomeScreen(nav: NavController) {
                                 else { AppState.addToCart(p); nav.navigate("cart") }
                             },
                             onWishlist = { AppState.toggleWishlist(p.id) },
+                            modifier = Modifier.weight(1f),
                         )
                     }
+                    if (row.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
         }
