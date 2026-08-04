@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Digital Chacho</string>
+    <string name="offline_message">Couldn\'t load the store. Check your connection and try again.</string>
+    <string name="retry">Try again</string>
+    <string name="site_url">https://www.digitalchacho.store</string>
+    <string name="site_url_fallback">https://prosubscriptions.lovable.app</string>
+    <style name="Theme.DigitalChacho" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#0B0B0F</item>
+        <item name="android:navigationBarColor">#0B0B0F</item>
+        <item name="android:windowBackground">#0B0B0F</item>
+    </style>
+</resources>
