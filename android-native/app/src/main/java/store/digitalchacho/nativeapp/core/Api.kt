@@ -55,7 +55,21 @@ object Api {
             ?: parsed?.get("error_description")?.jsonPrimitive?.contentOrNullSafe()
             ?: parsed?.get("msg")?.jsonPrimitive?.contentOrNullSafe()
             ?: parsed?.get("error")?.jsonPrimitive?.contentOrNullSafe()
-        return msg ?: "Request failed ($code)"
+        val errorCode = parsed?.get("error_code")?.jsonPrimitive?.contentOrNullSafe()
+        val friendly = when {
+            errorCode == "invalid_credentials" || msg?.contains("Invalid login", true) == true ->
+                "Wrong email or password. Check both and try again."
+            errorCode == "email_not_confirmed" || msg?.contains("not confirmed", true) == true ->
+                "Confirm your email first — open the link we sent you, then sign in."
+            errorCode == "user_already_exists" || msg?.contains("already registered", true) == true ->
+                "That email already has an account — sign in instead."
+            errorCode == "weak_password" -> "Password too weak. Use at least 6 characters."
+            errorCode == "over_email_send_rate_limit" || code == 429 ->
+                "Too many attempts. Wait a minute and try again."
+            code == 401 || code == 403 -> msg ?: "Not allowed. Please try again."
+            else -> msg
+        }
+        return friendly ?: "Request failed ($code)"
     }
 
     private fun JsonPrimitive.contentOrNullSafe(): String? = runCatching { content }.getOrNull()
@@ -75,8 +89,11 @@ object Api {
     // ------------------------------------------------------------------- auth
 
     private fun storeSession(payload: JsonObject) {
-        Session.accessToken = payload["access_token"]?.jsonPrimitive?.content
-        Session.refreshToken = payload["refresh_token"]?.jsonPrimitive?.content
+        val access = payload["access_token"]?.jsonPrimitive?.contentOrNullSafe()
+        val refresh = payload["refresh_token"]?.jsonPrimitive?.contentOrNullSafe()
+        if (access.isNullOrBlank()) throw ApiException("Sign-in did not return a session. Try again.")
+        Session.accessToken = access
+        Session.refreshToken = refresh
         val expiresIn = payload["expires_in"]?.jsonPrimitive?.content?.toLongOrNull() ?: 3600
         Session.expiresAt = System.currentTimeMillis() / 1000 + expiresIn
         val user = payload["user"]?.jsonObject
@@ -90,7 +107,7 @@ object Api {
         val res = exec(
             builder("${Env.authUrl}/token?grant_type=password", auth = false)
                 .post(body(buildJsonObject {
-                    put("email", JsonPrimitive(email.trim()))
+                    put("email", JsonPrimitive(email.trim().lowercase()))
                     put("password", JsonPrimitive(password))
                 })).build()
         )
@@ -98,24 +115,69 @@ object Api {
         refreshRole()
     }
 
-    suspend fun signUp(email: String, password: String, fullName: String) {
+    /** Returns true when a session was created (auto-confirm), false when email confirmation is needed. */
+    suspend fun signUp(email: String, password: String, fullName: String): Boolean {
+        val clean = email.trim().lowercase()
         val res = exec(
-            builder("${Env.authUrl}/signup", auth = false)
+            builder(
+                "${Env.authUrl}/signup?redirect_to=" + java.net.URLEncoder.encode("${Env.SITE_URL}/auth", "UTF-8"),
+                auth = false,
+            )
                 .post(body(buildJsonObject {
-                    put("email", JsonPrimitive(email.trim()))
+                    put("email", JsonPrimitive(clean))
                     put("password", JsonPrimitive(password))
                     put("data", buildJsonObject { put("full_name", JsonPrimitive(fullName)) })
                 })).build()
         )
         val obj = json.parseToJsonElement(res).jsonObject
-        if (obj["access_token"] != null) { storeSession(obj); refreshRole() }
+        if (obj["access_token"] != null) {
+            storeSession(obj); refreshRole(); return true
+        }
+        // GoTrue returns an obfuscated user (empty identities) when the email already exists.
+        val identities = obj["identities"] ?: obj["user"]?.jsonObject?.get("identities")
+        if (identities != null && identities.toString() == "[]") {
+            throw ApiException("That email already has an account — sign in or reset your password.")
+        }
+        return false
     }
 
     suspend fun resetPassword(email: String) {
         exec(
-            builder("${Env.authUrl}/recover", auth = false)
-                .post(body(buildJsonObject { put("email", JsonPrimitive(email.trim())) })).build()
+            builder(
+                "${Env.authUrl}/recover?redirect_to=" +
+                    java.net.URLEncoder.encode("${Env.SITE_URL}/reset-password", "UTF-8"),
+                auth = false,
+            )
+                .post(body(buildJsonObject { put("email", JsonPrimitive(email.trim().lowercase())) })).build()
         )
+    }
+
+    // ------------------------------------------------------------- google (PKCE)
+
+    /** Builds the Google consent URL and stores the PKCE verifier for the callback. */
+    fun googleAuthUrl(): String {
+        val verifier = Pkce.newVerifier()
+        Session.codeVerifier = verifier
+        val challenge = Pkce.challenge(verifier)
+        val redirect = java.net.URLEncoder.encode(Env.REDIRECT_SCHEME, "UTF-8")
+        return "${Env.authUrl}/authorize?provider=google&redirect_to=$redirect" +
+            "&code_challenge=$challenge&code_challenge_method=s256"
+    }
+
+    /** Exchanges the ?code= returned to the app deep link for a session. */
+    suspend fun sessionFromCode(code: String) {
+        val verifier = Session.codeVerifier
+            ?: throw ApiException("Sign-in session expired — start Google sign-in again.")
+        val res = exec(
+            builder("${Env.authUrl}/token?grant_type=pkce", auth = false)
+                .post(body(buildJsonObject {
+                    put("auth_code", JsonPrimitive(code))
+                    put("code_verifier", JsonPrimitive(verifier))
+                })).build()
+        )
+        Session.codeVerifier = null
+        storeSession(json.parseToJsonElement(res).jsonObject)
+        refreshRole()
     }
 
     /** Exchange an OAuth refresh token (deep link from the browser flow) for a session. */

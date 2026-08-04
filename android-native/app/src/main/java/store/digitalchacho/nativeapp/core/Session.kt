@@ -47,6 +47,11 @@ object Session {
         get() = prefs.getBoolean("seen_welcome", false)
         set(v) { prefs.edit().putBoolean("seen_welcome", v).apply() }
 
+    /** PKCE verifier kept between opening Google consent and returning to the app. */
+    var codeVerifier: String?
+        get() = prefs.getString("pkce", null)
+        set(v) { prefs.edit().putString("pkce", v).apply() }
+
     val signedIn: Boolean get() = accessToken != null
 
     fun clear() {
