@@ -542,13 +542,19 @@ export function ToolsDrawer({
 
   return (
     <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} aria-hidden />
+      <div
+        className="absolute inset-0 backdrop-blur-md"
+        style={{ background: "rgba(0,0,0,0.72)" }}
+        onClick={onClose}
+        aria-hidden
+      />
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label="Business tools"
-        className="relative flex max-h-[90svh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl border border-border/70 bg-card/85 shadow-2xl backdrop-blur-2xl sm:rounded-3xl"
+        className="relative m-0 flex max-h-[88svh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl border border-border/70 shadow-2xl backdrop-blur-2xl sm:m-4 sm:rounded-3xl"
+        style={{ background: "color-mix(in oklab, var(--background) 94%, var(--primary))" }}
       >
         <div className="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
           <div className="flex min-w-0 items-center gap-2.5">
