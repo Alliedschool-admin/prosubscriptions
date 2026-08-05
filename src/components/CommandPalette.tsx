@@ -62,6 +62,9 @@ export function CommandPalette() {
           <CommandItem onSelect={() => go(() => navigate({ to: "/requests" }))}>
             <Bell className="mr-2 size-4" /> Requests
           </CommandItem>
+          <CommandItem onSelect={() => go(() => navigate({ to: "/tips" }))}>
+            <Lightbulb className="mr-2 size-4" /> Tips &amp; tricks
+          </CommandItem>
           <CommandItem onSelect={() => go(() => navigate({ to: "/auth" }))}>
             <LogIn className="mr-2 size-4" /> Sign in
           </CommandItem>
