@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ExternalLink, Pin } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { CATEGORY_META, type Post } from "@/components/PostsFeed";
+import { CATEGORY_META, type Post, type PostCategory } from "@/components/PostsFeed";
 import { SITE_URL, excerpt } from "@/lib/site";
 
 export const Route = createFileRoute("/tips/$slug")({
@@ -94,7 +94,7 @@ function PostMissing() {
 
 function PostPage() {
   const { post } = Route.useLoaderData();
-  const meta = CATEGORY_META[post.category] ?? CATEGORY_META.update;
+  const meta = CATEGORY_META[post.category as PostCategory] ?? CATEGORY_META.update;
   const Icon = meta.icon;
 
   return (
