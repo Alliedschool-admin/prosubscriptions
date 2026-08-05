@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Search, Package, Home, Library, Heart, Bell, ShieldCheck, LogIn } from "lucide-react";
+import { Search, Package, Home, Library, Heart, Bell, ShieldCheck, LogIn, Lightbulb } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
