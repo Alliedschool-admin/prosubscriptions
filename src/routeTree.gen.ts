@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as TipsRouteImport } from './routes/tips'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -32,6 +33,11 @@ const WishlistRoute = WishlistRouteImport.update({
 const TipsRoute = TipsRouteImport.update({
   id: '/tips',
   path: '/tips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/requests': typeof RequestsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tips': typeof TipsRoute
   '/wishlist': typeof WishlistRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/requests': typeof RequestsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tips': typeof TipsRoute
   '/wishlist': typeof WishlistRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/requests': typeof RequestsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tips': typeof TipsRoute
   '/wishlist': typeof WishlistRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/requests'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/tips'
     | '/wishlist'
     | '/.mcp/list-tools'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/requests'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/tips'
     | '/wishlist'
     | '/.mcp/list-tools'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/requests'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/tips'
     | '/wishlist'
     | '/.mcp/list-tools'
@@ -201,6 +213,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   RequestsRoute: typeof RequestsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TipsRoute: typeof TipsRoute
   WishlistRoute: typeof WishlistRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
@@ -223,6 +236,13 @@ declare module '@tanstack/react-router' {
       path: '/tips'
       fullPath: '/tips'
       preLoaderRoute: typeof TipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -331,6 +351,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   RequestsRoute: RequestsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TipsRoute: TipsRoute,
   WishlistRoute: WishlistRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
