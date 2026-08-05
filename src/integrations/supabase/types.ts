@@ -724,7 +724,7 @@ export type Database = {
         | "binance_pay"
         | "crypto"
         | "other"
-      post_category: "free_method" | "update" | "announcement"
+      post_category: "free_method" | "update" | "announcement" | "tip"
       product_request_status:
         | "new"
         | "in_review"
@@ -872,7 +872,7 @@ export const Constants = {
         "crypto",
         "other",
       ],
-      post_category: ["free_method", "update", "announcement"],
+      post_category: ["free_method", "update", "announcement", "tip"],
       product_request_status: [
         "new",
         "in_review",

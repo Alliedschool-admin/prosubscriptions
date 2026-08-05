@@ -2242,7 +2242,7 @@ type PostRow = {
   id: string;
   title: string;
   body: string;
-  category: "free_method" | "update" | "announcement";
+  category: "tip" | "free_method" | "update" | "announcement";
   link: string | null;
   image: string | null;
   pinned: boolean;
@@ -2252,6 +2252,7 @@ type PostRow = {
 };
 
 const POST_CATEGORY_LABEL: Record<PostRow["category"], string> = {
+  tip: "Tip & trick",
   free_method: "Free method",
   update: "Update",
   announcement: "Announcement",
@@ -2397,6 +2398,7 @@ function PostsAdminPanel() {
               onChange={(e) => setCategory(e.target.value as PostRow["category"])}
               className="input w-full"
             >
+              <option value="tip">Tip &amp; trick</option>
               <option value="free_method">Free method</option>
               <option value="update">Update</option>
               <option value="announcement">Announcement</option>

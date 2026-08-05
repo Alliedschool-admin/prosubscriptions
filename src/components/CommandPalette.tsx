@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Search, Package, Home, Library, Heart, Bell, ShieldCheck, LogIn } from "lucide-react";
+import { Search, Package, Home, Library, Heart, Bell, ShieldCheck, LogIn, Lightbulb } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -61,6 +61,9 @@ export function CommandPalette() {
           </CommandItem>
           <CommandItem onSelect={() => go(() => navigate({ to: "/requests" }))}>
             <Bell className="mr-2 size-4" /> Requests
+          </CommandItem>
+          <CommandItem onSelect={() => go(() => navigate({ to: "/tips" }))}>
+            <Lightbulb className="mr-2 size-4" /> Tips &amp; tricks
           </CommandItem>
           <CommandItem onSelect={() => go(() => navigate({ to: "/auth" }))}>
             <LogIn className="mr-2 size-4" /> Sign in
