@@ -124,11 +124,10 @@ setQ(e.target.value)}
       </div>
 
       <div className="mt-6">
-        {isLoading && <p className="text-sm text-muted">Loading…</p>}
         {error && (
           <p className="text-sm text-muted">Couldn&apos;t load posts. Try again shortly.</p>
         )}
-        {!isLoading && !error && filtered.length === 0 && (
+        {!error && filtered.length === 0 && (
           <p className="rounded-xl border border-border bg-card p-6 text-sm text-muted">
             Nothing here yet
             {activeCat !== "all"
