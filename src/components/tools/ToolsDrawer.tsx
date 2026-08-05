@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   Copy,
@@ -536,11 +537,11 @@ export function ToolsDrawer({
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
   const active = TOOLS.find((t) => t.id === tool) ?? TOOLS[0];
   const ActiveIcon = active.icon;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center">
       <div
         className="absolute inset-0 backdrop-blur-md"
@@ -610,6 +611,7 @@ export function ToolsDrawer({
           {tool === "alerts" && <AlertsTool />}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
