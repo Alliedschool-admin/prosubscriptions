@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { Megaphone, X, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { showNotification } from "@/lib/notifications";
 
 const DISMISSED_KEY = "dismissed-broadcasts";
 
@@ -123,7 +124,10 @@ export function BroadcastListener() {
         { event: "INSERT", schema: "public", table: "broadcasts" },
         (payload) => {
           const row = payload.new as Broadcast & { active: boolean };
-          if (row.active) pushItem({ id: row.id, message: row.message, created_at: row.created_at });
+          if (row.active) {
+            pushItem({ id: row.id, message: row.message, created_at: row.created_at });
+            showNotification("Digital Chacho — announcement", row.message, `bc-${row.id}`);
+          }
         },
       )
       .subscribe();

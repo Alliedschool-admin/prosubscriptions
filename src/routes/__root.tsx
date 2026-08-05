@@ -27,6 +27,7 @@ import { CommandPalette } from "../components/CommandPalette";
 import { BroadcastListener } from "../components/BroadcastListener";
 import { OfflineBanner } from "../components/OfflineNotice";
 import { PurchaseTicker } from "../components/PurchaseTicker";
+import { NotificationPrompt } from "../components/NotificationPrompt";
 import { useReveal } from "../hooks/useReveal";
 
 function NotFoundComponent() {
@@ -182,6 +183,7 @@ function RootComponent() {
               <CommandPalette />
               <BroadcastListener />
               <PurchaseTicker />
+              <NotificationPrompt />
             </CartProvider>
           </AuthProvider>
         </I18nProvider>
