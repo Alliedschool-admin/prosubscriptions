@@ -8,6 +8,7 @@ export type PostCategory = "tip" | "free_method" | "update" | "announcement";
 
 export type Post = {
   id: string;
+  slug: string;
   title: string;
   body: string;
   category: PostCategory;
@@ -50,7 +51,7 @@ export function usePublishedPosts() {
   return useQuery({ queryKey: POSTS_QUERY_KEY, queryFn: fetchPosts });
 }
 
-export function PostCard({ post: p }: { post: Post }) {
+export function PostCard({ post: p, linkToPost = true }: { post: Post; linkToPost?: boolean }) {
   const meta = CATEGORY_META[p.category] ?? CATEGORY_META.update;
   const Icon = meta.icon;
   return (
@@ -76,8 +77,25 @@ export function PostCard({ post: p }: { post: Post }) {
           {new Date(p.created_at).toLocaleDateString()}
         </span>
       </div>
-      <h3 className="mt-2 text-base font-bold tracking-tight">{p.title}</h3>
+      <h3 className="mt-2 text-base font-bold tracking-tight">
+        {linkToPost && p.slug ? (
+          <Link to="/tips/$slug" params={{ slug: p.slug }} className="hover:underline">
+            {p.title}
+          </Link>
+        ) : (
+          p.title
+        )}
+      </h3>
       <p className="mt-1 whitespace-pre-wrap text-sm text-muted">{p.body}</p>
+      {linkToPost && p.slug && (
+        <Link
+          to="/tips/$slug"
+          params={{ slug: p.slug }}
+          className="mt-3 block font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-muted hover:text-foreground"
+        >
+          Read full post
+        </Link>
+      )}
       {p.link && (
         <a
           href={p.link}
