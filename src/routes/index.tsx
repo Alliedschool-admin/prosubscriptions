@@ -189,6 +189,32 @@ function Discovery() {
         </aside>
       </header>
 
+      {/* Mobile/tablet app download banner — drives native APK installs */}
+      <div className="reveal mb-6 lg:hidden">
+        <a
+          href="/__l5e/assets-v1/92bb18e1-7641-48a0-8d6e-e011e3128c6c/digital-chacho-native-v2.3.apk"
+          download
+          className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-border bg-card/60 p-4 backdrop-blur-md transition-colors hover:border-primary/60"
+        >
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -right-6 -top-6 size-28 rounded-full opacity-40 blur-2xl"
+            style={{ background: "radial-gradient(circle, color-mix(in oklab, var(--primary) 70%, transparent), transparent 70%)" }}
+          />
+          <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
+            <Smartphone className="size-6" />
+          </div>
+          <div className="flex-1">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Native v2.3</p>
+            <p className="text-sm font-bold">Digital Chacho Android app</p>
+            <p className="text-xs text-muted">Install the full native store on your phone.</p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 font-mono text-[10px] font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20">
+            <Download className="size-3" /> APK
+          </span>
+        </a>
+      </div>
+
       {/* Desktop marquee — trust ticker */}
       <div className="reveal relative mb-10 hidden overflow-hidden rounded-2xl border border-border/60 bg-background/30 py-3 backdrop-blur-md lg:block">
         <div
