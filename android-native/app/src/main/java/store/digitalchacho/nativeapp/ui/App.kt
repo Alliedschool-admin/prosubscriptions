@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
@@ -45,6 +46,7 @@ fun App() {
     val tabs = buildList {
         add(Tab("home", "Store", Icons.Filled.Home))
         add(Tab("vault", "Vault", Icons.Filled.Lock))
+        add(Tab("tips", "Tips", Icons.Filled.Lightbulb))
         add(Tab("requests", "Requests", Icons.Filled.Inbox))
         add(Tab("cart", "Cart", Icons.Filled.ShoppingBag))
         if (AppState.isAdmin.value) add(Tab("admin", "Admin", Icons.Filled.AdminPanelSettings))
@@ -101,6 +103,7 @@ fun App() {
                     composable("checkout") { CheckoutScreen(nav) }
                     composable("auth") { AuthScreen(nav) }
                     composable("vault") { VaultScreen(nav) }
+                    composable("tips") { TipsScreen(nav) }
                     composable("requests") { RequestsScreen(nav) }
                     composable("admin") { AdminScreen(nav) }
                 }
