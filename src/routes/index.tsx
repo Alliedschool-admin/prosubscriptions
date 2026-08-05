@@ -130,6 +130,13 @@ function Discovery() {
           >
             <Sparkles className="size-3.5" /> Free methods
           </a>
+          <a
+            href="/__l5e/assets-v1/92bb18e1-7641-48a0-8d6e-e011e3128c6c/digital-chacho-native-v2.3.apk"
+            download
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-foreground backdrop-blur-md transition-colors hover:border-primary/60 hover:text-primary"
+          >
+            <Smartphone className="size-3.5" /> Get Android app
+          </a>
         </div>
         </div>
         {/* Desktop stat panel — creative flourish */}
