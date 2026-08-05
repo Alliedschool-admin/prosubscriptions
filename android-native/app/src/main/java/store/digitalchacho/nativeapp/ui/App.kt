@@ -181,7 +181,7 @@ private fun FuturisticDock(
 }
 
 @Composable
-private fun DockItem(tab: Tab, selected: Boolean, total: Int, onClick: () -> Unit) {
+private fun RowScope.DockItem(tab: Tab, selected: Boolean, total: Int, onClick: () -> Unit) {
     val height by animateDpAsState(if (selected) 44.dp else 40.dp, label = "h")
     val iconAlpha by animateFloatAsState(if (selected) 1f else 0.75f, label = "a")
     val interaction = remember { MutableInteractionSource() }
