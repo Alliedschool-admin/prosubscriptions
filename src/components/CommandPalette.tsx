@@ -59,7 +59,7 @@ export function CommandPalette() {
           <CommandItem onSelect={() => go(() => navigate({ to: "/wishlist" }))}>
             <Heart className="mr-2 size-4" /> Wishlist
           </CommandItem>
-          <CommandItem onSelect={() => go(() => navigate({ to: "/requests" }))}>
+          <CommandItem onSelect={() => go(() => navigate({ to: "/requests", search: { request: undefined } }))}>
             <Bell className="mr-2 size-4" /> Requests
           </CommandItem>
           <CommandItem onSelect={() => go(() => navigate({ to: "/tips" }))}>

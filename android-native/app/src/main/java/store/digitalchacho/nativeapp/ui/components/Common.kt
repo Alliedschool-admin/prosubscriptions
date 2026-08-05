@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import store.digitalchacho.nativeapp.ui.DC
+import store.digitalchacho.nativeapp.ui.ThemeMode
 
 /** Animated aurora gradient backdrop used behind every screen. */
 @Composable
@@ -43,11 +44,17 @@ fun AuroraBackground(content: @Composable BoxScope.() -> Unit) {
         animationSpec = infiniteRepeatable(tween(12000, easing = LinearEasing), RepeatMode.Reverse),
         label = "shift",
     )
+    val drift by transition.animateFloat(
+        initialValue = 0f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(18000, easing = LinearEasing), RepeatMode.Reverse),
+        label = "drift",
+    )
+    val glow = if (ThemeMode.dark.value) 1f else 0.45f
     Box(Modifier.fillMaxSize().background(DC.Obsidian)) {
         Box(
             Modifier.fillMaxSize().background(
                 Brush.radialGradient(
-                    colors = listOf(DC.Molten.copy(alpha = 0.20f), Color.Transparent),
+                    colors = listOf(DC.Molten.copy(alpha = 0.20f * glow), Color.Transparent),
                     center = Offset(200f + shift * 500f, 200f),
                     radius = 900f,
                 )
@@ -56,7 +63,16 @@ fun AuroraBackground(content: @Composable BoxScope.() -> Unit) {
         Box(
             Modifier.fillMaxSize().background(
                 Brush.radialGradient(
-                    colors = listOf(DC.Cyan.copy(alpha = 0.14f), Color.Transparent),
+                    colors = listOf(DC.Violet.copy(alpha = 0.16f * glow), Color.Transparent),
+                    center = Offset(1000f - drift * 600f, 500f + drift * 300f),
+                    radius = 850f,
+                )
+            )
+        )
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.radialGradient(
+                    colors = listOf(DC.Cyan.copy(alpha = 0.14f * glow), Color.Transparent),
                     center = Offset(900f - shift * 400f, 1400f),
                     radius = 1000f,
                 )

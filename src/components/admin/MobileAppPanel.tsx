@@ -36,29 +36,29 @@ export function MobileAppPanel() {
 
       <div className="rounded-2xl border border-border bg-card p-5">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-          Native v2.2
+          Native v2.3
         </p>
-        <h3 className="mt-2 text-xl font-extrabold tracking-tight">Digital Chacho · Native v2.2</h3>
+        <h3 className="mt-2 text-xl font-extrabold tracking-tight">Digital Chacho · Native v2.3</h3>
         <p className="mt-1 text-sm text-muted">
           Kotlin + Jetpack Compose · package id <span className="font-mono">store.digitalchacho.nativeapp</span>
         </p>
         <p className="mt-1 text-xs text-primary">
-          v2.2 fixes Google sign-in (no more “missing OAuth secret”) and adds a Tech tips &amp; tricks tab.
+          v2.3 adds dark / light mode with a one-tap switch, a futuristic floating glass nav dock, and a new brand bar.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a
-            href="/downloads/digital-chacho-native-v2.2.zip?v=2.2"
+            href="/downloads/digital-chacho-native-v2.3.zip?v=2.3"
             download
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition hover:brightness-110"
           >
             <Download className="size-4" /> Download project package
           </a>
           <a
-            href="/__l5e/assets-v1/87991cf3-8f69-434f-89dd-6c82285652dc/digital-chacho-native-v2.2.apk"
+            href="/__l5e/assets-v1/92bb18e1-7641-48a0-8d6e-e011e3128c6c/digital-chacho-native-v2.3.apk"
             download
             className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-foreground transition hover:bg-foreground/5"
           >
-            <Sparkles className="size-4" /> Download APK (v2.2)
+            <Sparkles className="size-4" /> Download APK (v2.3)
           </a>
         </div>
         <p className="mt-3 text-xs text-muted">
