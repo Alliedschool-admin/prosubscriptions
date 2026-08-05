@@ -154,15 +154,12 @@ object Api {
 
     // ------------------------------------------------------------- google (PKCE)
 
-    /** Builds the Google consent URL and stores the PKCE verifier for the callback. */
-    fun googleAuthUrl(): String {
-        val verifier = Pkce.newVerifier()
-        Session.codeVerifier = verifier
-        val challenge = Pkce.challenge(verifier)
-        val redirect = java.net.URLEncoder.encode(Env.REDIRECT_SCHEME, "UTF-8")
-        return "${Env.authUrl}/authorize?provider=google&redirect_to=$redirect" +
-            "&code_challenge=$challenge&code_challenge_method=s256"
-    }
+    /**
+     * Google sign-in URL. Supabase's own /authorize endpoint has no Google
+     * secret (sign-in is brokered by the web app), so we open the web bridge
+     * page which returns the session to digitalchacho://auth.
+     */
+    fun googleAuthUrl(): String = "${Env.SITE_URL}/native-auth"
 
     /** Exchanges the ?code= returned to the app deep link for a session. */
     suspend fun sessionFromCode(code: String) {

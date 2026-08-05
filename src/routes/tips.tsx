@@ -54,7 +54,7 @@ export const Route = createFileRoute("/tips")({
 function TipsPage() {
   const [cat, setCat] = useState<string>("all");
   const [q, setQ] = useState("");
-  const { data: posts = [], isLoading, error } = usePublishedPosts();
+  const { data: posts = [], error } = usePublishedPosts();
 
   const query = q.slice(0, 100).trim().toLowerCase();
   const activeCat = CATS.some((c) => c.id === cat) ? cat : "all";
@@ -124,11 +124,10 @@ setQ(e.target.value)}
       </div>
 
       <div className="mt-6">
-        {isLoading && <p className="text-sm text-muted">Loading…</p>}
         {error && (
           <p className="text-sm text-muted">Couldn&apos;t load posts. Try again shortly.</p>
         )}
-        {!isLoading && !error && filtered.length === 0 && (
+        {!error && filtered.length === 0 && (
           <p className="rounded-xl border border-border bg-card p-6 text-sm text-muted">
             Nothing here yet
             {activeCat !== "all"
