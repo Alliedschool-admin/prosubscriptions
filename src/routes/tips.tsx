@@ -5,8 +5,10 @@ import {
   usePublishedPosts,
   PostCard,
   CATEGORY_META,
+  postsQueryOptions,
   type PostCategory,
 } from "../components/PostsFeed";
+import { SITE_URL } from "../lib/site";
 
 const CATS: { id: string; label: string }[] = [
   { id: "all", label: "All" },
@@ -21,6 +23,7 @@ const DESC =
   "Free methods, tech tips and tricks, and the latest store updates from Digital Chacho.";
 
 export const Route = createFileRoute("/tips")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(postsQueryOptions),
   head: () => ({
     meta: [
       { title: TITLE },
@@ -28,10 +31,22 @@ export const Route = createFileRoute("/tips")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://prosubscriptions.lovable.app/tips" },
+      { property: "og:url", content: `${SITE_URL}/tips` },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://prosubscriptions.lovable.app/tips" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/tips` }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Tech tips & tricks",
+          description: DESC,
+          url: `${SITE_URL}/tips`,
+        }),
+      },
+    ],
   }),
   component: TipsPage,
 });
