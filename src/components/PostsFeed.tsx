@@ -29,26 +29,24 @@ export const CATEGORY_META: Record<PostCategory, { label: string; icon: typeof G
   announcement: { label: "Announcement", icon: Megaphone, tone: "text-amber-500 bg-amber-500/10" },
 };
 
-async function fetchPosts(): Promise<Post[]> {
-  const { data, error } = await (supabase.from as unknown as (t: string) => {
-    select: (c: string) => {
-      eq: (a: string, b: boolean) => {
-        order: (c: string, o: { ascending: boolean }) => {
-          order: (c: string, o: { ascending: boolean }) => Promise<{ data: Post[] | null; error: { message: string } | null }>;
-        };
-      };
-    };
-  })("posts")
+export async function fetchPosts(): Promise<Post[]> {
+  const { data, error } = await supabase
+    .from("posts")
     .select("*")
     .eq("published", true)
     .order("pinned", { ascending: false })
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
-  return data ?? [];
+  return (data ?? []) as Post[];
 }
 
+export const postsQueryOptions = {
+  queryKey: POSTS_QUERY_KEY,
+  queryFn: fetchPosts,
+};
+
 export function usePublishedPosts() {
-  return useQuery({ queryKey: POSTS_QUERY_KEY, queryFn: fetchPosts });
+  return useQuery(postsQueryOptions);
 }
 
 export function PostCard({ post: p, linkToPost = true }: { post: Post; linkToPost?: boolean }) {
