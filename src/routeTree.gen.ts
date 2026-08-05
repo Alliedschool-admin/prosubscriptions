@@ -14,6 +14,7 @@ import { Route as TipsRouteImport } from './routes/tips'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RequestsRouteImport } from './routes/requests'
+import { Route as NativeAuthRouteImport } from './routes/native-auth'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -49,6 +50,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const RequestsRoute = RequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NativeAuthRoute = NativeAuthRouteImport.update({
+  id: '/native-auth',
+  path: '/native-auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpRoute = McpRouteImport.update({
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/mcp': typeof McpRoute
+  '/native-auth': typeof NativeAuthRoute
   '/requests': typeof RequestsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/mcp': typeof McpRoute
+  '/native-auth': typeof NativeAuthRoute
   '/requests': typeof RequestsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/mcp': typeof McpRoute
+  '/native-auth': typeof NativeAuthRoute
   '/requests': typeof RequestsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/mcp'
+    | '/native-auth'
     | '/requests'
     | '/reset-password'
     | '/sitemap.xml'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/mcp'
+    | '/native-auth'
     | '/requests'
     | '/reset-password'
     | '/sitemap.xml'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/mcp'
+    | '/native-auth'
     | '/requests'
     | '/reset-password'
     | '/sitemap.xml'
@@ -223,6 +235,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   McpRoute: typeof McpRoute
+  NativeAuthRoute: typeof NativeAuthRoute
   RequestsRoute: typeof RequestsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -269,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/requests'
       fullPath: '/requests'
       preLoaderRoute: typeof RequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/native-auth': {
+      id: '/native-auth'
+      path: '/native-auth'
+      fullPath: '/native-auth'
+      preLoaderRoute: typeof NativeAuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp': {
@@ -378,6 +398,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   McpRoute: McpRoute,
+  NativeAuthRoute: NativeAuthRoute,
   RequestsRoute: RequestsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
