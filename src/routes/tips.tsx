@@ -54,7 +54,7 @@ export const Route = createFileRoute("/tips")({
 function TipsPage() {
   const [cat, setCat] = useState<string>("all");
   const [q, setQ] = useState("");
-  const { data: posts = [], isLoading, error } = usePublishedPosts();
+  const { data: posts = [], error } = usePublishedPosts();
 
   const query = q.slice(0, 100).trim().toLowerCase();
   const activeCat = CATS.some((c) => c.id === cat) ? cat : "all";
