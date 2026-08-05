@@ -6,6 +6,7 @@ import { useTheme, type ThemeChoice } from "../lib/theme";
 import { useEffect, useRef, useState } from "react";
 import logoMark from "../assets/logo-mark.png";
 import { PWAInstallButton } from "./PWAInstallButton";
+import { ToolsMenu } from "./tools/ToolsMenu";
 
 export function TopNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -60,6 +61,7 @@ export function TopNav() {
                 </Link>
               );
             })}
+            <ToolsMenu />
             <ThemeMenu />
             <PWAInstallButton />
             {session ? (
@@ -80,6 +82,7 @@ export function TopNav() {
             )}
           </div>
           <div className="flex items-center gap-1 lg:hidden">
+            <ToolsMenu compact />
             <PWAInstallButton />
             <ThemeMenu compact />
             {session ? (
