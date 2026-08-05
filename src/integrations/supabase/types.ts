@@ -274,6 +274,7 @@ export type Database = {
           link: string | null
           pinned: boolean
           published: boolean
+          slug: string
           title: string
           updated_at: string
         }
@@ -287,6 +288,7 @@ export type Database = {
           link?: string | null
           pinned?: boolean
           published?: boolean
+          slug: string
           title: string
           updated_at?: string
         }
@@ -300,6 +302,7 @@ export type Database = {
           link?: string | null
           pinned?: boolean
           published?: boolean
+          slug?: string
           title?: string
           updated_at?: string
         }
@@ -700,6 +703,7 @@ export type Database = {
       }
       revoke_admin: { Args: { _user_id: string }; Returns: boolean }
       revoke_admin_invite: { Args: { _email: string }; Returns: boolean }
+      slugify_text: { Args: { _t: string }; Returns: string }
       visitor_stats: {
         Args: never
         Returns: {
