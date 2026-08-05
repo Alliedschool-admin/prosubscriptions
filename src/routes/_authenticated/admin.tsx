@@ -2313,7 +2313,10 @@ function PostsAdminPanel() {
         pinned,
       };
       if (editingId) {
-        const { error } = await supabase.from("posts").update(payload).eq("id", editingId);
+        // Keep the existing web address when the field is left blank on an edit.
+        const { slug: _slug, ...rest } = payload;
+        const updatePayload = slug.trim() ? payload : rest;
+        const { error } = await supabase.from("posts").update(updatePayload).eq("id", editingId);
         if (error) throw new Error(error.message);
         toast.success("Post updated");
       } else {
