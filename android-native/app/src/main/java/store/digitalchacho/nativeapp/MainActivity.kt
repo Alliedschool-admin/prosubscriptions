@@ -14,12 +14,14 @@ import store.digitalchacho.nativeapp.core.Cache
 import store.digitalchacho.nativeapp.core.Session
 import store.digitalchacho.nativeapp.ui.App
 import store.digitalchacho.nativeapp.ui.DigitalChachoTheme
+import store.digitalchacho.nativeapp.ui.ThemeMode
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         Session.init(this)
+        ThemeMode.init(this)
         Cache.init(this)
         Api.init(this)
         AppState.bootstrap()
