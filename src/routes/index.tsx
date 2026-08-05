@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Clock, Sparkles, Zap, ShieldCheck, Rocket, Infinity as InfinityIcon, Diamond } from "lucide-react";
+import { Search, Clock, Sparkles, Zap, ShieldCheck, Rocket, Infinity as InfinityIcon, Diamond, Smartphone, Download } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { categories } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
