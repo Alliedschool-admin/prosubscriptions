@@ -288,7 +288,7 @@ export type Database = {
           link?: string | null
           pinned?: boolean
           published?: boolean
-          slug: string
+          slug?: string
           title: string
           updated_at?: string
         }
