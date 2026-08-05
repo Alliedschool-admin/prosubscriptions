@@ -72,7 +72,7 @@ fun AuroraBackground(content: @Composable BoxScope.() -> Unit) {
         Box(
             Modifier.fillMaxSize().background(
                 Brush.radialGradient(
-                    colors = listOf(DC.Cyan.copy(alpha = 0.14f), Color.Transparent),
+                    colors = listOf(DC.Cyan.copy(alpha = 0.14f * glow), Color.Transparent),
                     center = Offset(900f - shift * 400f, 1400f),
                     radius = 1000f,
                 )
