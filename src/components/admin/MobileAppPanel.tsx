@@ -36,26 +36,29 @@ export function MobileAppPanel() {
 
       <div className="rounded-2xl border border-border bg-card p-5">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-          Native v2.0
+          Native v2.1
         </p>
-        <h3 className="mt-2 text-xl font-extrabold tracking-tight">Digital Chacho · Native v2.0</h3>
+        <h3 className="mt-2 text-xl font-extrabold tracking-tight">Digital Chacho · Native v2.1</h3>
         <p className="mt-1 text-sm text-muted">
           Kotlin + Jetpack Compose · package id <span className="font-mono">store.digitalchacho.nativeapp</span>
         </p>
+        <p className="mt-1 text-xs text-primary">
+          v2.1 fixes email sign-in / sign-up validation, duplicate-account detection and Google sign-in deep links.
+        </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a
-            href="/downloads/digital-chacho-native-v2.zip?v=2.0"
+            href="/downloads/digital-chacho-native-v2.zip?v=2.1"
             download
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition hover:brightness-110"
           >
             <Download className="size-4" /> Download project package
           </a>
           <a
-            href="/__l5e/assets-v1/6b08e508-07c9-40cf-a719-57e6be80dcc8/digital-chacho-native-v2.apk"
+            href="/__l5e/assets-v1/54c5e727-078d-436d-82c8-3d31156cd86a/digital-chacho-native-v2.1.apk"
             download
             className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-foreground transition hover:bg-foreground/5"
           >
-            <Sparkles className="size-4" /> Download APK
+            <Sparkles className="size-4" /> Download APK (v2.1)
           </a>
         </div>
         <p className="mt-3 text-xs text-muted">
