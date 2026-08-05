@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as TipsRouteImport } from './routes/tips'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -18,6 +19,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TipsSlugRouteImport } from './routes/tips.$slug'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -32,6 +34,11 @@ const WishlistRoute = WishlistRouteImport.update({
 const TipsRoute = TipsRouteImport.update({
   id: '/tips',
   path: '/tips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -67,6 +74,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const TipsSlugRoute = TipsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => TipsRoute,
 } as any)
 const ProductsIdRoute = ProductsIdRouteImport.update({
   id: '/products/$id',
@@ -104,12 +116,14 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/requests': typeof RequestsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/tips': typeof TipsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tips': typeof TipsRouteWithChildren
   '/wishlist': typeof WishlistRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/products/$id': typeof ProductsIdRoute
+  '/tips/$slug': typeof TipsSlugRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesByTo {
@@ -119,12 +133,14 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/requests': typeof RequestsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/tips': typeof TipsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tips': typeof TipsRouteWithChildren
   '/wishlist': typeof WishlistRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/products/$id': typeof ProductsIdRoute
+  '/tips/$slug': typeof TipsSlugRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesById {
@@ -136,12 +152,14 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/requests': typeof RequestsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/tips': typeof TipsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tips': typeof TipsRouteWithChildren
   '/wishlist': typeof WishlistRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/products/$id': typeof ProductsIdRoute
+  '/tips/$slug': typeof TipsSlugRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRouteTypes {
@@ -153,12 +171,14 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/requests'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/tips'
     | '/wishlist'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
     | '/products/$id'
+    | '/tips/$slug'
     | '/.mcp/invoke-tool/$tool'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -168,12 +188,14 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/requests'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/tips'
     | '/wishlist'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
     | '/products/$id'
+    | '/tips/$slug'
     | '/.mcp/invoke-tool/$tool'
   id:
     | '__root__'
@@ -184,12 +206,14 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/requests'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/tips'
     | '/wishlist'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
     | '/products/$id'
+    | '/tips/$slug'
     | '/.mcp/invoke-tool/$tool'
   fileRoutesById: FileRoutesById
 }
@@ -201,7 +225,8 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   RequestsRoute: typeof RequestsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  TipsRoute: typeof TipsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TipsRoute: typeof TipsRouteWithChildren
   WishlistRoute: typeof WishlistRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -223,6 +248,13 @@ declare module '@tanstack/react-router' {
       path: '/tips'
       fullPath: '/tips'
       preLoaderRoute: typeof TipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -274,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tips/$slug': {
+      id: '/tips/$slug'
+      path: '/$slug'
+      fullPath: '/tips/$slug'
+      preLoaderRoute: typeof TipsSlugRouteImport
+      parentRoute: typeof TipsRoute
+    }
     '/products/$id': {
       id: '/products/$id'
       path: '/products/$id'
@@ -323,6 +362,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface TipsRouteChildren {
+  TipsSlugRoute: typeof TipsSlugRoute
+}
+
+const TipsRouteChildren: TipsRouteChildren = {
+  TipsSlugRoute: TipsSlugRoute,
+}
+
+const TipsRouteWithChildren = TipsRoute._addFileChildren(TipsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -331,7 +380,8 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   RequestsRoute: RequestsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  TipsRoute: TipsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TipsRoute: TipsRouteWithChildren,
   WishlistRoute: WishlistRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:

@@ -2240,6 +2240,7 @@ function UsersPanel() {
 
 type PostRow = {
   id: string;
+  slug: string;
   title: string;
   body: string;
   category: "tip" | "free_method" | "update" | "announcement";
@@ -2263,6 +2264,7 @@ function PostsAdminPanel() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<PostRow["category"]>("free_method");
+  const [slug, setSlug] = useState("");
   const [link, setLink] = useState("");
   const [image, setImage] = useState("");
   const [pinned, setPinned] = useState(false);
@@ -2286,6 +2288,7 @@ function PostsAdminPanel() {
     setTitle("");
     setBody("");
     setCategory("free_method");
+    setSlug("");
     setLink("");
     setImage("");
     setPinned(false);
@@ -2304,12 +2307,16 @@ function PostsAdminPanel() {
         title: title.trim(),
         body: body.trim(),
         category,
+        slug: slug.trim(),
         link: link.trim() || null,
         image: image.trim() || null,
         pinned,
       };
       if (editingId) {
-        const { error } = await supabase.from("posts").update(payload).eq("id", editingId);
+        // Keep the existing web address when the field is left blank on an edit.
+        const { slug: _slug, ...rest } = payload;
+        const updatePayload = slug.trim() ? payload : rest;
+        const { error } = await supabase.from("posts").update(updatePayload).eq("id", editingId);
         if (error) throw new Error(error.message);
         toast.success("Post updated");
       } else {
@@ -2360,6 +2367,7 @@ function PostsAdminPanel() {
     setTitle(p.title);
     setBody(p.body);
     setCategory(p.category);
+    setSlug(p.slug ?? "");
     setLink(p.link ?? "");
     setImage(p.image ?? "");
     setPinned(p.pinned);
@@ -2409,6 +2417,20 @@ function PostsAdminPanel() {
               placeholder="Optional link (https://…)"
               className="input w-full"
             />
+          </div>
+          <div>
+            <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+              Web address (leave blank to auto-generate)
+            </p>
+            <input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="netflix-cheap-trick"
+              className="input w-full"
+            />
+            <p className="mt-1 text-[10px] text-muted">
+              digitalchacho.store/tips/{slug.trim() || "auto"}
+            </p>
           </div>
           <div>
             <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-muted">

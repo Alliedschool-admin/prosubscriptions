@@ -12,6 +12,7 @@ import { MY_ORDERS_QUERY_KEY, claimFreeProduct } from "../lib/orders-store";
 import { recordProductView } from "../lib/recently-viewed";
 import { WishlistButton } from "../components/WishlistButton";
 import { ReviewsSection } from "../components/ReviewsSection";
+import { SITE_URL } from "../lib/site";
 
 const PENDING_CLAIM_KEY = "pending-free-claim";
 
@@ -22,13 +23,17 @@ export const Route = createFileRoute("/products/$id")({
       return { meta: [{ title: "Product · Digital Chacho" }] };
     }
     const title = `${product.name} — Digital Chacho`;
+    const url = `${SITE_URL}/products/${params.id}`;
     return {
+      links: [{ rel: "canonical", href: url }],
       meta: [
         { title },
         { name: "description", content: product.tagline },
         { property: "og:title", content: title },
         { property: "og:description", content: product.tagline },
         { property: "og:image", content: product.image },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: url },
         { name: "twitter:card", content: "summary_large_image" },
       ],
     };
