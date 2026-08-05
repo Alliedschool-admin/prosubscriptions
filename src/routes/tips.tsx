@@ -1,7 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useNavigate } from "@tanstack/react-router";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { z } from "zod";
+import { useState } from "react";
 import { Lightbulb, Search, ArrowLeft } from "lucide-react";
 import {
   usePublishedPosts,
@@ -9,11 +7,6 @@ import {
   CATEGORY_META,
   type PostCategory,
 } from "../components/PostsFeed";
-
-const searchSchema = z.object({
-  cat: fallback(z.string(), "all").default("all"),
-  q: fallback(z.string(), "").default(""),
-});
 
 const CATS: { id: string; label: string }[] = [
   { id: "all", label: "All" },
@@ -28,7 +21,6 @@ const DESC =
   "Free methods, tech tips and tricks, and the latest store updates from Digital Chacho.";
 
 export const Route = createFileRoute("/tips")({
-  validateSearch: zodValidator(searchSchema),
   head: () => ({
     meta: [
       { title: TITLE },
@@ -45,8 +37,8 @@ export const Route = createFileRoute("/tips")({
 });
 
 function TipsPage() {
-  const { cat, q } = Route.useSearch();
-  const navigate = useNavigate({ from: "/tips" });
+  const [cat, setCat] = useState<string>("all");
+  const [q, setQ] = useState("");
   const { data: posts = [], isLoading, error } = usePublishedPosts();
 
   const query = q.slice(0, 100).trim().toLowerCase();
@@ -92,8 +84,7 @@ function TipsPage() {
               key={c.id}
               type="button"
               onClick={() =>
-                navigate({ search: (prev) => ({ ...prev, cat: c.id }) })
-              }
+setCat(c.id)}
               className={`rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest transition ${
                 on
                   ? "border-primary/60 bg-primary/15 text-foreground"
@@ -111,8 +102,7 @@ function TipsPage() {
         <input
           value={q}
           onChange={(e) =>
-            navigate({ search: (prev) => ({ ...prev, q: e.target.value }) })
-          }
+setQ(e.target.value)}
           placeholder="Search tips, methods, updates…"
           className="input w-full pl-9"
         />
