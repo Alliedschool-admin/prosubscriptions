@@ -43,7 +43,9 @@ export function setNotificationsEnabled(on: boolean) {
   }
 }
 
-export async function requestNotificationPermission(): Promise<NotificationPermission | "unsupported"> {
+export async function requestNotificationPermission(): Promise<
+  NotificationPermission | "unsupported"
+> {
   if (!notificationsSupported()) return "unsupported";
   markAskedNotifications();
   try {

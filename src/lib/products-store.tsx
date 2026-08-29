@@ -64,7 +64,9 @@ export const PRODUCTS_QUERY_KEY = ["products"] as const;
 async function fetchProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr, is_free")
+    .select(
+      "id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr, is_free",
+    )
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data as ProductRow[]).map(rowToProduct);
@@ -126,7 +128,9 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
       is_free: isFree,
       created_by: userData.user?.id ?? null,
     })
-    .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr, is_free")
+    .select(
+      "id, code, name, tagline, description, price, price_usd, price_pkr, category, image, features, available_stock, delivery_instructions, cost_usd, cost_pkr, is_free",
+    )
     .single();
   if (error) throw error;
   return rowToProduct(data as ProductRow);

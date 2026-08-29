@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type CartItem = {
   kind: "product" | "plan";
@@ -31,7 +39,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) setItem(JSON.parse(raw) as CartItem);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   // Persist item across reloads.
@@ -39,7 +49,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       if (item) localStorage.setItem(STORAGE_KEY, JSON.stringify(item));
       else localStorage.removeItem(STORAGE_KEY);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, [item]);
 
   const openWith = useCallback((next: CartItem) => {

@@ -16,11 +16,14 @@ export default defineTool({
     });
     const { data, error } = await sb
       .from("products")
-      .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, features, is_free")
+      .select(
+        "id, code, name, tagline, description, price, price_usd, price_pkr, category, features, is_free",
+      )
       .or(`id.eq.${id},code.eq.${id}`)
       .maybeSingle();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
-    if (!data) return { content: [{ type: "text", text: `No product found for '${id}'.` }], isError: true };
+    if (!data)
+      return { content: [{ type: "text", text: `No product found for '${id}'.` }], isError: true };
     return {
       content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
       structuredContent: { product: data },

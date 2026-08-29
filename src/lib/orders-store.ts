@@ -109,26 +109,38 @@ export async function getProofSignedUrl(path: string) {
   return data.signedUrl;
 }
 
-export async function createOrder(input: {
-  buyer_id: string;
-  item_kind: string;
+/**
+ * Place an order atomically via the `place_order` RPC.
+ * The server recomputes the price from the product catalog, validates the
+ * payment method + coupon, inserts the order and redeems the coupon in a
+ * single transaction — the client never dictates the amount.
+ */
+export async function placeOrder(input: {
   item_id: string;
-  item_name: string;
-  amount: number;
-  currency?: string;
-  quantity?: number;
+  currency: string;
+  quantity: number;
   payment_method_id: string;
-  payment_method_label: string;
   sender_name: string;
   sender_contact: string;
   transaction_ref?: string | null;
   proof_path?: string | null;
   coupon_code?: string | null;
-  discount_amount?: number;
-}) {
-  const { data, error } = await supabase.from("orders").insert(input).select().single();
-  if (error) throw error;
-  return data as Order;
+}): Promise<{ order_id: string; amount: number; discount: number }> {
+  const { data, error } = await supabase.rpc("place_order", {
+    _item_id: input.item_id,
+    _currency: input.currency,
+    _quantity: input.quantity,
+    _payment_method_id: input.payment_method_id,
+    _sender_name: input.sender_name,
+    _sender_contact: input.sender_contact,
+    _transaction_ref: input.transaction_ref ?? null,
+    _proof_path: input.proof_path ?? null,
+    _coupon_code: input.coupon_code ?? null,
+  });
+  if (error) throw new Error(error.message.replace(/^.*?:\s*/, ""));
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) throw new Error("Order failed — please try again");
+  return row;
 }
 
 export async function reviewOrder(
@@ -169,7 +181,10 @@ export async function claimFreeProduct(productId: string) {
     supabase.rpc as unknown as (
       fn: string,
       args: Record<string, unknown>,
-    ) => Promise<{ data: { order_id: string | null; already_owned: boolean; out_of_stock: boolean }[] | null; error: { message: string } | null }>
+    ) => Promise<{
+      data: { order_id: string | null; already_owned: boolean; out_of_stock: boolean }[] | null;
+      error: { message: string } | null;
+    }>
   )("claim_free_product", { _product_id: productId });
   if (error) throw new Error(error.message);
   const row = Array.isArray(data) ? data[0] : data;

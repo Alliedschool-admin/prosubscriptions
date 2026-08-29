@@ -26,15 +26,24 @@ export function SalesAnalyticsPanel() {
   });
 
   if (isLoading) return <p className="py-10 text-center text-sm text-muted">Loading…</p>;
-  if (error || !data) return <p className="py-10 text-center text-sm text-destructive">Failed to load stats.</p>;
+  if (error || !data)
+    return <p className="py-10 text-center text-sm text-destructive">Failed to load stats.</p>;
 
   const maxOrders = Math.max(1, ...data.daily_30d.map((d) => d.orders));
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat icon={DollarSign} label="Revenue (USD)" value={`$${Number(data.total_revenue_usd).toLocaleString()}`} />
-        <Stat icon={DollarSign} label="Revenue (PKR)" value={`₨${Number(data.total_revenue_pkr).toLocaleString()}`} />
+        <Stat
+          icon={DollarSign}
+          label="Revenue (USD)"
+          value={`$${Number(data.total_revenue_usd).toLocaleString()}`}
+        />
+        <Stat
+          icon={DollarSign}
+          label="Revenue (PKR)"
+          value={`₨${Number(data.total_revenue_pkr).toLocaleString()}`}
+        />
         <Stat icon={ShoppingBag} label="Approved orders" value={String(data.total_orders)} />
         <Stat icon={Clock} label="Pending" value={String(data.pending_orders)} tone="warn" />
       </div>
@@ -46,7 +55,9 @@ export function SalesAnalyticsPanel() {
       </div>
 
       <section className="rounded-2xl border border-border bg-background/50 p-4">
-        <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-primary">Orders — last 30 days</p>
+        <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-primary">
+          Orders — last 30 days
+        </p>
         <div className="flex h-32 items-end gap-1">
           {data.daily_30d.length === 0 ? (
             <p className="text-sm text-muted">No data yet.</p>
@@ -64,13 +75,18 @@ export function SalesAnalyticsPanel() {
       </section>
 
       <section className="rounded-2xl border border-border bg-background/50 p-4">
-        <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-primary">Top products</p>
+        <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-primary">
+          Top products
+        </p>
         {data.top_products.length === 0 ? (
           <p className="text-sm text-muted">No sales yet.</p>
         ) : (
           <ul className="divide-y divide-border">
             {data.top_products.map((p, i) => (
-              <li key={`${p.item_name}-${p.currency}-${i}`} className="flex items-center justify-between py-2">
+              <li
+                key={`${p.item_name}-${p.currency}-${i}`}
+                className="flex items-center justify-between py-2"
+              >
                 <span className="flex items-center gap-2">
                   <span className="grid size-6 place-items-center rounded-md bg-primary/10 font-mono text-[10px] font-bold text-primary">
                     {i + 1}

@@ -16,7 +16,9 @@ export function useBroadcasts(opts?: { activeOnly?: boolean }) {
   return useQuery({
     queryKey: [...BROADCASTS_KEY, { activeOnly }],
     queryFn: async () => {
-      let q = (supabase.from as unknown as (t: string) => ReturnType<typeof supabase.from>)("broadcasts")
+      let q = (supabase.from as unknown as (t: string) => ReturnType<typeof supabase.from>)(
+        "broadcasts",
+      )
         .select("*")
         .order("created_at", { ascending: false })
         .limit(20);
@@ -29,25 +31,25 @@ export function useBroadcasts(opts?: { activeOnly?: boolean }) {
 }
 
 export async function createBroadcast(message: string, kind: string = "info") {
-  const { error } = await (supabase.from as unknown as (t: string) => ReturnType<typeof supabase.from>)(
-    "broadcasts",
-  ).insert({ message, kind });
+  const { error } = await (
+    supabase.from as unknown as (t: string) => ReturnType<typeof supabase.from>
+  )("broadcasts").insert({ message, kind });
   if (error) throw error;
 }
 
 export async function setBroadcastActive(id: string, active: boolean) {
-  const { error } = await (supabase.from as unknown as (t: string) => ReturnType<typeof supabase.from>)(
-    "broadcasts",
-  )
+  const { error } = await (
+    supabase.from as unknown as (t: string) => ReturnType<typeof supabase.from>
+  )("broadcasts")
     .update({ active })
     .eq("id", id);
   if (error) throw error;
 }
 
 export async function deleteBroadcast(id: string) {
-  const { error } = await (supabase.from as unknown as (t: string) => ReturnType<typeof supabase.from>)(
-    "broadcasts",
-  )
+  const { error } = await (
+    supabase.from as unknown as (t: string) => ReturnType<typeof supabase.from>
+  )("broadcasts")
     .delete()
     .eq("id", id);
   if (error) throw error;

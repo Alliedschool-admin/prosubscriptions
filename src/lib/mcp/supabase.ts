@@ -45,7 +45,9 @@ function supabasePublishableKey(): string {
   }
   const legacy = configuredEnv(["SUPABASE_ANON_KEY", "VITE_SUPABASE_ANON_KEY"]);
   if (legacy) return legacy;
-  throw new Error("SUPABASE_PUBLISHABLE_KEY, SUPABASE_PUBLISHABLE_KEYS, or SUPABASE_ANON_KEY is required");
+  throw new Error(
+    "SUPABASE_PUBLISHABLE_KEY, SUPABASE_PUBLISHABLE_KEYS, or SUPABASE_ANON_KEY is required",
+  );
 }
 
 /** Forwards the verified bearer token so RLS runs as the signed-in user. */
@@ -61,7 +63,10 @@ export function supabaseForUser(ctx: ToolContext) {
 export function notAuthenticated() {
   return {
     content: [
-      { type: "text" as const, text: "Not authenticated. Sign in to Digital Chacho to use this tool." },
+      {
+        type: "text" as const,
+        text: "Not authenticated. Sign in to Digital Chacho to use this tool.",
+      },
     ],
     isError: true as const,
   };

@@ -54,8 +54,8 @@ function ResetPasswordPage() {
       if (error) throw error;
       toast.success("Password updated. You're signed in.");
       navigate({ to: "/dashboard", replace: true });
-    } catch (err: any) {
-      toast.error(err?.message ?? "Failed to update password");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update password");
     } finally {
       setBusy(false);
     }
@@ -68,10 +68,10 @@ function ResetPasswordPage() {
           <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-foreground text-background">
             <ShieldCheck className="size-5" />
           </div>
-          <h1 className="mt-4 text-2xl font-extrabold tracking-tight sm:text-3xl">Set a new password</h1>
-          <p className="mt-2 text-sm text-muted">
-            Pick a strong one — at least 6 characters.
-          </p>
+          <h1 className="mt-4 text-2xl font-extrabold tracking-tight sm:text-3xl">
+            Set a new password
+          </h1>
+          <p className="mt-2 text-sm text-muted">Pick a strong one — at least 6 characters.</p>
         </div>
 
         {!ready ? (

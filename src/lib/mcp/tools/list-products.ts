@@ -11,7 +11,8 @@ function anonClient() {
 export default defineTool({
   name: "list_products",
   title: "List products",
-  description: "List public products in the Digital Chacho catalog. Optionally filter by category and limit results.",
+  description:
+    "List public products in the Digital Chacho catalog. Optionally filter by category and limit results.",
   inputSchema: {
     category: z
       .enum(["Presets", "UI Kits", "AI Tools", "Dev Templates"])
@@ -24,7 +25,9 @@ export default defineTool({
     const sb = anonClient();
     let q = sb
       .from("products")
-      .select("id, code, name, tagline, description, price, price_usd, price_pkr, category, features, is_free")
+      .select(
+        "id, code, name, tagline, description, price, price_usd, price_pkr, category, features, is_free",
+      )
       .order("name", { ascending: true })
       .limit(limit ?? 50);
     if (category) q = q.eq("category", category);

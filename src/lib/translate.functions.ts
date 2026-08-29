@@ -64,6 +64,8 @@ export const translateStrings = createServerFn({ method: "POST" })
     }
     const t = Array.isArray(parsed.t) ? parsed.t.map((v) => String(v)) : [];
     // Pad / trim to input length to keep client mapping safe.
-    const translations = strings.map((s, i) => (typeof t[i] === "string" && t[i].length > 0 ? t[i] : s));
+    const translations = strings.map((s, i) =>
+      typeof t[i] === "string" && t[i].length > 0 ? t[i] : s,
+    );
     return { translations };
   });

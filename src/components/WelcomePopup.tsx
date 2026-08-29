@@ -62,18 +62,27 @@ export function WelcomePopup() {
         <div
           aria-hidden
           className="pointer-events-none absolute -top-24 -right-20 size-64 animate-pulse rounded-full opacity-70 blur-3xl"
-          style={{ background: "radial-gradient(circle, hsl(268 85% 68% / 0.5), transparent 70%)", animationDuration: "4s" }}
+          style={{
+            background: "radial-gradient(circle, hsl(268 85% 68% / 0.5), transparent 70%)",
+            animationDuration: "4s",
+          }}
         />
         <div
           aria-hidden
           className="pointer-events-none absolute -bottom-24 -left-20 size-72 animate-pulse rounded-full opacity-60 blur-3xl"
-          style={{ background: "radial-gradient(circle, hsl(190 90% 62% / 0.45), transparent 70%)", animationDuration: "6s" }}
+          style={{
+            background: "radial-gradient(circle, hsl(190 90% 62% / 0.45), transparent 70%)",
+            animationDuration: "6s",
+          }}
         />
         {/* Subtle grain */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.04] mix-blend-overlay"
-          style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "3px 3px" }}
+          style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+            backgroundSize: "3px 3px",
+          }}
         />
 
         <button
@@ -112,7 +121,9 @@ export function WelcomePopup() {
             >
               <MessagesSquare className="size-4" />
               Join WhatsApp
-              <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
+              <span aria-hidden className="transition-transform group-hover:translate-x-1">
+                →
+              </span>
             </a>
             <a
               href={COMMUNITY_LINKS.channel}

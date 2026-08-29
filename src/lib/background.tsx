@@ -10,11 +10,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 
 export type BackgroundStyle =
-  | "default"
-  | "animated-grid"
-  | "floating-particles"
-  | "aurora"
-  | "mesh";
+  "default" | "animated-grid" | "floating-particles" | "aurora" | "mesh";
 
 export const BACKGROUNDS: {
   id: BackgroundStyle;
@@ -62,8 +58,7 @@ export const BACKGROUNDS: {
 const SETTING_KEY = "site_background";
 const CACHE_KEY = "site-background";
 
-const isValid = (v: string): v is BackgroundStyle =>
-  BACKGROUNDS.some((b) => b.id === v);
+const isValid = (v: string): v is BackgroundStyle => BACKGROUNDS.some((b) => b.id === v);
 
 type Ctx = {
   background: BackgroundStyle;

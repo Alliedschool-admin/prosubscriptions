@@ -68,7 +68,9 @@ function ProductDetail() {
     if (!user) {
       try {
         localStorage.setItem(PENDING_CLAIM_KEY, product.id);
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       toast.info("Sign in to claim this free product");
       navigate({ to: "/auth" });
       return;
@@ -97,21 +99,23 @@ function ProductDetail() {
     let pending: string | null = null;
     try {
       pending = localStorage.getItem(PENDING_CLAIM_KEY);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     if (pending !== product.id) return;
     autoRan.current = true;
     try {
       localStorage.removeItem(PENDING_CLAIM_KEY);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     claimFree();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, product?.id, isFree]);
 
   if (loading && !product) {
     return (
-      <main className="mx-auto max-w-2xl px-4 py-24 text-center text-sm text-muted">
-        Loading…
-      </main>
+      <main className="mx-auto max-w-2xl px-4 py-24 text-center text-sm text-muted">Loading…</main>
     );
   }
 
@@ -132,9 +136,7 @@ function ProductDetail() {
   }
 
   const sameCat = products.filter((p) => p.id !== product.id && p.category === product.category);
-  const others = products.filter(
-    (p) => p.id !== product.id && p.category !== product.category,
-  );
+  const others = products.filter((p) => p.id !== product.id && p.category !== product.category);
   const related = [...sameCat, ...others].slice(0, 4);
 
   return (
@@ -148,67 +150,75 @@ function ProductDetail() {
 
       <div className="lg:grid lg:grid-cols-[1.05fr_1fr] lg:items-start lg:gap-12">
         <div className="lg:sticky lg:top-24 overflow-hidden rounded-2xl border border-border bg-neutral-200">
-        <img
-          src={product.image}
-          alt={product.name}
-          width={1024}
-          height={1024}
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-          className="aspect-square w-full object-cover lg:aspect-[4/5]"
-        />
+          <img
+            src={product.image}
+            alt={product.name}
+            width={1024}
+            height={1024}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            className="aspect-square w-full object-cover lg:aspect-[4/5]"
+          />
         </div>
 
         <div className="lg:pt-2">
-        <div className="mt-6 flex items-start justify-between gap-3 lg:mt-0">
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
-            {product.code} · {product.category}
+          <div className="mt-6 flex items-start justify-between gap-3 lg:mt-0">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                {product.code} · {product.category}
+              </p>
+              <h1 className="mt-1 text-3xl font-extrabold tracking-tight lg:text-5xl lg:leading-[1.02]">
+                {product.name}
+              </h1>
+              <p className="mt-1 text-sm text-muted lg:mt-2 lg:text-base">{product.tagline}</p>
+              <div className="mt-2">
+                {isFree ? <StockBadge stock={stock} free /> : <StockBadge stock={stock} />}
+              </div>
+              <div className="mt-3">
+                <WishlistButton productId={product.id} variant="inline" />
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              {isFree ? (
+                <span className="rounded-md bg-emerald-500 px-3 py-1.5 font-mono text-sm font-bold text-white">
+                  FREE
+                </span>
+              ) : (
+                currencies.map((c) => (
+                  <span
+                    key={c}
+                    className="rounded-md bg-foreground px-3 py-1.5 font-mono text-sm font-bold text-background"
+                  >
+                    {formatMoney(c, productPrice(product, c) ?? Number(product.price))}
+                  </span>
+                ))
+              )}
+            </div>
+          </div>
+
+          <p className="mt-6 text-pretty text-[15px] leading-relaxed text-foreground/80 lg:text-base">
+            {product.description}
           </p>
-          <h1 className="mt-1 text-3xl font-extrabold tracking-tight lg:text-5xl lg:leading-[1.02]">{product.name}</h1>
-          <p className="mt-1 text-sm text-muted lg:mt-2 lg:text-base">{product.tagline}</p>
-          <div className="mt-2">
-            {isFree ? (
-              <StockBadge stock={stock} free />
-            ) : (
-              <StockBadge stock={stock} />
-            )}
-          </div>
-          <div className="mt-3">
-            <WishlistButton productId={product.id} variant="inline" />
-          </div>
-        </div>
-        <div className="flex shrink-0 flex-col items-end gap-1">
-          {isFree ? (
-            <span className="rounded-md bg-emerald-500 px-3 py-1.5 font-mono text-sm font-bold text-white">FREE</span>
-          ) : currencies.map((c) => (
-            <span key={c} className="rounded-md bg-foreground px-3 py-1.5 font-mono text-sm font-bold text-background">
-              {formatMoney(c, productPrice(product, c) ?? Number(product.price))}
-            </span>
-          ))}
-        </div>
-      </div>
 
-      <p className="mt-6 text-pretty text-[15px] leading-relaxed text-foreground/80 lg:text-base">
-        {product.description}
-      </p>
-
-      <section className="mt-8">
-        <h2 className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
-          What&apos;s inside
-        </h2>
-        <ul className="space-y-2">
-          {product.features.map((f: string) => (
-            <li key={f} className="flex items-start gap-3 rounded-xl border border-border bg-background p-3">
-              <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                <Check className="size-3" strokeWidth={3} />
-              </span>
-              <span className="text-sm">{f}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
+          <section className="mt-8">
+            <h2 className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+              What&apos;s inside
+            </h2>
+            <ul className="space-y-2">
+              {product.features.map((f: string) => (
+                <li
+                  key={f}
+                  className="flex items-start gap-3 rounded-xl border border-border bg-background p-3"
+                >
+                  <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                    <Check className="size-3" strokeWidth={3} />
+                  </span>
+                  <span className="text-sm">{f}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
       </div>
 
@@ -249,7 +259,12 @@ function ProductDetail() {
               params={{ id: r.id }}
               className="group block overflow-hidden rounded-xl border border-border transition-transform hover:-translate-y-1"
             >
-              <img src={r.image} alt={r.name} loading="lazy" className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <img
+                src={r.image}
+                alt={r.name}
+                loading="lazy"
+                className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
               <div className="p-3">
                 <p className="truncate text-xs font-bold">{r.name}</p>
                 <p className="font-mono text-[10px] text-muted">
@@ -269,11 +284,15 @@ function ProductDetail() {
       <div className="fixed inset-x-0 bottom-[68px] z-30 border-t border-border bg-background/90 p-4 backdrop-blur-xl sm:bottom-0">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 lg:max-w-6xl lg:px-4">
           <div className="leading-none">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">{isFree ? "Price" : "From"}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+              {isFree ? "Price" : "From"}
+            </span>
             <div className="text-xl font-extrabold">
-              {isFree ? "FREE" : currencies
-                .map((c) => formatMoney(c, productPrice(product, c) ?? Number(product.price)))
-                .join(" · ") || "—"}
+              {isFree
+                ? "FREE"
+                : currencies
+                    .map((c) => formatMoney(c, productPrice(product, c) ?? Number(product.price)))
+                    .join(" · ") || "—"}
             </div>
           </div>
           {isFree ? (
@@ -282,7 +301,8 @@ function ProductDetail() {
               onClick={claimFree}
               className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
             >
-              <Gift className="size-4" /> {outOfStock ? "Sold out — restocking" : claiming ? "Claiming…" : "Get it free"}
+              <Gift className="size-4" />{" "}
+              {outOfStock ? "Sold out — restocking" : claiming ? "Claiming…" : "Get it free"}
             </button>
           ) : outOfStock ? (
             <button
@@ -297,23 +317,23 @@ function ProductDetail() {
               <MessageSquarePlus className="size-4" /> Request this
             </button>
           ) : (
-          <button
-            disabled={outOfStock}
-            onClick={() =>
-              openWith({
-                kind: "product",
-                id: product.id,
-                name: product.name,
-                subtitle: `${product.category} · ${product.code}`,
-                price_usd: usd,
-                price_pkr: pkr,
-                available_stock: stock,
-              })
-            }
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
-          >
-            <Download className="size-4" /> {outOfStock ? "Sold out — restocking" : "Buy Now"}
-          </button>
+            <button
+              disabled={outOfStock}
+              onClick={() =>
+                openWith({
+                  kind: "product",
+                  id: product.id,
+                  name: product.name,
+                  subtitle: `${product.category} · ${product.code}`,
+                  price_usd: usd,
+                  price_pkr: pkr,
+                  available_stock: stock,
+                })
+              }
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
+            >
+              <Download className="size-4" /> {outOfStock ? "Sold out — restocking" : "Buy Now"}
+            </button>
           )}
         </div>
       </div>
