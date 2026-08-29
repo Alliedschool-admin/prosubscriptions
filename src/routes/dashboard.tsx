@@ -69,9 +69,7 @@ function Dashboard() {
             {initials}
           </div>
           <div className="min-w-0">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
-              Signed in
-            </p>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Signed in</p>
             <h1 className="truncate text-2xl font-extrabold tracking-tight">{user.email}</h1>
           </div>
         </div>
@@ -84,9 +82,7 @@ function Dashboard() {
       <section className="mt-8 px-4 lg:px-0">
         <div className="mb-4 flex items-end justify-between">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
-              Your orders
-            </p>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Your orders</p>
             <h2 className="text-2xl font-extrabold tracking-tight">MY PURCHASES</h2>
           </div>
           <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-primary">
@@ -98,9 +94,7 @@ function Dashboard() {
           <p className="py-10 text-center text-sm text-muted">Loading…</p>
         ) : orders.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-            <p className="text-sm text-muted">
-              No orders yet. Browse the store to buy your first item.
-            </p>
+            <p className="text-sm text-muted">No orders yet. Browse the store to buy your first item.</p>
             <Link
               to="/"
               className="mt-4 inline-flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-primary"
@@ -115,9 +109,7 @@ function Dashboard() {
                 key={o.id}
                 order={o}
                 instructions={
-                  o.item_kind === "product"
-                    ? (getProduct(o.item_id)?.delivery_instructions ?? null)
-                    : null
+                  o.item_kind === "product" ? getProduct(o.item_id)?.delivery_instructions ?? null : null
                 }
                 onDelete={() => handleDelete(o.id)}
               />
@@ -137,9 +129,7 @@ function Dashboard() {
               <MessageSquarePlus className="mr-1 inline size-3" /> Wishlist
             </p>
             <p className="mt-1 text-sm font-bold">Request a product we don't stock</p>
-            <p className="text-xs text-muted">
-              Track your requests and admin replies in one place.
-            </p>
+            <p className="text-xs text-muted">Track your requests and admin replies in one place.</p>
           </div>
           <span className="shrink-0 rounded-lg bg-primary px-3 py-2 text-[11px] font-extrabold uppercase tracking-widest text-primary-foreground">
             Open
@@ -153,6 +143,7 @@ function Dashboard() {
     </main>
   );
 }
+
 
 function OrderCard({
   order: o,
@@ -186,12 +177,15 @@ function OrderCard({
         <StatusPill status={o.status} />
       </div>
       <p className="mt-2 font-mono text-xs text-muted">
-        {formatMoney((o.currency as Currency) ?? "USD", Number(o.amount))} ·{" "}
-        {o.payment_method_label ?? "—"}
+        {formatMoney((o.currency as Currency) ?? "USD", Number(o.amount))} · {o.payment_method_label ?? "—"}
       </p>
 
       {o.status === "approved" && o.delivered_content && (
-        <DeliveredLinks content={o.delivered_content} instructions={instructions} onCopy={copy} />
+        <DeliveredLinks
+          content={o.delivered_content}
+          instructions={instructions}
+          onCopy={copy}
+        />
       )}
 
       {o.status === "pending" && (
@@ -207,9 +201,7 @@ function OrderCard({
             rel="noreferrer"
             className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-[#25D366] px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-widest text-white shadow-sm transition hover:brightness-110"
           >
-            <svg viewBox="0 0 24 24" className="size-3" fill="currentColor" aria-hidden="true">
-              <path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.4-1.7a11.9 11.9 0 0 0 5.6 1.4h.1c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.3-6.2-3.5-8.3zM12 21.5c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.8 1 1-3.7-.2-.4a9.6 9.6 0 1 1 8.4 4.7z" />
-            </svg>
+            <svg viewBox="0 0 24 24" className="size-3" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.4-1.7a11.9 11.9 0 0 0 5.6 1.4h.1c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.3-6.2-3.5-8.3zM12 21.5c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.8 1 1-3.7-.2-.4a9.6 9.6 0 1 1 8.4 4.7z"/></svg>
             Ping admin on WhatsApp
           </a>
         </>
@@ -296,15 +288,15 @@ function DeliveredLinks({
       </ul>
 
       {instructions && (
-        <div className="mt-2 rounded-md border border-primary/20 bg-background/60 p-3">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
-            How to activate
-          </p>
-          <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-foreground/90">
-            {instructions}
-          </p>
-        </div>
-      )}
+            <div className="mt-2 rounded-md border border-primary/20 bg-background/60 p-3">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                How to activate
+              </p>
+              <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-foreground/90">
+                {instructions}
+              </p>
+            </div>
+          )}
     </div>
   );
 }

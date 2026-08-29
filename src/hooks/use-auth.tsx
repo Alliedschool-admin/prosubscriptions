@@ -26,7 +26,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsSuperAdmin(false);
       return;
     }
-    const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
     const roles = (data ?? []).map((r) => r.role);
     setIsSuperAdmin(roles.includes("super_admin"));
     setIsAdmin(roles.includes("admin") || roles.includes("super_admin"));

@@ -122,7 +122,11 @@ export const plans: Plan[] = [
     tagline: "Try the vault, no card required.",
     price: 0,
     cadence: "/mo",
-    features: ["Access to 5 free assets monthly", "Personal-use license", "Community support"],
+    features: [
+      "Access to 5 free assets monthly",
+      "Personal-use license",
+      "Community support",
+    ],
   },
   {
     id: "monthly",
@@ -155,10 +159,7 @@ export const plans: Plan[] = [
   },
 ];
 
-export const promoCodes: Record<
-  string,
-  { label: string; kind: "percent" | "flat"; value: number }
-> = {
+export const promoCodes: Record<string, { label: string; kind: "percent" | "flat"; value: number }> = {
   PRO10: { label: "PRO10 · 10% off", kind: "percent", value: 10 },
   LAUNCH25: { label: "LAUNCH25 · 25% off", kind: "percent", value: 25 },
   PRO50: { label: "PRO50 · $50 off", kind: "flat", value: 50 },

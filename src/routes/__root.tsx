@@ -96,17 +96,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Digital Chacho — Premium subscriptions at unreal prices" },
-      {
-        name: "description",
-        content:
-          "A curated vault of professional-grade presets, UI kits, AI tools and dev templates. Buy once or unlock everything with Pro.",
-      },
+      { name: "description", content: "A curated vault of professional-grade presets, UI kits, AI tools and dev templates. Buy once or unlock everything with Pro." },
       { name: "author", content: "Digital Chacho" },
       { property: "og:title", content: "Digital Chacho — Premium digital tools" },
-      {
-        property: "og:description",
-        content: "Curated presets, UI kits, AI tools and dev templates. Buy once or go Pro.",
-      },
+      { property: "og:description", content: "Curated presets, UI kits, AI tools and dev templates. Buy once or go Pro." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -170,31 +163,31 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <SkinProvider>
-          <BackgroundProvider>
-            <I18nProvider>
-              <AuthProvider>
-                <CartProvider>
-                  <div className="min-h-screen bg-background text-foreground antialiased">
-                    <SiteBackground />
-                    <div className="relative z-10">
-                      <OfflineBanner />
-                      <TopNav />
-                      <Outlet />
-                    </div>
-                  </div>
-                  <div aria-hidden className="grain-overlay" />
-                  <CheckoutSheet />
-                  <Toaster />
-                  <VisitorTracker />
-                  <WelcomePopup />
-                  <CommandPalette />
-                  <BroadcastListener />
-                  <PurchaseTicker />
-                  <NotificationPrompt />
-                </CartProvider>
-              </AuthProvider>
-            </I18nProvider>
-          </BackgroundProvider>
+        <BackgroundProvider>
+        <I18nProvider>
+          <AuthProvider>
+            <CartProvider>
+              <div className="min-h-screen bg-background text-foreground antialiased">
+                <SiteBackground />
+                <div className="relative z-10">
+                  <OfflineBanner />
+                  <TopNav />
+                  <Outlet />
+                </div>
+              </div>
+              <div aria-hidden className="grain-overlay" />
+              <CheckoutSheet />
+              <Toaster />
+              <VisitorTracker />
+              <WelcomePopup />
+              <CommandPalette />
+              <BroadcastListener />
+              <PurchaseTicker />
+              <NotificationPrompt />
+            </CartProvider>
+          </AuthProvider>
+        </I18nProvider>
+        </BackgroundProvider>
         </SkinProvider>
       </ThemeProvider>
     </QueryClientProvider>

@@ -1,17 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Search,
-  Clock,
-  Sparkles,
-  Zap,
-  ShieldCheck,
-  Rocket,
-  Infinity as InfinityIcon,
-  Diamond,
-  Smartphone,
-  Download,
-} from "lucide-react";
+import { Search, Clock, Sparkles, Zap, ShieldCheck, Rocket, Infinity as InfinityIcon, Diamond, Smartphone, Download } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { categories } from "../lib/mock-data";
 import { useProducts } from "../lib/products-store";
@@ -35,8 +24,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Digital Chacho — Premium subscriptions at unreal prices" },
       {
         property: "og:description",
-        content:
-          "Premium subscriptions, AI tools and digital gear at unreal prices. Instant delivery.",
+        content: "Premium subscriptions, AI tools and digital gear at unreal prices. Instant delivery.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE_URL}/` },
@@ -76,8 +64,7 @@ function Discovery() {
   const filtered = useMemo(() => {
     const q = debouncedQuery.trim().toLowerCase();
     return products.filter((p) => {
-      const matchesQ =
-        q === "" || p.name.toLowerCase().includes(q) || p.tagline.toLowerCase().includes(q);
+      const matchesQ = q === "" || p.name.toLowerCase().includes(q) || p.tagline.toLowerCase().includes(q);
       const matchesC = cat === "All" || p.category === cat;
       return matchesQ && matchesC;
     });
@@ -91,108 +78,66 @@ function Discovery() {
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[780px] grid-backdrop lg:block"
       />
       {/* Aurora orbs — floating cosmic light sources */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[520px] overflow-hidden lg:h-[680px]"
-      >
-        <div
-          className="aurora-orb"
-          style={{
-            top: "-60px",
-            left: "-40px",
-            width: 260,
-            height: 260,
-            background: "radial-gradient(circle, hsl(268 85% 68% / 0.55), transparent 70%)",
-          }}
-        />
-        <div
-          className="aurora-orb"
-          style={{
-            top: "40px",
-            right: "-60px",
-            width: 320,
-            height: 320,
-            background: "radial-gradient(circle, hsl(190 90% 62% / 0.45), transparent 70%)",
-            animationDelay: "-6s",
-          }}
-        />
-        <div
-          className="aurora-orb"
-          style={{
-            top: "220px",
-            left: "35%",
-            width: 220,
-            height: 220,
-            background: "radial-gradient(circle, hsl(38 95% 62% / 0.35), transparent 70%)",
-            animationDelay: "-11s",
-          }}
-        />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[520px] overflow-hidden lg:h-[680px]">
+        <div className="aurora-orb" style={{ top: "-60px", left: "-40px", width: 260, height: 260, background: "radial-gradient(circle, hsl(268 85% 68% / 0.55), transparent 70%)" }} />
+        <div className="aurora-orb" style={{ top: "40px", right: "-60px", width: 320, height: 320, background: "radial-gradient(circle, hsl(190 90% 62% / 0.45), transparent 70%)", animationDelay: "-6s" }} />
+        <div className="aurora-orb" style={{ top: "220px", left: "35%", width: 220, height: 220, background: "radial-gradient(circle, hsl(38 95% 62% / 0.35), transparent 70%)", animationDelay: "-11s" }} />
       </div>
 
       {/* Asymmetric hero */}
       <header className="relative mb-10 lg:mb-16 lg:grid lg:grid-cols-12 lg:items-end lg:gap-8">
         <div className="lg:col-span-8">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1 backdrop-blur-md">
-            <span className="relative grid size-2 place-items-center">
-              <span className="absolute inline-flex size-full rounded-full bg-primary pulse-ring" />
-              <span className="relative inline-flex size-2 rounded-full bg-primary" />
-            </span>
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-muted">
-              Premium Subscriptions · Fair Prices
-            </span>
-          </div>
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1 backdrop-blur-md">
+          <span className="relative grid size-2 place-items-center">
+            <span className="absolute inline-flex size-full rounded-full bg-primary pulse-ring" />
+            <span className="relative inline-flex size-2 rounded-full bg-primary" />
+          </span>
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-muted">
+            Premium Subscriptions · Fair Prices
+          </span>
+        </div>
 
-          <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(1.9rem,9vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
-            <span className="text-chrome">Premium tools.</span>
-            <br />
-            <span className="text-aurora sm:ml-[0.9em]">Unreal prices.</span>
-            <span className="hidden sm:inline">
-              <br />
-              <span className="text-foreground/90">/ no compromise.</span>
-            </span>
-          </h1>
+        <h1 className="font-display text-balance leading-[0.95] tracking-tight text-[clamp(1.9rem,9vw,4rem)] sm:text-6xl lg:text-5xl xl:text-6xl">
+          <span className="text-chrome">Premium tools.</span>
+          <br />
+          <span className="text-aurora sm:ml-[0.9em]">Unreal prices.</span>
+          <span className="hidden sm:inline"><br /><span className="text-foreground/90">/ no compromise.</span></span>
+        </h1>
 
-          <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6 sm:mt-6 lg:mt-8">
-            <p className="max-w-md text-sm leading-relaxed text-muted lg:text-base">
-              <span className="sm:hidden">Top-shelf subscriptions at a fraction of retail.</span>
-              <span className="hidden sm:inline">
-                Top-shelf subscriptions — AI, design, and dev tools — bundled at a fraction of
-                retail. Same features, smarter price, zero fluff.
-              </span>
-            </p>
-            <div className="hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-widest text-muted sm:block">
-              <div className="text-foreground/80">
-                {products.length.toString().padStart(3, "0")}
-              </div>
-              <div>plans live</div>
-            </div>
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6 sm:mt-6 lg:mt-8">
+          <p className="max-w-md text-sm leading-relaxed text-muted lg:text-base">
+            <span className="sm:hidden">Top-shelf subscriptions at a fraction of retail.</span>
+            <span className="hidden sm:inline">Top-shelf subscriptions — AI, design, and dev tools — bundled at a fraction of retail. Same features, smarter price, zero fluff.</span>
+          </p>
+          <div className="hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-widest text-muted sm:block">
+            <div className="text-foreground/80">{products.length.toString().padStart(3, "0")}</div>
+            <div>plans live</div>
           </div>
+        </div>
 
-          {/* Desktop-only CTA row */}
-          <div className="mt-8 hidden items-center gap-3 lg:flex">
-            <a
-              href="#vault"
-              className="group inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-primary-foreground shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
-              style={{
-                background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)",
-              }}
-            >
-              <Zap className="size-3.5" /> Enter the vault
-            </a>
-            <a
-              href="#posts"
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-foreground backdrop-blur-md transition-colors hover:border-primary/60 hover:text-primary"
-            >
-              <Sparkles className="size-3.5" /> Free methods
-            </a>
-            <a
-              href="/__l5e/assets-v1/92bb18e1-7641-48a0-8d6e-e011e3128c6c/digital-chacho-native-v2.3.apk"
-              download
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-foreground backdrop-blur-md transition-colors hover:border-primary/60 hover:text-primary"
-            >
-              <Smartphone className="size-3.5" /> Get Android app
-            </a>
-          </div>
+        {/* Desktop-only CTA row */}
+        <div className="mt-8 hidden items-center gap-3 lg:flex">
+          <a
+            href="#vault"
+            className="group inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-primary-foreground shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
+            style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
+          >
+            <Zap className="size-3.5" /> Enter the vault
+          </a>
+          <a
+            href="#posts"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-foreground backdrop-blur-md transition-colors hover:border-primary/60 hover:text-primary"
+          >
+            <Sparkles className="size-3.5" /> Free methods
+          </a>
+          <a
+            href="/__l5e/assets-v1/92bb18e1-7641-48a0-8d6e-e011e3128c6c/digital-chacho-native-v2.3.apk"
+            download
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.22em] text-foreground backdrop-blur-md transition-colors hover:border-primary/60 hover:text-primary"
+          >
+            <Smartphone className="size-3.5" /> Get Android app
+          </a>
+        </div>
         </div>
         {/* Desktop stat panel — creative flourish */}
         <aside className="mt-8 hidden lg:col-span-4 lg:mt-0 lg:block">
@@ -203,10 +148,7 @@ function Discovery() {
             <span
               aria-hidden
               className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full opacity-60 blur-3xl"
-              style={{
-                background:
-                  "radial-gradient(circle, color-mix(in oklab, var(--primary) 60%, transparent), transparent 70%)",
-              }}
+              style={{ background: "radial-gradient(circle, color-mix(in oklab, var(--primary) 60%, transparent), transparent 70%)" }}
             />
             <div className="mb-4 flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-emerald-400">
@@ -221,38 +163,25 @@ function Discovery() {
               </span>
             </div>
             <div className="flex items-baseline gap-3">
-              <CountUp
-                to={products.length}
-                className="font-display text-7xl tracking-tight text-aurora"
-              />
-              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted">
-                live plans
-              </span>
+              <CountUp to={products.length} className="font-display text-7xl tracking-tight text-aurora" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted">live plans</span>
             </div>
             <div className="mt-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
             <ul className="mt-4 space-y-2.5 font-mono text-[11px] uppercase tracking-widest text-muted">
               <li className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-2">
-                  <Rocket className="size-3 text-primary" /> Instant delivery
-                </span>
+                <span className="inline-flex items-center gap-2"><Rocket className="size-3 text-primary" /> Instant delivery</span>
                 <span className="text-foreground/80">24/7</span>
               </li>
               <li className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-2">
-                  <ShieldCheck className="size-3 text-primary" /> Verified stock
-                </span>
+                <span className="inline-flex items-center gap-2"><ShieldCheck className="size-3 text-primary" /> Verified stock</span>
                 <span className="text-foreground/80">Live</span>
               </li>
               <li className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-2">
-                  <Diamond className="size-3 text-primary" /> Fair pricing
-                </span>
+                <span className="inline-flex items-center gap-2"><Diamond className="size-3 text-primary" /> Fair pricing</span>
                 <span className="text-foreground/80">Always</span>
               </li>
               <li className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-2">
-                  <InfinityIcon className="size-3 text-primary" /> Support
-                </span>
+                <span className="inline-flex items-center gap-2"><InfinityIcon className="size-3 text-primary" /> Support</span>
                 <span className="text-foreground/80">Human</span>
               </li>
             </ul>
@@ -270,18 +199,13 @@ function Discovery() {
           <span
             aria-hidden
             className="pointer-events-none absolute -right-6 -top-6 size-28 rounded-full opacity-40 blur-2xl"
-            style={{
-              background:
-                "radial-gradient(circle, color-mix(in oklab, var(--primary) 70%, transparent), transparent 70%)",
-            }}
+            style={{ background: "radial-gradient(circle, color-mix(in oklab, var(--primary) 70%, transparent), transparent 70%)" }}
           />
           <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
             <Smartphone className="size-6" />
           </div>
           <div className="flex-1">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-              Native v2.3
-            </p>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Native v2.3</p>
             <p className="text-sm font-bold">Digital Chacho Android app</p>
             <p className="text-xs text-muted">Install the full native store on your phone.</p>
           </div>
@@ -304,29 +228,17 @@ function Discovery() {
         <div className="flex w-max animate-marquee gap-10 pr-10 font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-muted">
           {Array.from({ length: 2 }).map((_, dup) => (
             <div key={dup} className="flex shrink-0 items-center gap-10">
-              <span className="inline-flex items-center gap-2">
-                <Zap className="size-3 text-primary" /> Instant activation
-              </span>
+              <span className="inline-flex items-center gap-2"><Zap className="size-3 text-primary" /> Instant activation</span>
               <span className="text-foreground/30">◇</span>
-              <span className="inline-flex items-center gap-2">
-                <ShieldCheck className="size-3 text-primary" /> Buyer protected
-              </span>
+              <span className="inline-flex items-center gap-2"><ShieldCheck className="size-3 text-primary" /> Buyer protected</span>
               <span className="text-foreground/30">◇</span>
-              <span className="inline-flex items-center gap-2">
-                <Rocket className="size-3 text-primary" /> Live restocks
-              </span>
+              <span className="inline-flex items-center gap-2"><Rocket className="size-3 text-primary" /> Live restocks</span>
               <span className="text-foreground/30">◇</span>
-              <span className="inline-flex items-center gap-2">
-                <Sparkles className="size-3 text-primary" /> Free bonus drops
-              </span>
+              <span className="inline-flex items-center gap-2"><Sparkles className="size-3 text-primary" /> Free bonus drops</span>
               <span className="text-foreground/30">◇</span>
-              <span className="inline-flex items-center gap-2">
-                <Diamond className="size-3 text-primary" /> Fair, honest pricing
-              </span>
+              <span className="inline-flex items-center gap-2"><Diamond className="size-3 text-primary" /> Fair, honest pricing</span>
               <span className="text-foreground/30">◇</span>
-              <span className="inline-flex items-center gap-2">
-                <InfinityIcon className="size-3 text-primary" /> Human support
-              </span>
+              <span className="inline-flex items-center gap-2"><InfinityIcon className="size-3 text-primary" /> Human support</span>
               <span className="text-foreground/30">◇</span>
             </div>
           ))}
@@ -366,10 +278,7 @@ function Discovery() {
               }`}
               style={
                 active
-                  ? {
-                      background:
-                        "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)",
-                    }
+                  ? { background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }
                   : undefined
               }
             >
@@ -410,7 +319,9 @@ function Discovery() {
             No assets match that filter yet.
           </p>
         ) : (
-          filtered.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)
+          filtered.map((p, i) => (
+            <ProductCard key={p.id} product={p} index={i} />
+          ))
         )}
       </section>
 

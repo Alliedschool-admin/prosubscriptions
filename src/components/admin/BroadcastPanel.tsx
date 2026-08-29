@@ -97,9 +97,7 @@ export function BroadcastPanel() {
               <li
                 key={b.id}
                 className={`flex items-start justify-between gap-3 rounded-xl border p-3 ${
-                  b.active
-                    ? "border-primary/40 bg-primary/5"
-                    : "border-border bg-background/40 opacity-60"
+                  b.active ? "border-primary/40 bg-primary/5" : "border-border bg-background/40 opacity-60"
                 }`}
               >
                 <div className="min-w-0">

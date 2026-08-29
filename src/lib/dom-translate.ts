@@ -1,6 +1,7 @@
 import { translateStrings } from "./translate.functions";
 import type { Lang } from "./i18n";
 
+
 // Attribute set to translated node so we don't re-translate it.
 const MARK_ATTR = "data-i18n-lang";
 const ORIG_ATTR = "data-i18n-orig";
