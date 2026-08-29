@@ -31,19 +31,43 @@ import {
 
 export type ToolId = "copy" | "qr" | "password" | "text" | "calc" | "notes" | "alerts";
 
-export const TOOLS: { id: ToolId; label: string; desc: string; icon: typeof Copy; shortcut?: string }[] = [
-  { id: "copy", label: "Copy Unlocker", desc: "Select & copy text on pages that block it", icon: Unlock, shortcut: "Alt + U" },
+export const TOOLS: {
+  id: ToolId;
+  label: string;
+  desc: string;
+  icon: typeof Copy;
+  shortcut?: string;
+}[] = [
+  {
+    id: "copy",
+    label: "Copy Unlocker",
+    desc: "Select & copy text on pages that block it",
+    icon: Unlock,
+    shortcut: "Alt + U",
+  },
   { id: "qr", label: "QR Generator", desc: "Turn any link or text into a QR code", icon: QrCode },
-  { id: "password", label: "Password Vault Gen", desc: "Strong passwords for client accounts", icon: KeyRound },
+  {
+    id: "password",
+    label: "Password Vault Gen",
+    desc: "Strong passwords for client accounts",
+    icon: KeyRound,
+  },
   { id: "text", label: "Text Toolkit", desc: "Word count, case convert, clean-up", icon: Type },
-  { id: "calc", label: "Profit Calculator", desc: "Cost, price, margin & profit in seconds", icon: Calculator },
+  {
+    id: "calc",
+    label: "Profit Calculator",
+    desc: "Cost, price, margin & profit in seconds",
+    icon: Calculator,
+  },
   { id: "notes", label: "Quick Notes", desc: "Scratchpad saved on this device", icon: NotebookPen },
   { id: "alerts", label: "Alerts & Permissions", desc: "Announcement notifications", icon: Bell },
 ];
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border/70 bg-card/60 p-4 backdrop-blur-xl">{children}</div>
+    <div className="rounded-2xl border border-border/70 bg-card/60 p-4 backdrop-blur-xl">
+      {children}
+    </div>
   );
 }
 
@@ -143,8 +167,8 @@ function CopyTool() {
       <Card>
         <p className="text-sm font-bold">Works on other websites too</p>
         <p className="mt-0.5 text-xs text-muted">
-          Copy this one-line bookmarklet, save it as a browser bookmark, then tap it on any site that
-          blocks copying.
+          Copy this one-line bookmarklet, save it as a browser bookmark, then tap it on any site
+          that blocks copying.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Btn
@@ -273,7 +297,9 @@ function PasswordTool() {
               key={o.label}
               onClick={() => o.set(!o.on)}
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold ${
-                o.on ? "border-primary/50 bg-primary/15 text-foreground" : "border-border/70 text-muted"
+                o.on
+                  ? "border-primary/50 bg-primary/15 text-foreground"
+                  : "border-border/70 text-muted"
               }`}
             >
               {o.on && <Check className="size-3" />} {o.label}
@@ -299,8 +325,18 @@ function TextTool() {
   const actions: { label: string; fn: (s: string) => string }[] = [
     { label: "UPPER", fn: (s) => s.toUpperCase() },
     { label: "lower", fn: (s) => s.toLowerCase() },
-    { label: "Title Case", fn: (s) => s.replace(/\w\S*/g, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase()) },
-    { label: "Clean spaces", fn: (s) => s.replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim() },
+    {
+      label: "Title Case",
+      fn: (s) => s.replace(/\w\S*/g, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase()),
+    },
+    {
+      label: "Clean spaces",
+      fn: (s) =>
+        s
+          .replace(/[ \t]+/g, " ")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim(),
+    },
     { label: "Remove line breaks", fn: (s) => s.replace(/\s*\n\s*/g, " ").trim() },
   ];
   return (
@@ -320,7 +356,10 @@ function TextTool() {
             ["Lines", stats.lines],
             ["Min read", stats.read],
           ].map(([l, v]) => (
-            <div key={l as string} className="rounded-xl border border-border/60 bg-background/40 py-2">
+            <div
+              key={l as string}
+              className="rounded-xl border border-border/60 bg-background/40 py-2"
+            >
               <p className="font-mono text-sm font-bold">{v as number}</p>
               <p className="text-[10px] uppercase tracking-widest text-muted">{l as string}</p>
             </div>
@@ -591,7 +630,10 @@ export function ToolsDrawer({
                 }`}
                 style={
                   on
-                    ? { background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }
+                    ? {
+                        background:
+                          "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)",
+                      }
                     : undefined
                 }
               >

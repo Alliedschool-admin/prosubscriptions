@@ -44,7 +44,11 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
     e.stopPropagation();
     if (outOfStock) return;
     if (!user) {
-      try { localStorage.setItem(PENDING_CLAIM_KEY, product.id); } catch { /* ignore */ }
+      try {
+        localStorage.setItem(PENDING_CLAIM_KEY, product.id);
+      } catch {
+        /* ignore */
+      }
       toast.info("Sign in to claim this free product");
       navigate({ to: "/auth" });
       return;
@@ -104,10 +108,10 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
                 ? "bg-foreground text-background"
                 : "bg-emerald-500/90 text-white"
               : outOfStock
-              ? "bg-foreground text-background"
-              : stock <= 3
-                ? "bg-primary text-primary-foreground"
-                : "bg-background/60 text-foreground border border-border"
+                ? "bg-foreground text-background"
+                : stock <= 3
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-background/60 text-foreground border border-border"
           }`}
         >
           {isFree
@@ -115,10 +119,10 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
               ? "Restocking soon"
               : `FREE · ${stock} in stock`
             : outOfStock
-            ? "Restocking soon"
-            : stock <= 3
-              ? `Only ${stock} left`
-              : `${stock} in stock`}
+              ? "Restocking soon"
+              : stock <= 3
+                ? `Only ${stock} left`
+                : `${stock} in stock`}
         </span>
       </div>
       <div className="flex items-start justify-between gap-3 px-1">
@@ -134,7 +138,9 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             <span
               key={t}
               className="rounded-md px-2 py-1 font-mono text-xs font-bold text-primary-foreground"
-              style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
+              style={{
+                background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)",
+              }}
             >
               {t}
             </span>
@@ -148,7 +154,8 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           disabled={claiming || outOfStock}
           className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.2em] text-white shadow-lg shadow-emerald-500/30 transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-foreground/30 disabled:shadow-none"
         >
-          <Gift className="size-3.5" /> {outOfStock ? "Sold out" : claiming ? "Claiming…" : "Get it free"}
+          <Gift className="size-3.5" />{" "}
+          {outOfStock ? "Sold out" : claiming ? "Claiming…" : "Get it free"}
         </button>
       )}
       {!isFree && !outOfStock && (

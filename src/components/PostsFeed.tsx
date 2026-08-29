@@ -1,7 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Sparkles, Megaphone, Gift, Pin, ExternalLink, ChevronDown, Lightbulb, ArrowRight } from "lucide-react";
+import {
+  Sparkles,
+  Megaphone,
+  Gift,
+  Pin,
+  ExternalLink,
+  ChevronDown,
+  Lightbulb,
+  ArrowRight,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type PostCategory = "tip" | "free_method" | "update" | "announcement";
@@ -22,7 +31,10 @@ export type Post = {
 
 export const POSTS_QUERY_KEY = ["posts"] as const;
 
-export const CATEGORY_META: Record<PostCategory, { label: string; icon: typeof Gift; tone: string }> = {
+export const CATEGORY_META: Record<
+  PostCategory,
+  { label: string; icon: typeof Gift; tone: string }
+> = {
   tip: { label: "Tip & trick", icon: Lightbulb, tone: "text-cyan-400 bg-cyan-400/10" },
   free_method: { label: "Free method", icon: Gift, tone: "text-emerald-500 bg-emerald-500/10" },
   update: { label: "Update", icon: Sparkles, tone: "text-primary bg-primary/10" },
@@ -68,7 +80,9 @@ export function PostCard({ post: p, linkToPost = true }: { post: Post; linkToPos
         </span>
       )}
       <div className="flex items-center gap-2">
-        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest ${meta.tone}`}>
+        <span
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest ${meta.tone}`}
+        >
           <Icon className="size-3" /> {meta.label}
         </span>
         <span className="font-mono text-[10px] text-muted">

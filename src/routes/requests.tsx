@@ -19,9 +19,15 @@ export const Route = createFileRoute("/requests")({
   head: () => ({
     meta: [
       { title: "My Requests — Digital Chacho" },
-      { name: "description", content: "Request products we don't stock yet and track admin replies." },
+      {
+        name: "description",
+        content: "Request products we don't stock yet and track admin replies.",
+      },
       { property: "og:title", content: "My Requests" },
-      { property: "og:description", content: "Request products we don't stock yet and track admin replies." },
+      {
+        property: "og:description",
+        content: "Request products we don't stock yet and track admin replies.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -45,7 +51,9 @@ function RequestsPage() {
       setName(search.request);
       setOpen(true);
       setTimeout(() => {
-        document.getElementById("request-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        document
+          .getElementById("request-form")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 60);
     }
   }, [search.request]);
@@ -54,7 +62,9 @@ function RequestsPage() {
     return (
       <main className="mx-auto max-w-md px-4 py-20 text-center">
         <h1 className="text-2xl font-extrabold tracking-tight">Sign in to request products</h1>
-        <p className="mt-2 text-sm text-muted">Tell us what to stock and track admin replies here.</p>
+        <p className="mt-2 text-sm text-muted">
+          Tell us what to stock and track admin replies here.
+        </p>
         <Link
           to="/auth"
           className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-primary py-3 text-sm font-extrabold uppercase tracking-widest text-primary-foreground"
@@ -226,13 +236,7 @@ function RequestsPage() {
   );
 }
 
-function RequestCard({
-  req,
-  onDelete,
-}: {
-  req: ProductRequest;
-  onDelete: (id: string) => void;
-}) {
+function RequestCard({ req, onDelete }: { req: ProductRequest; onDelete: (id: string) => void }) {
   const answered = !!req.admin_response;
   return (
     <li className="rounded-xl border border-border bg-background p-4">
@@ -257,9 +261,7 @@ function RequestCard({
           {REQUEST_STATUS_LABEL[req.status]}
         </span>
       </div>
-      {req.details && (
-        <p className="mt-2 whitespace-pre-line text-xs text-muted">{req.details}</p>
-      )}
+      {req.details && <p className="mt-2 whitespace-pre-line text-xs text-muted">{req.details}</p>}
       {req.reference_link && (
         <a
           href={req.reference_link}

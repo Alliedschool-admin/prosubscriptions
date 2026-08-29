@@ -9,7 +9,15 @@ const CSS = `*,*::before,*::after{
   -webkit-touch-callout:default !important;
 }`;
 
-const blocked = ["contextmenu", "copy", "cut", "selectstart", "dragstart", "mousedown", "mouseup"] as const;
+const blocked = [
+  "contextmenu",
+  "copy",
+  "cut",
+  "selectstart",
+  "dragstart",
+  "mousedown",
+  "mouseup",
+] as const;
 
 function stopper(e: Event) {
   e.stopPropagation();
@@ -67,8 +75,8 @@ export const COPY_UNLOCK_BOOKMARKLET = `javascript:(function(){var d=document,s=
 
 /** Copy whatever text is currently selected (or the whole page as fallback). */
 export async function copySelectionOrPage(): Promise<{ ok: boolean; chars: number }> {
-  const sel = typeof window !== "undefined" ? window.getSelection()?.toString() ?? "" : "";
-  const text = sel.trim() ? sel : document.body?.innerText ?? "";
+  const sel = typeof window !== "undefined" ? (window.getSelection()?.toString() ?? "") : "";
+  const text = sel.trim() ? sel : (document.body?.innerText ?? "");
   if (!text.trim()) return { ok: false, chars: 0 };
   try {
     await navigator.clipboard.writeText(text);

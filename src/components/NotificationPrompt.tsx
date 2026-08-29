@@ -45,10 +45,14 @@ export function NotificationPrompt() {
                   const r = await requestNotificationPermission();
                   setShow(false);
                   if (r === "granted") toast.success("Alerts enabled");
-                  else if (r === "denied") toast.error("You can enable them later in Tools → Alerts");
+                  else if (r === "denied")
+                    toast.error("You can enable them later in Tools → Alerts");
                 }}
                 className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25"
-                style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
+                style={{
+                  background:
+                    "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)",
+                }}
               >
                 Allow
               </button>

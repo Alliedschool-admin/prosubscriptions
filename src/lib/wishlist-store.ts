@@ -20,7 +20,9 @@ export function useWishlist() {
 }
 
 export async function addToWishlist(userId: string, productId: string) {
-  const { error } = await supabase.from("wishlists").insert({ user_id: userId, product_id: productId });
+  const { error } = await supabase
+    .from("wishlists")
+    .insert({ user_id: userId, product_id: productId });
   if (error && !/duplicate/i.test(error.message)) throw error;
 }
 

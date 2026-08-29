@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Search, Package, Home, Library, Heart, Bell, ShieldCheck, LogIn, Lightbulb } from "lucide-react";
+import {
+  Search,
+  Package,
+  Home,
+  Library,
+  Heart,
+  Bell,
+  ShieldCheck,
+  LogIn,
+  Lightbulb,
+} from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -59,7 +69,9 @@ export function CommandPalette() {
           <CommandItem onSelect={() => go(() => navigate({ to: "/wishlist" }))}>
             <Heart className="mr-2 size-4" /> Wishlist
           </CommandItem>
-          <CommandItem onSelect={() => go(() => navigate({ to: "/requests", search: { request: undefined } }))}>
+          <CommandItem
+            onSelect={() => go(() => navigate({ to: "/requests", search: { request: undefined } }))}
+          >
             <Bell className="mr-2 size-4" /> Requests
           </CommandItem>
           <CommandItem onSelect={() => go(() => navigate({ to: "/tips" }))}>

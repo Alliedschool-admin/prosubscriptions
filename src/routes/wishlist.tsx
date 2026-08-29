@@ -47,13 +47,17 @@ function WishlistPage() {
         <Heart className="mr-1 inline size-3" /> Favorites
       </p>
       <h1 className="text-2xl font-extrabold tracking-tight">MY WISHLIST</h1>
-      <p className="mt-1 text-sm text-muted">Come back anytime — items stay saved to your account.</p>
+      <p className="mt-1 text-sm text-muted">
+        Come back anytime — items stay saved to your account.
+      </p>
 
       {isLoading ? (
         <p className="py-16 text-center text-sm text-muted">Loading…</p>
       ) : items.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-dashed border-border p-10 text-center">
-          <p className="text-sm text-muted">Your wishlist is empty. Tap the heart on any product to save it.</p>
+          <p className="text-sm text-muted">
+            Your wishlist is empty. Tap the heart on any product to save it.
+          </p>
           <Link
             to="/"
             className="mt-4 inline-flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-primary"

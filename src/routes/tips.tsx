@@ -62,9 +62,7 @@ function TipsPage() {
   const filtered = posts.filter((p) => {
     const catOk = activeCat === "all" || p.category === (activeCat as PostCategory);
     const qOk =
-      !query ||
-      p.title.toLowerCase().includes(query) ||
-      p.body.toLowerCase().includes(query);
+      !query || p.title.toLowerCase().includes(query) || p.body.toLowerCase().includes(query);
     return catOk && qOk;
   });
 
@@ -98,8 +96,7 @@ function TipsPage() {
             <button
               key={c.id}
               type="button"
-              onClick={() =>
-setCat(c.id)}
+              onClick={() => setCat(c.id)}
               className={`rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest transition ${
                 on
                   ? "border-primary/60 bg-primary/15 text-foreground"
@@ -116,8 +113,7 @@ setCat(c.id)}
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
         <input
           value={q}
-          onChange={(e) =>
-setQ(e.target.value)}
+          onChange={(e) => setQ(e.target.value)}
           placeholder="Search tips, methods, updates…"
           className="input w-full pl-9"
         />

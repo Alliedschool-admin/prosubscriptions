@@ -67,28 +67,41 @@ export function PWAInstallButton() {
               >
                 <X className="size-4" />
               </button>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Install on iPhone</p>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                Install on iPhone
+              </p>
               <h3 className="mt-2 text-lg font-extrabold tracking-tight">Add to Home Screen</h3>
               <ol className="mt-4 space-y-3 text-sm">
                 <li className="flex items-start gap-3">
-                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 font-mono text-[11px] font-bold text-primary">1</span>
+                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 font-mono text-[11px] font-bold text-primary">
+                    1
+                  </span>
                   <span className="flex flex-wrap items-center gap-1.5">
-                    Tap the <Share className="inline size-4 text-primary" /> <b>Share</b> button in Safari
+                    Tap the <Share className="inline size-4 text-primary" /> <b>Share</b> button in
+                    Safari
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 font-mono text-[11px] font-bold text-primary">2</span>
+                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 font-mono text-[11px] font-bold text-primary">
+                    2
+                  </span>
                   <span className="flex flex-wrap items-center gap-1.5">
-                    Scroll and pick <Plus className="inline size-4 text-primary" /> <b>Add to Home Screen</b>
+                    Scroll and pick <Plus className="inline size-4 text-primary" />{" "}
+                    <b>Add to Home Screen</b>
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 font-mono text-[11px] font-bold text-primary">3</span>
-                  <span>Tap <b>Add</b> — the app icon lands on your home screen.</span>
+                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/15 font-mono text-[11px] font-bold text-primary">
+                    3
+                  </span>
+                  <span>
+                    Tap <b>Add</b> — the app icon lands on your home screen.
+                  </span>
                 </li>
               </ol>
               <p className="mt-4 text-[11px] text-muted">
-                Make sure you're using Safari (not Chrome/in-app browsers) — Apple only allows install from Safari.
+                Make sure you're using Safari (not Chrome/in-app browsers) — Apple only allows
+                install from Safari.
               </p>
             </div>
           </div>

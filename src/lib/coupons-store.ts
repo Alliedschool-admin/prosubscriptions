@@ -31,11 +31,5 @@ export async function applyCouponRpc(
   return row;
 }
 
-export async function redeemCouponRpc(code: string) {
-  try {
-    await (supabase.rpc as unknown as (fn: string, args: Record<string, unknown>) => Promise<unknown>)(
-      "redeem_coupon",
-      { _code: code },
-    );
-  } catch { /* best-effort */ }
-}
+// NOTE: coupon redemption now happens atomically inside the `place_order`
+// RPC (see orders-store.placeOrder) — no separate redeem call is needed.

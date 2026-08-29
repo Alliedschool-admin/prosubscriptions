@@ -17,7 +17,9 @@ export function LoyaltyCard() {
           <Sparkles className="size-5" />
         </span>
         <div className="flex-1">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Loyalty points</p>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+            Loyalty points
+          </p>
           <p className="font-display text-2xl leading-none tracking-tight">
             {points.toLocaleString()} <span className="text-sm font-normal text-muted">pts</span>
           </p>

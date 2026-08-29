@@ -1,5 +1,17 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Compass, LayoutDashboard, ShieldCheck, LogIn, LogOut, Sun, Moon, Monitor, MessageSquarePlus, Heart, Lightbulb } from "lucide-react";
+import {
+  Compass,
+  LayoutDashboard,
+  ShieldCheck,
+  LogIn,
+  LogOut,
+  Sun,
+  Moon,
+  Monitor,
+  MessageSquarePlus,
+  Heart,
+  Lightbulb,
+} from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
 import { useI18n } from "../lib/i18n";
 import { useTheme, type ThemeChoice } from "../lib/theme";
@@ -28,9 +40,7 @@ export function TopNav() {
       <nav className="sticky top-0 z-40 border-b border-border/60 bg-background/50 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4 lg:max-w-6xl lg:px-8">
           <Link to="/" className="group flex items-center gap-2.5">
-            <span
-              className="relative grid size-9 place-items-center overflow-hidden rounded-full bg-[oklch(0.14_0.02_280)] ring-1 ring-border/70 shadow-[0_4px_16px_-4px_color-mix(in_oklab,var(--primary)_45%,transparent)] transition-transform duration-500 group-hover:scale-[1.06]"
-            >
+            <span className="relative grid size-9 place-items-center overflow-hidden rounded-full bg-[oklch(0.14_0.02_280)] ring-1 ring-border/70 shadow-[0_4px_16px_-4px_color-mix(in_oklab,var(--primary)_45%,transparent)] transition-transform duration-500 group-hover:scale-[1.06]">
               <img
                 src={logoMark}
                 alt="Digital Chacho"
@@ -41,7 +51,7 @@ export function TopNav() {
             </span>
             <span className="font-display whitespace-nowrap text-base tracking-tight sm:text-lg">
               <span className="text-chrome">DIGITAL</span>
-            <span className="hidden text-foreground/80 sm:inline"> · CHACHO</span>
+              <span className="hidden text-foreground/80 sm:inline"> · CHACHO</span>
             </span>
           </Link>
           <div className="hidden items-center gap-1 lg:flex">
@@ -75,7 +85,10 @@ export function TopNav() {
               <Link
                 to="/auth"
                 className="ml-1 inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/30"
-                style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
+                style={{
+                  background:
+                    "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)",
+                }}
               >
                 <LogIn className="size-4" /> {t("nav.signIn")}
               </Link>
@@ -97,7 +110,10 @@ export function TopNav() {
               <Link
                 to="/auth"
                 className="rounded-full px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-primary-foreground shadow-md shadow-primary/30"
-                style={{ background: "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)" }}
+                style={{
+                  background:
+                    "linear-gradient(120deg, var(--primary) 0%, var(--primary-glow) 100%)",
+                }}
               >
                 {t("nav.signIn")}
               </Link>

@@ -277,7 +277,9 @@ function ProductsPanel() {
       return data ?? [];
     },
   });
-  const countByProduct = new Map(purchaseCounts.map((r) => [r.product_id, Number(r.purchase_count)]));
+  const countByProduct = new Map(
+    purchaseCounts.map((r) => [r.product_id, Number(r.purchase_count)]),
+  );
 
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -316,8 +318,8 @@ function ProductsPanel() {
       toast.error("Name, tagline and description are required.");
       return;
     }
-    const usdNum = isFree ? 0 : (priceUsd.trim() === "" ? null : Number(priceUsd));
-    const pkrNum = isFree ? 0 : (pricePkr.trim() === "" ? null : Number(pricePkr));
+    const usdNum = isFree ? 0 : priceUsd.trim() === "" ? null : Number(priceUsd);
+    const pkrNum = isFree ? 0 : pricePkr.trim() === "" ? null : Number(pricePkr);
     const costUsdNum = costUsd.trim() === "" ? null : Number(costUsd);
     const costPkrNum = costPkr.trim() === "" ? null : Number(costPkr);
     if (!isFree) {
@@ -379,58 +381,142 @@ function ProductsPanel() {
 
   return (
     <>
-      <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-background p-5">
+      <form
+        onSubmit={onSubmit}
+        className="space-y-4 rounded-2xl border border-border bg-background p-5"
+      >
         <Field label="Name">
-          <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="QUANTUM ICONS" className="input" />
+          <input
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="QUANTUM ICONS"
+            className="input"
+          />
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Code">
-            <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="VLT-042" className="input font-mono" />
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="VLT-042"
+              className="input font-mono"
+            />
           </Field>
           <Field label="Category">
-            <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="input">
-              {CAT_OPTIONS.map((c) => (<option key={c}>{c}</option>))}
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as Category)}
+              className="input"
+            >
+              {CAT_OPTIONS.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
             </select>
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Price (USD)" hint="Leave blank if USD not offered.">
-            <input type="number" min="0" step="0.01" disabled={isFree} value={isFree ? "" : priceUsd} onChange={(e) => setPriceUsd(e.target.value)} placeholder={isFree ? "Free" : "29"} className="input font-mono disabled:opacity-50" />
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              disabled={isFree}
+              value={isFree ? "" : priceUsd}
+              onChange={(e) => setPriceUsd(e.target.value)}
+              placeholder={isFree ? "Free" : "29"}
+              className="input font-mono disabled:opacity-50"
+            />
           </Field>
           <Field label="Price (PKR)" hint="Leave blank if PKR not offered.">
-            <input type="number" min="0" step="1" disabled={isFree} value={isFree ? "" : pricePkr} onChange={(e) => setPricePkr(e.target.value)} placeholder={isFree ? "Free" : "7999"} className="input font-mono disabled:opacity-50" />
+            <input
+              type="number"
+              min="0"
+              step="1"
+              disabled={isFree}
+              value={isFree ? "" : pricePkr}
+              onChange={(e) => setPricePkr(e.target.value)}
+              placeholder={isFree ? "Free" : "7999"}
+              className="input font-mono disabled:opacity-50"
+            />
           </Field>
         </div>
         <label className="flex items-center gap-2 rounded-lg border border-border bg-foreground/[0.03] px-3 py-2 text-xs font-bold uppercase tracking-widest text-foreground">
-          <input type="checkbox" checked={isFree} onChange={(e) => setIsFree(e.target.checked)} className="size-4 accent-emerald-500" />
+          <input
+            type="checkbox"
+            checked={isFree}
+            onChange={(e) => setIsFree(e.target.checked)}
+            className="size-4 accent-emerald-500"
+          />
           Free product · buyers claim instantly with no approval or checkout
         </label>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Cost (USD)" hint="Your purchase price. Used for profit tracking.">
-            <input type="number" min="0" step="0.01" value={costUsd} onChange={(e) => setCostUsd(e.target.value)} placeholder="12" className="input font-mono" />
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={costUsd}
+              onChange={(e) => setCostUsd(e.target.value)}
+              placeholder="12"
+              className="input font-mono"
+            />
           </Field>
           <Field label="Cost (PKR)" hint="Your purchase price. Used for profit tracking.">
-            <input type="number" min="0" step="1" value={costPkr} onChange={(e) => setCostPkr(e.target.value)} placeholder="3200" className="input font-mono" />
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={costPkr}
+              onChange={(e) => setCostPkr(e.target.value)}
+              placeholder="3200"
+              className="input font-mono"
+            />
           </Field>
         </div>
         <Field label="Tagline">
-          <input required value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="500 pixel-perfect icons for modern UIs" className="input" />
+          <input
+            required
+            value={tagline}
+            onChange={(e) => setTagline(e.target.value)}
+            placeholder="500 pixel-perfect icons for modern UIs"
+            className="input"
+          />
         </Field>
         <Field label="Description">
-          <textarea required rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className="input resize-none" />
+          <textarea
+            required
+            rows={4}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="input resize-none"
+          />
         </Field>
-        <Field label="Product image" hint="Paste a URL or upload from your device. Leave blank to use a default cover.">
+        <Field
+          label="Product image"
+          hint="Paste a URL or upload from your device. Leave blank to use a default cover."
+        >
           <ImageInput value={image} onChange={setImage} folder="products" />
         </Field>
         <Field label="Features" hint="One per line.">
-          <textarea rows={4} value={features} onChange={(e) => setFeatures(e.target.value)} className="input resize-none" />
+          <textarea
+            rows={4}
+            value={features}
+            onChange={(e) => setFeatures(e.target.value)}
+            className="input resize-none"
+          />
         </Field>
-        <Field label="Delivery / activation instructions" hint="Shown to the buyer next to their delivered link after approval. Explain how to redeem, install, or activate.">
+        <Field
+          label="Delivery / activation instructions"
+          hint="Shown to the buyer next to their delivered link after approval. Explain how to redeem, install, or activate."
+        >
           <textarea
             rows={5}
             value={deliveryInstructions}
             onChange={(e) => setDeliveryInstructions(e.target.value)}
-            placeholder={"1. Open the link\n2. Sign in with the email you used at checkout\n3. Paste the license key into Settings → Activate"}
+            placeholder={
+              "1. Open the link\n2. Sign in with the email you used at checkout\n3. Paste the license key into Settings → Activate"
+            }
             className="input resize-none"
           />
         </Field>
@@ -462,7 +548,12 @@ function ProductsPanel() {
         ) : (
           <ul className="space-y-3">
             {products.map((p) => (
-              <ProductRow key={p.id} product={p} onDelete={onDelete} purchaseCount={countByProduct.get(p.id) ?? 0} />
+              <ProductRow
+                key={p.id}
+                product={p}
+                onDelete={onDelete}
+                purchaseCount={countByProduct.get(p.id) ?? 0}
+              />
             ))}
           </ul>
         )}
@@ -591,7 +682,10 @@ function CouponsPanel() {
 
   return (
     <>
-      <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-background p-5">
+      <form
+        onSubmit={onSubmit}
+        className="space-y-4 rounded-2xl border border-border bg-background p-5"
+      >
         <div className="grid grid-cols-2 gap-3">
           <Field label="Code">
             <input
@@ -603,7 +697,11 @@ function CouponsPanel() {
             />
           </Field>
           <Field label="Type">
-            <select value={kind} onChange={(e) => setKind(e.target.value as "percent" | "fixed")} className="input">
+            <select
+              value={kind}
+              onChange={(e) => setKind(e.target.value as "percent" | "fixed")}
+              className="input"
+            >
               <option value="percent">Percent (%)</option>
               <option value="fixed">Fixed amount</option>
             </select>
@@ -622,7 +720,10 @@ function CouponsPanel() {
               className="input font-mono"
             />
           </Field>
-          <Field label="Currency" hint={kind === "fixed" ? "Required for fixed." : "Restrict to one currency (optional)."}>
+          <Field
+            label="Currency"
+            hint={kind === "fixed" ? "Required for fixed." : "Restrict to one currency (optional)."}
+          >
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value as "" | "USD" | "PKR")}
@@ -685,7 +786,9 @@ function CouponsPanel() {
 
       <section className="mt-8">
         <div className="mb-3">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Existing codes</p>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            Existing codes
+          </p>
           <h2 className="text-2xl font-extrabold tracking-tight">MANAGE</h2>
         </div>
         {isLoading ? (
@@ -704,7 +807,9 @@ function CouponsPanel() {
                 <li key={c.id} className="rounded-2xl border border-border bg-background p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <p className="font-mono text-sm font-extrabold uppercase tracking-widest">{c.code}</p>
+                      <p className="font-mono text-sm font-extrabold uppercase tracking-widest">
+                        {c.code}
+                      </p>
                       <p className="text-xs text-muted">
                         {formatValue(c)}
                         {c.min_amount > 0 && ` · min ${c.min_amount}`}
@@ -731,7 +836,11 @@ function CouponsPanel() {
                   </div>
                   <div className="mt-2 grid grid-cols-3 gap-2 text-[11px] text-muted">
                     <span>
-                      Uses: <span className="font-mono text-foreground">{c.uses_count}{c.max_uses != null ? `/${c.max_uses}` : ""}</span>
+                      Uses:{" "}
+                      <span className="font-mono text-foreground">
+                        {c.uses_count}
+                        {c.max_uses != null ? `/${c.max_uses}` : ""}
+                      </span>
                     </span>
                     <span>
                       Expires:{" "}
@@ -830,31 +939,46 @@ function ProductRow({
   return (
     <li className="rounded-xl border border-border bg-background p-3">
       <div className="flex items-center gap-3">
-        <img src={product.image} alt={product.name} loading="lazy" className="size-12 shrink-0 rounded-lg object-cover" />
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          className="size-12 shrink-0 rounded-lg object-cover"
+        />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-bold">
             {product.name}
-            {isFree && <span className="ml-2 rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-600">FREE</span>}
+            {isFree && (
+              <span className="ml-2 rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-600">
+                FREE
+              </span>
+            )}
           </p>
           <p className="truncate font-mono text-[10px] uppercase tracking-widest text-muted">
             {product.code} · {product.category}
-            {!isFree && product.price_usd != null && product.price_usd > 0 ? ` · $${Number(product.price_usd)}` : ""}
-            {!isFree && product.price_pkr != null && product.price_pkr > 0 ? ` · Rs ${Number(product.price_pkr).toLocaleString("en-PK")}` : ""}
+            {!isFree && product.price_usd != null && product.price_usd > 0
+              ? ` · $${Number(product.price_usd)}`
+              : ""}
+            {!isFree && product.price_pkr != null && product.price_pkr > 0
+              ? ` · Rs ${Number(product.price_pkr).toLocaleString("en-PK")}`
+              : ""}
             {` · ${purchaseCount} sold`}
           </p>
         </div>
-        {!isFree && (<span
-          className={`shrink-0 rounded-full px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest ${
-            stock === 0
-              ? "bg-destructive/15 text-destructive"
-              : stock <= 3
-                ? "bg-primary/15 text-primary"
-                : "bg-foreground/5 text-foreground"
-          }`}
-          title="Available stock links"
-        >
-          {stock} stock
-        </span>)}
+        {!isFree && (
+          <span
+            className={`shrink-0 rounded-full px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest ${
+              stock === 0
+                ? "bg-destructive/15 text-destructive"
+                : stock <= 3
+                  ? "bg-primary/15 text-primary"
+                  : "bg-foreground/5 text-foreground"
+            }`}
+            title="Available stock links"
+          >
+            {stock} stock
+          </span>
+        )}
         <button
           onClick={() => setEditing((v) => !v)}
           className={`rounded-lg p-2 ${editing ? "bg-primary text-primary-foreground" : "bg-foreground/5 text-muted hover:text-foreground"}`}
@@ -869,10 +993,19 @@ function ProductRow({
         >
           <Package className="size-4" />
         </button>
-        <Link to="/products/$id" params={{ id: product.id }} className="rounded-lg bg-foreground/5 p-2 text-muted hover:text-foreground" aria-label="View">
+        <Link
+          to="/products/$id"
+          params={{ id: product.id }}
+          className="rounded-lg bg-foreground/5 p-2 text-muted hover:text-foreground"
+          aria-label="View"
+        >
           <ExternalLink className="size-4" />
         </Link>
-        <button onClick={() => onDelete(product.id, product.name)} className="rounded-lg bg-destructive/10 p-2 text-destructive hover:bg-destructive/15" aria-label="Delete">
+        <button
+          onClick={() => onDelete(product.id, product.name)}
+          className="rounded-lg bg-destructive/10 p-2 text-destructive hover:bg-destructive/15"
+          aria-label="Delete"
+        >
           <Trash2 className="size-4" />
         </button>
       </div>
@@ -894,15 +1027,21 @@ function EditProductForm({
   const [code, setCode] = useState(product.code);
   const [category, setCategory] = useState<Category>(product.category);
   const [isFree, setIsFree] = useState(!!product.is_free);
-  const [priceUsd, setPriceUsd] = useState(product.price_usd == null ? "" : String(product.price_usd));
-  const [pricePkr, setPricePkr] = useState(product.price_pkr == null ? "" : String(product.price_pkr));
+  const [priceUsd, setPriceUsd] = useState(
+    product.price_usd == null ? "" : String(product.price_usd),
+  );
+  const [pricePkr, setPricePkr] = useState(
+    product.price_pkr == null ? "" : String(product.price_pkr),
+  );
   const [costUsd, setCostUsd] = useState(product.cost_usd == null ? "" : String(product.cost_usd));
   const [costPkr, setCostPkr] = useState(product.cost_pkr == null ? "" : String(product.cost_pkr));
   const [tagline, setTagline] = useState(product.tagline);
   const [description, setDescription] = useState(product.description);
   const [image, setImage] = useState(product.image);
   const [features, setFeatures] = useState((product.features ?? []).join("\n"));
-  const [deliveryInstructions, setDeliveryInstructions] = useState(product.delivery_instructions ?? "");
+  const [deliveryInstructions, setDeliveryInstructions] = useState(
+    product.delivery_instructions ?? "",
+  );
   const [busy, setBusy] = useState(false);
 
   async function save(e: FormEvent) {
@@ -911,8 +1050,8 @@ function EditProductForm({
       toast.error("Name, tagline and description are required.");
       return;
     }
-    const usdNum = isFree ? 0 : (priceUsd.trim() === "" ? null : Number(priceUsd));
-    const pkrNum = isFree ? 0 : (pricePkr.trim() === "" ? null : Number(pricePkr));
+    const usdNum = isFree ? 0 : priceUsd.trim() === "" ? null : Number(priceUsd);
+    const pkrNum = isFree ? 0 : pricePkr.trim() === "" ? null : Number(pricePkr);
     if (!isFree) {
       if (usdNum != null && (!Number.isFinite(usdNum) || usdNum < 0)) {
         toast.error("Enter a valid USD price.");
@@ -927,7 +1066,10 @@ function EditProductForm({
         return;
       }
     }
-    const featureList = features.split("\n").map((f) => f.trim()).filter(Boolean);
+    const featureList = features
+      .split("\n")
+      .map((f) => f.trim())
+      .filter(Boolean);
 
     setBusy(true);
     try {
@@ -967,45 +1109,100 @@ function EditProductForm({
       </Field>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Code">
-          <input value={code} onChange={(e) => setCode(e.target.value)} className="input font-mono" />
+          <input
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className="input font-mono"
+          />
         </Field>
         <Field label="Category">
-          <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="input">
-            {CAT_OPTIONS.map((c) => (<option key={c}>{c}</option>))}
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value as Category)}
+            className="input"
+          >
+            {CAT_OPTIONS.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
           </select>
         </Field>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Price (USD)">
-          <input type="number" min="0" step="0.01" disabled={isFree} value={isFree ? "" : priceUsd} onChange={(e) => setPriceUsd(e.target.value)} className="input font-mono disabled:opacity-50" />
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            disabled={isFree}
+            value={isFree ? "" : priceUsd}
+            onChange={(e) => setPriceUsd(e.target.value)}
+            className="input font-mono disabled:opacity-50"
+          />
         </Field>
         <Field label="Price (PKR)">
-          <input type="number" min="0" step="1" disabled={isFree} value={isFree ? "" : pricePkr} onChange={(e) => setPricePkr(e.target.value)} className="input font-mono disabled:opacity-50" />
+          <input
+            type="number"
+            min="0"
+            step="1"
+            disabled={isFree}
+            value={isFree ? "" : pricePkr}
+            onChange={(e) => setPricePkr(e.target.value)}
+            className="input font-mono disabled:opacity-50"
+          />
         </Field>
       </div>
       <label className="flex items-center gap-2 rounded-lg border border-border bg-foreground/[0.03] px-3 py-2 text-xs font-bold uppercase tracking-widest text-foreground">
-        <input type="checkbox" checked={isFree} onChange={(e) => setIsFree(e.target.checked)} className="size-4 accent-emerald-500" />
+        <input
+          type="checkbox"
+          checked={isFree}
+          onChange={(e) => setIsFree(e.target.checked)}
+          className="size-4 accent-emerald-500"
+        />
         Free product · unlimited instant claims
       </label>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Cost (USD)">
-          <input type="number" min="0" step="0.01" value={costUsd} onChange={(e) => setCostUsd(e.target.value)} className="input font-mono" />
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={costUsd}
+            onChange={(e) => setCostUsd(e.target.value)}
+            className="input font-mono"
+          />
         </Field>
         <Field label="Cost (PKR)">
-          <input type="number" min="0" step="1" value={costPkr} onChange={(e) => setCostPkr(e.target.value)} className="input font-mono" />
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={costPkr}
+            onChange={(e) => setCostPkr(e.target.value)}
+            className="input font-mono"
+          />
         </Field>
       </div>
       <Field label="Tagline">
         <input value={tagline} onChange={(e) => setTagline(e.target.value)} className="input" />
       </Field>
       <Field label="Description">
-        <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="input resize-none" />
+        <textarea
+          rows={3}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="input resize-none"
+        />
       </Field>
       <Field label="Product image">
         <ImageInput value={image} onChange={setImage} folder="products" />
       </Field>
       <Field label="Features" hint="One per line.">
-        <textarea rows={3} value={features} onChange={(e) => setFeatures(e.target.value)} className="input resize-none" />
+        <textarea
+          rows={3}
+          value={features}
+          onChange={(e) => setFeatures(e.target.value)}
+          className="input resize-none"
+        />
       </Field>
       <Field label="Delivery / activation instructions">
         <textarea
@@ -1107,8 +1304,13 @@ function StockManager({ productId }: { productId: string }) {
             ) : (
               <ul className="space-y-1">
                 {available.map((it) => (
-                  <li key={it.id} className="flex items-center gap-2 rounded-md bg-background px-2 py-1">
-                    <span className="min-w-0 flex-1 truncate font-mono text-[11px]">{it.content}</span>
+                  <li
+                    key={it.id}
+                    className="flex items-center gap-2 rounded-md bg-background px-2 py-1"
+                  >
+                    <span className="min-w-0 flex-1 truncate font-mono text-[11px]">
+                      {it.content}
+                    </span>
                     <button
                       onClick={() => remove(it.id)}
                       className="shrink-0 rounded p-1 text-muted hover:text-destructive"
@@ -1128,7 +1330,10 @@ function StockManager({ productId }: { productId: string }) {
               </p>
               <ul className="space-y-1">
                 {sold.map((it) => (
-                  <li key={it.id} className="flex items-center gap-2 rounded-md bg-foreground/[0.03] px-2 py-1 opacity-70">
+                  <li
+                    key={it.id}
+                    className="flex items-center gap-2 rounded-md bg-foreground/[0.03] px-2 py-1 opacity-70"
+                  >
                     <span className="min-w-0 flex-1 truncate font-mono text-[11px] line-through">
                       {it.content}
                     </span>
@@ -1227,33 +1432,73 @@ function MethodsPanel() {
       <form onSubmit={add} className="space-y-4 rounded-2xl border border-border bg-background p-5">
         <div className="grid grid-cols-3 gap-3">
           <Field label="Type">
-            <select value={kind} onChange={(e) => setKind(e.target.value as PaymentMethodKind)} className="input">
+            <select
+              value={kind}
+              onChange={(e) => setKind(e.target.value as PaymentMethodKind)}
+              className="input"
+            >
               {KIND_OPTIONS.map((k) => (
-                <option key={k} value={k}>{PAYMENT_KIND_LABEL[k]}</option>
+                <option key={k} value={k}>
+                  {PAYMENT_KIND_LABEL[k]}
+                </option>
               ))}
             </select>
           </Field>
           <Field label="Currency">
-            <select value={currency} onChange={(e) => setCurrency(e.target.value as "USD" | "PKR")} className="input">
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value as "USD" | "PKR")}
+              className="input"
+            >
               <option value="PKR">PKR</option>
               <option value="USD">USD</option>
             </select>
           </Field>
           <Field label="Label">
-            <input required value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Personal JazzCash" className="input" />
+            <input
+              required
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="Personal JazzCash"
+              className="input"
+            />
           </Field>
         </div>
         <Field label="Account holder name">
-          <input value={accountName} onChange={(e) => setAccountName(e.target.value)} placeholder="Muhammad Khalil" className="input" />
+          <input
+            value={accountName}
+            onChange={(e) => setAccountName(e.target.value)}
+            placeholder="Muhammad Khalil"
+            className="input"
+          />
         </Field>
         <Field label="Account number / IBAN / wallet address / Binance ID">
-          <input required value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="03XX-XXXXXXX" className="input font-mono" />
+          <input
+            required
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value)}
+            placeholder="03XX-XXXXXXX"
+            className="input font-mono"
+          />
         </Field>
-        <Field label="Instructions" hint="Shown to the buyer at checkout. e.g. network (TRC20), memo, hours to confirm.">
-          <textarea rows={3} value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder="Send exact amount. Include your order number in the note." className="input resize-none" />
+        <Field
+          label="Instructions"
+          hint="Shown to the buyer at checkout. e.g. network (TRC20), memo, hours to confirm."
+        >
+          <textarea
+            rows={3}
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            placeholder="Send exact amount. Include your order number in the note."
+            className="input resize-none"
+          />
         </Field>
         <div className="flex justify-end">
-          <button type="submit" disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60">
+          <button
+            type="submit"
+            disabled={busy}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 disabled:opacity-60"
+          >
             <Plus className="size-4" /> {busy ? "Adding…" : "Add method"}
           </button>
         </div>
@@ -1271,7 +1516,10 @@ function MethodsPanel() {
         ) : (
           <ul className="mt-4 space-y-3">
             {methods.map((m) => (
-              <li key={m.id} className={`rounded-xl border p-4 ${m.active ? "border-border bg-background" : "border-border bg-foreground/[0.03] opacity-70"}`}>
+              <li
+                key={m.id}
+                className={`rounded-xl border p-4 ${m.active ? "border-border bg-background" : "border-border bg-foreground/[0.03] opacity-70"}`}
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="text-sm font-bold">{m.label}</p>
@@ -1280,17 +1528,27 @@ function MethodsPanel() {
                     </p>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => toggleActive(m.id, m.active)} className="rounded-lg bg-foreground/5 p-2 text-muted hover:text-foreground" aria-label={m.active ? "Disable" : "Enable"}>
+                    <button
+                      onClick={() => toggleActive(m.id, m.active)}
+                      className="rounded-lg bg-foreground/5 p-2 text-muted hover:text-foreground"
+                      aria-label={m.active ? "Disable" : "Enable"}
+                    >
                       {m.active ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
                     </button>
-                    <button onClick={() => remove(m.id, m.label)} className="rounded-lg bg-destructive/10 p-2 text-destructive hover:bg-destructive/15" aria-label="Delete">
+                    <button
+                      onClick={() => remove(m.id, m.label)}
+                      className="rounded-lg bg-destructive/10 p-2 text-destructive hover:bg-destructive/15"
+                      aria-label="Delete"
+                    >
                       <Trash2 className="size-4" />
                     </button>
                   </div>
                 </div>
                 <p className="mt-2 truncate font-mono text-sm">{m.account_number}</p>
                 {m.account_name && <p className="text-xs text-muted">{m.account_name}</p>}
-                {m.instructions && <p className="mt-1 whitespace-pre-line text-xs text-muted">{m.instructions}</p>}
+                {m.instructions && (
+                  <p className="mt-1 whitespace-pre-line text-xs text-muted">{m.instructions}</p>
+                )}
               </li>
             ))}
           </ul>
@@ -1363,7 +1621,9 @@ function OrdersPanel() {
             key={f}
             onClick={() => setFilter(f)}
             className={`rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest ${
-              filter === f ? "bg-foreground text-background" : "bg-foreground/5 text-muted hover:text-foreground"
+              filter === f
+                ? "bg-foreground text-background"
+                : "bg-foreground/5 text-muted hover:text-foreground"
             }`}
           >
             {f}
@@ -1462,7 +1722,9 @@ function StatusBadge({ status }: { status: string }) {
     rejected: "bg-destructive/15 text-destructive",
   };
   return (
-    <span className={`shrink-0 rounded-full px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest ${map[status] ?? "bg-foreground/5 text-muted"}`}>
+    <span
+      className={`shrink-0 rounded-full px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest ${map[status] ?? "bg-foreground/5 text-muted"}`}
+    >
       {status}
     </span>
   );
@@ -1477,11 +1739,21 @@ function Info({ label, value, mono }: { label: string; value: string; mono?: boo
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <div className="mb-1.5 flex items-center justify-between">
-        <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">{label}</span>
+        <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">
+          {label}
+        </span>
         {hint && <span className="text-[10px] text-muted">{hint}</span>}
       </div>
       {children}
@@ -1510,8 +1782,7 @@ function AccountsPanel() {
     const qty = Number(o.quantity ?? 1);
     revenue += Number(o.amount) || 0;
     const p = productMap.get(o.item_id);
-    const unitCost =
-      currency === "USD" ? Number(p?.cost_usd ?? 0) : Number(p?.cost_pkr ?? 0);
+    const unitCost = currency === "USD" ? Number(p?.cost_usd ?? 0) : Number(p?.cost_pkr ?? 0);
     cogs += (Number.isFinite(unitCost) ? unitCost : 0) * qty;
   }
   const profit = revenue - cogs;
@@ -1519,15 +1790,12 @@ function AccountsPanel() {
   let inventoryValue = 0;
   for (const p of products) {
     const stock = Number(p.available_stock ?? 0);
-    const unitCost =
-      currency === "USD" ? Number(p.cost_usd ?? 0) : Number(p.cost_pkr ?? 0);
+    const unitCost = currency === "USD" ? Number(p.cost_usd ?? 0) : Number(p.cost_pkr ?? 0);
     inventoryValue += (Number.isFinite(unitCost) ? unitCost : 0) * stock;
   }
 
   const fmt = (n: number) =>
-    currency === "USD"
-      ? `$${n.toFixed(2)}`
-      : `Rs ${Math.round(n).toLocaleString("en-PK")}`;
+    currency === "USD" ? `$${n.toFixed(2)}` : `Rs ${Math.round(n).toLocaleString("en-PK")}`;
 
   async function remove(id: string, name: string) {
     if (
@@ -1614,10 +1882,7 @@ function AccountsPanel() {
               const rowCogs = (Number.isFinite(unitCost) ? unitCost : 0) * qty;
               const rowProfit = Number(o.amount) - rowCogs;
               return (
-                <li
-                  key={o.id}
-                  className="rounded-xl border border-border bg-background p-3"
-                >
+                <li key={o.id} className="rounded-xl border border-border bg-background p-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold">
@@ -1625,8 +1890,7 @@ function AccountsPanel() {
                         <span className="text-xs font-normal text-muted">× {qty}</span>
                       </p>
                       <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
-                        {new Date(o.reviewed_at ?? o.created_at).toLocaleString()} ·{" "}
-                        {o.sender_name}
+                        {new Date(o.reviewed_at ?? o.created_at).toLocaleString()} · {o.sender_name}
                       </p>
                     </div>
                     <button
@@ -1668,11 +1932,7 @@ function Stat({
   tone: "up" | "down" | "neutral";
 }) {
   const toneClass =
-    tone === "up"
-      ? "text-primary"
-      : tone === "down"
-        ? "text-destructive"
-        : "text-foreground";
+    tone === "up" ? "text-primary" : tone === "down" ? "text-destructive" : "text-foreground";
   const Icon = tone === "up" ? TrendingUp : tone === "down" ? TrendingDown : BarChart3;
   return (
     <div className="rounded-2xl border border-border bg-background p-4">
@@ -1740,12 +2000,7 @@ function RequestsAdminPanel() {
       ) : (
         <ul className="space-y-3">
           {filtered.map((r) => (
-            <RequestAdminRow
-              key={r.id}
-              req={r}
-              onDelete={remove}
-              onSaved={invalidate}
-            />
+            <RequestAdminRow key={r.id} req={r} onDelete={remove} onSaved={invalidate} />
           ))}
         </ul>
       )}
@@ -1798,9 +2053,7 @@ function RequestAdminRow({
         <StatusBadge status={req.status} />
       </div>
 
-      {req.details && (
-        <p className="mt-2 whitespace-pre-line text-xs text-muted">{req.details}</p>
-      )}
+      {req.details && <p className="mt-2 whitespace-pre-line text-xs text-muted">{req.details}</p>}
       <div className="mt-2 grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
         {req.reference_link && (
           <a
@@ -1887,9 +2140,10 @@ function AdminsPanel() {
     enabled: isSuperAdmin,
     queryFn: async () => {
       const { data, error } = await (
-        supabase.rpc as unknown as (
-          fn: string,
-        ) => Promise<{ data: { email: string; created_at: string; invited_by_email: string | null }[] | null; error: { message: string } | null }>
+        supabase.rpc as unknown as (fn: string) => Promise<{
+          data: { email: string; created_at: string; invited_by_email: string | null }[] | null;
+          error: { message: string } | null;
+        }>
       )("list_admin_invites");
       if (error) throw new Error(error.message);
       return data ?? [];
@@ -1909,7 +2163,10 @@ function AdminsPanel() {
         supabase.rpc as unknown as (
           fn: string,
           args: Record<string, unknown>,
-        ) => Promise<{ data: { email: string; granted: boolean; invited: boolean }[] | null; error: { message: string } | null }>
+        ) => Promise<{
+          data: { email: string; granted: boolean; invited: boolean }[] | null;
+          error: { message: string } | null;
+        }>
       )("invite_admin_by_email", { _email: value });
       if (error) throw error;
       const row = Array.isArray(data) ? data[0] : data;
@@ -1977,9 +2234,8 @@ function AdminsPanel() {
           </p>
           <h2 className="text-2xl font-extrabold tracking-tight">INVITE ADMIN</h2>
           <p className="text-xs text-muted">
-            Enter any email. If they already have an account, they become admin instantly.
-            Otherwise the invite waits and auto-grants admin the moment they sign up with that
-            email.
+            Enter any email. If they already have an account, they become admin instantly. Otherwise
+            the invite waits and auto-grants admin the moment they sign up with that email.
           </p>
           <Field label="Email">
             <input
@@ -2112,10 +2368,18 @@ type UserRow = {
 
 function UsersPanel() {
   const [query, setQuery] = useState("");
-  const { data: users = [], isLoading, error } = useQuery({
+  const {
+    data: users = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data, error } = await (supabase.rpc as unknown as (fn: string) => Promise<{ data: UserRow[] | null; error: { message: string } | null }>)("list_users");
+      const { data, error } = await (
+        supabase.rpc as unknown as (
+          fn: string,
+        ) => Promise<{ data: UserRow[] | null; error: { message: string } | null }>
+      )("list_users");
       if (error) throw new Error(error.message);
       return (data ?? []) as UserRow[];
     },
@@ -2171,7 +2435,9 @@ function UsersPanel() {
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="truncate text-sm font-bold">{u.full_name || u.email || u.user_id}</p>
+                    <p className="truncate text-sm font-bold">
+                      {u.full_name || u.email || u.user_id}
+                    </p>
                     {u.is_admin && (
                       <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-primary">
                         Admin
@@ -2184,9 +2450,7 @@ function UsersPanel() {
                     )}
                   </div>
                   <p className="mt-1 truncate font-mono text-xs text-muted">{u.email ?? "—"}</p>
-                  {u.phone && (
-                    <p className="truncate font-mono text-xs text-muted">📞 {u.phone}</p>
-                  )}
+                  {u.phone && <p className="truncate font-mono text-xs text-muted">📞 {u.phone}</p>}
                 </div>
                 <div className="text-right text-[10px] font-mono uppercase tracking-widest text-muted">
                   <p>Joined {new Date(u.created_at).toLocaleDateString()}</p>
@@ -2271,11 +2535,11 @@ function PostsAdminPanel() {
   const [busy, setBusy] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["admin-posts"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("posts")
+      const { data, error } = await supabase
+        .from("posts")
         .select("*")
         .order("pinned", { ascending: false })
         .order("created_at", { ascending: false });
@@ -2335,7 +2599,8 @@ function PostsAdminPanel() {
   }
 
   async function togglePublished(p: PostRow) {
-    const { error } = await supabase.from("posts")
+    const { error } = await supabase
+      .from("posts")
       .update({ published: !p.published })
       .eq("id", p.id);
     if (error) return toast.error(error.message);
@@ -2344,9 +2609,7 @@ function PostsAdminPanel() {
   }
 
   async function togglePinned(p: PostRow) {
-    const { error } = await supabase.from("posts")
-      .update({ pinned: !p.pinned })
-      .eq("id", p.id);
+    const { error } = await supabase.from("posts").update({ pinned: !p.pinned }).eq("id", p.id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin-posts"] });
     qc.invalidateQueries({ queryKey: ["posts"] });
@@ -2439,11 +2702,7 @@ function PostsAdminPanel() {
             <ImageInput value={image} onChange={setImage} folder="posts" />
           </div>
           <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted">
-            <input
-              type="checkbox"
-              checked={pinned}
-              onChange={(e) => setPinned(e.target.checked)}
-            />
+            <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
             Pin to top
           </label>
           <div className="flex gap-2">

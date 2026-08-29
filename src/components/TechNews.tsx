@@ -16,9 +16,18 @@ async function fetchTopTech(): Promise<Story[]> {
   const res = await fetch(
     "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=12",
   ).then((r) => r.json());
-  const hits: any[] = res?.hits ?? [];
+  type AlgoliaHit = {
+    objectID: string;
+    title?: string;
+    url?: string;
+    points?: number;
+    author?: string;
+    created_at_i?: number;
+    num_comments?: number;
+  };
+  const hits: AlgoliaHit[] = res?.hits ?? [];
   return hits
-    .filter((h) => h.title && h.url)
+    .filter((h): h is AlgoliaHit & { title: string; url: string } => !!h.title && !!h.url)
     .map((h) => ({
       id: Number(h.objectID),
       title: h.title,
@@ -57,7 +66,9 @@ export function TechNews() {
             <Newspaper className="size-3" /> Live · auto-updates
           </p>
           <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Latest Tech News</h2>
-          <p className="mt-1 text-xs text-muted">Top stories from the tech world, refreshed every 15 minutes.</p>
+          <p className="mt-1 text-xs text-muted">
+            Top stories from the tech world, refreshed every 15 minutes.
+          </p>
         </div>
         <span className="hidden items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-primary sm:inline-flex">
           <Flame className="size-3" /> Hot
@@ -67,7 +78,10 @@ export function TechNews() {
       {isLoading ? (
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <li key={i} className="h-24 animate-pulse rounded-xl border border-border bg-foreground/5" />
+            <li
+              key={i}
+              className="h-24 animate-pulse rounded-xl border border-border bg-foreground/5"
+            />
           ))}
         </ul>
       ) : !data || data.length === 0 ? (
@@ -78,7 +92,11 @@ export function TechNews() {
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {data.map((s, idx) => {
             const host = (() => {
-              try { return new URL(s.url!).hostname.replace(/^www\./, ""); } catch { return ""; }
+              try {
+                return new URL(s.url!).hostname.replace(/^www\./, "");
+              } catch {
+                return "";
+              }
             })();
             return (
               <li key={s.id}>
