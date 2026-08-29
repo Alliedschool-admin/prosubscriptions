@@ -51,7 +51,11 @@ export async function createRequest(input: {
   reference_link?: string | null;
   contact?: string | null;
 }) {
-  const { data, error } = await supabase.from("product_requests").insert(input).select().single();
+  const { data, error } = await supabase
+    .from("product_requests")
+    .insert(input)
+    .select()
+    .single();
   if (error) throw error;
   return data as ProductRequest;
 }

@@ -23,9 +23,7 @@ export function CommunityPill() {
             Join our community — good stuff drops first
           </span>
         </span>
-        <ChevronDown
-          className={`size-4 shrink-0 text-muted transition ${open ? "rotate-180" : ""}`}
-        />
+        <ChevronDown className={`size-4 shrink-0 text-muted transition ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
         <div className="mt-2 flex gap-2">

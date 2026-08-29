@@ -8,9 +8,7 @@ export function recordProductView(id: string) {
     const list: string[] = raw ? JSON.parse(raw) : [];
     const next = [id, ...list.filter((x) => x !== id)].slice(0, MAX);
     localStorage.setItem(KEY, JSON.stringify(next));
-  } catch {
-    /* ignore */
-  }
+  } catch { /* ignore */ }
 }
 
 export function getRecentlyViewed(): string[] {
@@ -24,9 +22,5 @@ export function getRecentlyViewed(): string[] {
 }
 
 export function clearRecentlyViewed() {
-  try {
-    localStorage.removeItem(KEY);
-  } catch {
-    /* ignore */
-  }
+  try { localStorage.removeItem(KEY); } catch { /* ignore */ }
 }

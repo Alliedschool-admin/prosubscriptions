@@ -28,9 +28,8 @@ export function MobileAppPanel() {
         <div>
           <h2 className="text-lg font-extrabold tracking-tight">Mobile app (Android)</h2>
           <p className="text-sm text-muted">
-            Fully native v2 app: built in Kotlin with Jetpack Compose, loads products offline, syncs
-            when online, and supports email sign-in, Google OAuth, cart, checkout, proof upload,
-            coupons, My Vault, requests, and admin.
+            Fully native v2 app: built in Kotlin with Jetpack Compose, loads products offline, syncs when online,
+            and supports email sign-in, Google OAuth, cart, checkout, proof upload, coupons, My Vault, requests, and admin.
           </p>
         </div>
       </header>
@@ -41,12 +40,10 @@ export function MobileAppPanel() {
         </p>
         <h3 className="mt-2 text-xl font-extrabold tracking-tight">Digital Chacho · Native v2.3</h3>
         <p className="mt-1 text-sm text-muted">
-          Kotlin + Jetpack Compose · package id{" "}
-          <span className="font-mono">store.digitalchacho.nativeapp</span>
+          Kotlin + Jetpack Compose · package id <span className="font-mono">store.digitalchacho.nativeapp</span>
         </p>
         <p className="mt-1 text-xs text-primary">
-          v2.3 adds dark / light mode with a one-tap switch, a futuristic floating glass nav dock,
-          and a new brand bar.
+          v2.3 adds dark / light mode with a one-tap switch, a futuristic floating glass nav dock, and a new brand bar.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a
@@ -75,13 +72,10 @@ export function MobileAppPanel() {
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
           Legacy v1.3
         </p>
-        <h3 className="mt-2 text-lg font-extrabold tracking-tight">
-          Digital Chacho · WebView v1.3
-        </h3>
+        <h3 className="mt-2 text-lg font-extrabold tracking-tight">Digital Chacho · WebView v1.3</h3>
         <p className="mt-1 text-sm text-muted">
-          Offline-first WebView shell: the store loads from the device even with no internet, then
-          syncs silently. Google sign-in works, pull-to-refresh syncs on demand, and
-          WhatsApp/payment links open in their own apps.
+          Offline-first WebView shell: the store loads from the device even with no internet, then syncs silently.
+          Google sign-in works, pull-to-refresh syncs on demand, and WhatsApp/payment links open in their own apps.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a

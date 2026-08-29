@@ -158,9 +158,7 @@ export function ReviewsSection({ productId }: { productId: string }) {
                 </span>
               </div>
               {r.title && <p className="mt-2 text-sm font-bold">{r.title}</p>}
-              {r.body && (
-                <p className="mt-1 whitespace-pre-line text-sm text-foreground/85">{r.body}</p>
-              )}
+              {r.body && <p className="mt-1 whitespace-pre-line text-sm text-foreground/85">{r.body}</p>}
             </li>
           ))}
         </ul>

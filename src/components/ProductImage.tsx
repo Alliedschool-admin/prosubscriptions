@@ -14,7 +14,9 @@ function transform(src: string, width: number): string {
 
 function buildSrcSet(src: string): string | undefined {
   if (!src.includes("/storage/v1/object/public/")) return undefined;
-  return [320, 480, 640, 800, 1024].map((w) => `${transform(src, w)} ${w}w`).join(", ");
+  return [320, 480, 640, 800, 1024]
+    .map((w) => `${transform(src, w)} ${w}w`)
+    .join(", ");
 }
 
 type Props = {

@@ -77,11 +77,7 @@ export function ImageInput({
           disabled={busy}
           className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-foreground hover:bg-foreground/5 disabled:opacity-60"
         >
-          {busy ? (
-            <Loader2 className="size-3.5 animate-spin" />
-          ) : (
-            <ImagePlus className="size-3.5" />
-          )}
+          {busy ? <Loader2 className="size-3.5 animate-spin" /> : <ImagePlus className="size-3.5" />}
           {busy ? "Uploading…" : "Upload image"}
         </button>
         {value && (
@@ -89,7 +85,7 @@ export function ImageInput({
             src={value}
             alt="Preview"
             className="size-12 rounded-lg border border-border object-cover"
-            onError={(e) => (e.currentTarget.style.opacity = "0.3")}
+            onError={(e) => ((e.currentTarget.style.opacity = "0.3"))}
           />
         )}
       </div>

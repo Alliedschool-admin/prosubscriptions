@@ -51,18 +51,13 @@ function BroadcastCard({ b, onClose }: { b: Broadcast; onClose: (id: string) => 
         <p className="mb-0.5 flex items-center gap-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-white/85">
           <Sparkles className="size-3" />
           <span>Live announcement</span>
-          <span
-            aria-hidden
-            className="inline-block size-1.5 animate-pulse rounded-full bg-emerald-300 shadow-[0_0_10px_#6ee7b7]"
-          />
+          <span aria-hidden className="inline-block size-1.5 animate-pulse rounded-full bg-emerald-300 shadow-[0_0_10px_#6ee7b7]" />
         </p>
         <div ref={boxRef} className="relative overflow-hidden">
           {overflow ? (
             <div className="broadcast-marquee-track text-[13px] font-semibold leading-snug sm:text-sm">
               <span className="pr-12">{b.message}</span>
-              <span className="pr-12" aria-hidden>
-                {b.message}
-              </span>
+              <span className="pr-12" aria-hidden>{b.message}</span>
             </div>
           ) : (
             <span className="block text-[13px] font-semibold leading-snug sm:text-sm">

@@ -3,10 +3,10 @@ import { CheckCircle2, Copy, Lock, Upload, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useCart } from "../lib/cart-context";
 import { useAuth } from "../hooks/use-auth";
-import { applyCouponRpc, type AppliedCoupon } from "../lib/coupons-store";
+import { applyCouponRpc, redeemCouponRpc, type AppliedCoupon } from "../lib/coupons-store";
 import {
   usePaymentMethods,
-  placeOrder,
+  createOrder,
   uploadPaymentProof,
   useOrdersInvalidator,
   PAYMENT_KIND_LABEL,
@@ -91,9 +91,7 @@ export function CheckoutSheet() {
   const subtotal = unitPrice * quantity;
   const discount = useMemo(() => applied?.discount ?? 0, [applied]);
   const total = Math.max(0, subtotal - discount);
-  const selectedMethod: PaymentMethod | undefined = filteredMethods.find(
-    (m) => m.id === selectedMethodId,
-  );
+  const selectedMethod: PaymentMethod | undefined = filteredMethods.find((m) => m.id === selectedMethodId);
   const money = (n: number) => formatMoney(currency, n);
 
   async function applyPromo() {
@@ -128,21 +126,28 @@ export function CheckoutSheet() {
       if (proofFile) {
         proofPath = await uploadPaymentProof(user.id, proofFile);
       }
-      // Atomic server-side checkout: the RPC recomputes the price from the
-      // catalog, validates the coupon and redeems it in one transaction.
-      const order = await placeOrder({
+      const order = await createOrder({
+        buyer_id: user.id,
+        item_kind: item.kind,
         item_id: item.id,
+        item_name: item.name,
+        amount: total,
         currency,
         quantity,
         payment_method_id: selectedMethod.id,
+        payment_method_label: `${PAYMENT_KIND_LABEL[selectedMethod.kind]} · ${selectedMethod.label}`,
         sender_name: senderName.trim(),
         sender_contact: senderContact.trim(),
         transaction_ref: txRef.trim() || null,
         proof_path: proofPath,
         coupon_code: applied?.code ?? null,
+        discount_amount: applied?.discount ?? 0,
       });
+      if (applied?.code) {
+        await redeemCouponRpc(applied.code);
+      }
       invalidateOrders();
-      setOrderRef(`VLT-${order.order_id.slice(0, 6).toUpperCase()}`);
+      setOrderRef(`VLT-${order.id.slice(0, 6).toUpperCase()}`);
       setConfirmed(true);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to submit order";
@@ -171,9 +176,7 @@ export function CheckoutSheet() {
       <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" onClick={close} />
       <div
         className={`absolute inset-x-0 bottom-0 mx-auto w-full max-w-lg rounded-t-[32px] border-t border-border bg-background shadow-2xl transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] sm:right-0 sm:left-auto sm:top-0 sm:h-full sm:max-w-md sm:rounded-none sm:rounded-l-[32px] ${
-          isOpen
-            ? "translate-y-0 sm:translate-x-0"
-            : "translate-y-full sm:translate-y-0 sm:translate-x-full"
+          isOpen ? "translate-y-0 sm:translate-x-0" : "translate-y-full sm:translate-y-0 sm:translate-x-full"
         }`}
       >
         <div className="flex h-[90vh] flex-col sm:h-full">
@@ -198,9 +201,8 @@ export function CheckoutSheet() {
               </div>
               <h3 className="text-2xl font-extrabold tracking-tight">Awaiting verification</h3>
               <p className="max-w-xs text-sm text-muted">
-                We&apos;ve received your order for{" "}
-                <span className="font-bold text-foreground">{item.name}</span>. Once we confirm your
-                transfer, it will unlock in your dashboard. This usually takes a few hours.
+                We&apos;ve received your order for <span className="font-bold text-foreground">{item.name}</span>.
+                Once we confirm your transfer, it will unlock in your dashboard. This usually takes a few hours.
               </p>
               <div className="rounded-xl border border-border px-4 py-2">
                 <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Order</p>
@@ -214,9 +216,7 @@ export function CheckoutSheet() {
                 rel="noreferrer"
                 className="mt-2 inline-flex w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-extrabold uppercase tracking-widest text-white shadow-lg shadow-[#25D366]/20 transition hover:brightness-110"
               >
-                <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden="true">
-                  <path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.4-1.7a11.9 11.9 0 0 0 5.6 1.4h.1c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.3-6.2-3.5-8.3zM12 21.5c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.8 1 1-3.7-.2-.4a9.6 9.6 0 1 1 8.4 4.7zm5.4-7.2c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1c-.2.3-.8 1-1 1.2s-.4.2-.7.1a7.9 7.9 0 0 1-3.9-3.4c-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5s-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.4 1 2.8 1.2 3c.2.2 2 3.1 5 4.4.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z" />
-                </svg>
+                <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.4-1.7a11.9 11.9 0 0 0 5.6 1.4h.1c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.3-6.2-3.5-8.3zM12 21.5c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.8 1 1-3.7-.2-.4a9.6 9.6 0 1 1 8.4 4.7zm5.4-7.2c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1c-.2.3-.8 1-1 1.2s-.4.2-.7.1a7.9 7.9 0 0 1-3.9-3.4c-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5s-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.4 1 2.8 1.2 3c.2.2 2 3.1 5 4.4.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
                 Ping admin on WhatsApp
               </a>
               <p className="max-w-xs text-[11px] text-muted">
@@ -250,9 +250,7 @@ export function CheckoutSheet() {
           ) : availableCurrencies.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
               <h3 className="text-lg font-extrabold tracking-tight">No price set</h3>
-              <p className="max-w-xs text-sm text-muted">
-                This item has no active price. Please try later.
-              </p>
+              <p className="max-w-xs text-sm text-muted">This item has no active price. Please try later.</p>
             </div>
           ) : methods.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
@@ -501,9 +499,7 @@ export function CheckoutSheet() {
                     <span>Total Due</span>
                     <span>
                       {money(total)}
-                      {item.cadence ? (
-                        <span className="text-sm font-normal text-muted"> {item.cadence}</span>
-                      ) : null}
+                      {item.cadence ? <span className="text-sm font-normal text-muted"> {item.cadence}</span> : null}
                     </span>
                   </div>
                 </div>
